@@ -2,6 +2,7 @@
    Neuronium design tokens
    ========================================================= */
 :root {
+  color-scheme: dark;
   /* palette — fixed brand colours */
   --violet: #8b55f6;
   --violet-hi: #b493ff;

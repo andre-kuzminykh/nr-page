@@ -5,8 +5,8 @@
   z-index: 30;
   display: flex;
   align-items: center;
-  height: var(--topbar-h);
-  padding: 0 var(--gutter);
+  height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
   pointer-events: none;
 }
 
