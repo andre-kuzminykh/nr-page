@@ -1,0 +1,59 @@
+/* =========================================================
+   Neuronium design tokens
+   ========================================================= */
+:root {
+  color-scheme: dark;
+  /* palette — fixed brand colours */
+  --violet: #8b55f6;
+  --violet-hi: #b493ff;
+  --orange: #f9894b;
+  --orange-hi: #ffb077;
+  --magenta: #d63cf5;
+  --rose: #f2449a;
+  --peach: #ffb59a;
+  --lavender: #c9b5ff;
+  /* violet → magenta → pink → orange, after the Neuronium brand artwork */
+  --grad: linear-gradient(90deg, #8b55f6 0%, #c43cf2 34%, #f2449a 66%, #f9894b 100%);
+  --grad-v: linear-gradient(180deg, #8b55f6 0%, #c43cf2 34%, #f2449a 66%, #f9894b 100%);
+
+  /* dark theme (default) */
+  --bg: #0b0a0f;
+  --bg-rgb: 11 10 15;
+  --fg: #f8f7fa;
+  --fg-rgb: 248 247 250;
+  --muted: #aea7b7;
+  --fg-60: rgb(var(--fg-rgb) / 0.6);
+  --fg-30: rgb(var(--fg-rgb) / 0.3);
+  --line: rgb(var(--fg-rgb) / 0.1);
+  --line-strong: rgb(var(--fg-rgb) / 0.2);
+  --surface: rgb(var(--fg-rgb) / 0.035);
+  --surface-2: rgb(var(--fg-rgb) / 0.065);
+  --panel: rgb(14 12 20 / 0.62);
+  --accent-text: #b493ff;
+  --accent-warm: #ffa36d;
+  --focus: #b493ff;
+
+  /* type */
+  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fs-display: clamp(52px, min(11.4vw, 17.5vh), 196px);
+  --fs-h2: clamp(31px, min(5.1vw, 7.6vh), 78px);
+  --fs-h3: clamp(20px, min(2.1vw, 3.2vh), 30px);
+  --fs-lead: clamp(16px, min(1.5vw, 2.4vh), 21px);
+  --fs-body: clamp(14px, min(1.08vw, 1.85vh), 16px);
+  --fs-small: 13px;
+  --fs-mono: 11px;
+
+  /* layout */
+  --gutter: clamp(20px, 5.2vw, 84px);
+  --topbar-h: clamp(56px, 8vh, 76px);
+  --frame-max: 1400px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --dur-slide: 820ms;
+  --dur-reveal: 900ms;
+}

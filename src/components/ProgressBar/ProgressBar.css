@@ -1,0 +1,33 @@
+.progress {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 30;
+  height: 2px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.progress__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p));
+  background: var(--grad);
+  transition: transform var(--dur-slide) var(--ease-out);
+}
+
+.progress__head {
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 72px;
+  height: 10px;
+  margin-left: -60px;
+  transform: translateX(calc(var(--p) * 100vw));
+  background: radial-gradient(closest-side, rgb(249 137 75 / 0.75), transparent);
+  filter: blur(3px);
+  transition: transform var(--dur-slide) var(--ease-out);
+}
+
