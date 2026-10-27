@@ -23,6 +23,7 @@ uniform vec4  uB;       // orange: center.xy, radius, intensity
 uniform vec4  uShape;   // rotation A, rotation B, stretch A, stretch B
 uniform float uEnergy;
 uniform float uPx;      // canvas pixels per CSS pixel
+uniform float uGrain;   // grain frame: a steady counter, independent of the light's flow
 uniform vec3  uBg;
 
 float field(vec2 p, vec4 f, float ang, float stretch) {
@@ -71,9 +72,9 @@ void main() {
   blend = mix(blend, peach, smoothstep(0.72, 0.95, ratio));
   vec3 tint = (violet * fA + orange * fB + blend * ov * 1.6) / max(S, 1e-4);
 
-  // Film grain: per-pixel noise, re-rolled ~18 times a second. It also dithers a soft
+  // Film grain: per-pixel noise, re-rolled ~8 times a second. It also dithers a soft
   // quantisation of the intensity, so the light reads as computed, not painted.
-  float g = hash12(floor(gl_FragCoord.xy / max(uPx, 1.0)) + floor(t * 18.0) * 17.31);
+  float g = hash12(floor(gl_FragCoord.xy / max(uPx, 1.0)) + uGrain * 17.31);
   float steps = 20.0;
   float I = 1.0 - exp(-S * uEnergy * 1.6);
   I = mix(I, floor(I * steps + g) / steps, 0.5);
@@ -88,7 +89,7 @@ void main() {
 
   // Luminous synthetic light over the dark base, with grain strongest in the light.
   vec3 col = uBg + tint * I * 0.95;
-  col += (g - 0.5) * (0.018 + 0.07 * I);
+  col += (g - 0.5) * (0.012 + 0.045 * I);
   gl_FragColor = vec4(col, 1.0);
 }
 `

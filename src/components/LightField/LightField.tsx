@@ -109,6 +109,7 @@ export function LightField({ preset, reducedMotion, pulseKey }: Props) {
       bg: gl.getUniformLocation(program, 'uBg'),
       shape: gl.getUniformLocation(program, 'uShape'),
       px: gl.getUniformLocation(program, 'uPx'),
+      grain: gl.getUniformLocation(program, 'uGrain'),
     }
 
     const initial = target.current
@@ -178,6 +179,8 @@ export function LightField({ preset, reducedMotion, pulseKey }: Props) {
         1 + 0.22 * Math.cos(time * 0.19 + 1),
       )
       gl.uniform1f(u.px, pxRatio)
+      // Grain re-rolls at a calm, steady ~8 fps (frozen when motion is reduced).
+      gl.uniform1f(u.grain, target.current.reducedMotion ? 0 : Math.floor(performance.now() / 125) % 997)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
 
