@@ -1,0 +1,37 @@
+.light-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--bg);
+}
+
+.light-field__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* CSS fallback when WebGL is unavailable: still two overlapping lights, never a blank page. */
+.light-field__fallback {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(38% 34% at calc(var(--lx) - 6%) calc(var(--ly) - 4%), rgb(139 85 246 / 0.55), transparent 70%),
+    radial-gradient(36% 32% at calc(var(--lx) + 7%) calc(var(--ly) + 5%), rgb(249 137 75 / 0.5), transparent 70%),
+    radial-gradient(22% 20% at var(--lx) var(--ly), rgb(240 106 155 / 0.35), transparent 70%);
+  filter: blur(30px);
+  transition: background-position 900ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .light-field__fallback {
+    animation: lf-drift 22s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes lf-drift {
+  to {
+    transform: translate3d(2%, -2%, 0) rotate(6deg) scale(1.05);
+  }
+}

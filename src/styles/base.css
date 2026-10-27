@@ -1,0 +1,521 @@
+/* =========================================================
+   Base, slide system, reveal motion, shared typography & controls
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--bg);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+::selection {
+  background: rgb(139 85 246 / 0.45);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'zero' 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translate(-50%, -160%);
+  transition: transform 300ms var(--ease-out);
+}
+
+.skip-link:focus {
+  transform: translate(-50%, 0);
+}
+
+/* ---------- stage ---------- */
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  outline: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, 4.5vh, 0) scale(0.992);
+  filter: blur(8px);
+  transition:
+    opacity 640ms var(--ease-out),
+    transform var(--dur-slide) var(--ease-out),
+    filter 640ms var(--ease-out),
+    visibility 0s linear var(--dur-slide);
+}
+
+.slide[data-state='before'] {
+  transform: translate3d(0, -4.5vh, 0) scale(0.985);
+}
+
+.slide[data-state='active'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  filter: none;
+  transition:
+    opacity 760ms var(--ease-out) 90ms,
+    transform var(--dur-slide) var(--ease-out) 40ms,
+    filter 700ms var(--ease-out) 60ms,
+    visibility 0s;
+}
+
+/* Content never squeezes below its natural height; if a slide is taller than the
+   screen, the frame scrolls instead (gesture-aware, see Slide Controller). */
+.slide__frame > * {
+  flex-shrink: 0;
+}
+
+.slide__frame {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  height: 100%;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + clamp(4px, 2.4vh, 30px)) var(--gutter) clamp(26px, 5vh, 56px);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* ---------- reveal on arrival (no scroll-to-reveal; everything arrives on its own) ---------- */
+.rv {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+}
+
+.rv--blur {
+  filter: blur(8px);
+}
+
+.rv--x {
+  transform: translate3d(-18px, 0, 0);
+}
+
+.rv--scale {
+  transform: scale(0.96);
+}
+
+.rv--line {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+.rv--line-y {
+  opacity: 1;
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+
+.rv--fade {
+  transform: none;
+}
+
+[data-shown] .rv {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform calc(var(--dur-reveal) + 200ms) var(--ease-out),
+    filter var(--dur-reveal) var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms + 160ms);
+}
+
+/* line mask reveal for display type */
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.mask > span {
+  display: block;
+  transform: translate3d(0, 108%, 0);
+}
+
+[data-shown] .mask > span {
+  transform: none;
+  transition: transform 1150ms var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms + 160ms);
+}
+
+/* ---------- typography ---------- */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eyebrow__num {
+  color: var(--fg);
+}
+
+.eyebrow__rule {
+  width: 28px;
+  height: 1px;
+  background: var(--grad);
+}
+
+.display {
+  font-size: var(--fs-display);
+  font-weight: 520;
+  line-height: 0.9;
+  letter-spacing: -0.058em;
+}
+
+.h2 {
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.048em;
+  text-wrap: balance;
+}
+
+.h3 {
+  font-size: var(--fs-h3);
+  font-weight: 520;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.body {
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.fg {
+  color: var(--fg);
+}
+
+/* ---------- controls ---------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 52px;
+  padding: 0 26px 0 28px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 400ms var(--ease-out),
+    box-shadow 500ms var(--ease-out),
+    background-color 400ms,
+    border-color 400ms,
+    color 400ms;
+}
+
+.btn svg {
+  transition: transform 400ms var(--ease-out);
+}
+
+.btn:hover svg {
+  transform: translateX(3px);
+}
+
+.btn--primary {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.btn--primary:hover {
+  box-shadow:
+    -14px 10px 44px -14px rgb(139 85 246 / 0.85),
+    14px 10px 44px -14px rgb(249 137 75 / 0.8);
+}
+
+.btn--ghost {
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  background: color-mix(in oklab, var(--bg) 30%, transparent);
+}
+
+.btn--ghost:hover {
+  border-color: var(--fg-60);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.text-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  padding: 6px 0;
+}
+
+.text-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--grad);
+  transform-origin: 0 50%;
+  transform: scaleX(0.35);
+  transition: transform 500ms var(--ease-out);
+}
+
+.text-link:hover::after,
+.text-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.note::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--grad);
+  flex-shrink: 0;
+}
+
+/* thin themed scrollbars for inner scroll areas */
+.scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.scroll-y::-webkit-scrollbar,
+.slide__frame::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scroll-y::-webkit-scrollbar-thumb,
+.slide__frame::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide,
+  .slide[data-state='active'],
+  .slide[data-state='before'] {
+    transform: none;
+    filter: none;
+    transition:
+      opacity 280ms linear,
+      visibility 0s linear 280ms;
+  }
+
+  .slide[data-state='active'] {
+    transition: opacity 280ms linear, visibility 0s;
+  }
+
+  .rv,
+  .rv--line,
+  .rv--line-y,
+  [data-shown] .rv,
+  .mask > span,
+  [data-shown] .mask > span {
+    transform: none !important;
+    filter: none !important;
+    transition: opacity 300ms linear !important;
+    transition-delay: 0ms !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
