@@ -32,7 +32,7 @@ Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
 
 ```bash
 npm run validate:data      # 100 AI employees: names, order, numbering, unique element symbols
-npm run validate:browser   # 17 blocks × 6 viewports + functional checks (menu, table, departments, forms, touch…)
+npm run validate:browser   # 17 blocks × 7 viewports + functional checks (menu, table, departments, forms, touch…)
 npm run simulate           # simulated visitors: trackpad/desktop, phone with swipes, keyboard only
 ```
 
@@ -54,9 +54,9 @@ contact sheets for every viewport in [docs/screenshots/sheets](docs/screenshots/
 | # | Block | What it shows |
 |---|---|---|
 | 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System.” |
-| 02 | Shared context · Superagent | Files, calendars, conversations and tools (examples, connected through MCP and integrations) become one business context — AI Identity and the AI Knowledge Graph. The AI Superagent plans the work across AI employees; AI Governance (Policy · Access · Oversight · Control) keeps outgoing emails waiting for approval. |
-| 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. Search (by name, tool or symbol), arrow keys, a short tour, a card with “Open *department*”. |
-| 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block shows its ten AI employees as elements next to 3–4 pieces of interface. The selected AI employee brings its panel forward and lights up exactly the part of the interface it does; the block plays through all ten until you pick one. |
+| 02 | Shared context · Superagent | A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. The AI Superagent starts in the middle and runs along the connections, two ways at once: the connections light up, each tool swells and shows its icon, its name appears and fades. |
+| 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. Pick a department (its row lights up, a card lists its ten AI employees in two rows of five) or an element (a card with what it does). Search by name, tool or symbol; arrow keys; a short tour. |
+| 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning — knowledge, meeting notes, goals, the product, its tasks, a Gantt chart, the calendar and the board — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee from AI Agents, AI Workflows and AI Skills on the shared context, with AI Governance on every step. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. |
 | 16 | FAQ | Eight questions, answered as a conversation with Neuronium. |
@@ -64,7 +64,7 @@ contact sheets for every viewport in [docs/screenshots/sheets](docs/screenshots/
 
 | Department | Headline | Interface pieces |
 |---|---|---|
-| Management | From goals and tasks to your calendar. | Weekly review (Google Meet notes) · Goals and tasks · Board and timeline · Calendar, inbox and team |
+| Management | From goals and tasks to your calendar. | One turning interface: Knowledge · Weekly review · Goals · Product · Tasks · Projects (Gantt) · Calendar · Board · Inbox · Team |
 | HR | The skills you need. Grown or hired. | Skills map · Hiring · People |
 | Marketing | From a business idea to a product concept. | Market map · Customers · Product concept |
 | SMM | Content for every social channel. | Content plan · Studio · Publish and listen |
@@ -85,8 +85,8 @@ contact sheets for every viewport in [docs/screenshots/sheets](docs/screenshots/
   (Northwind Studio, Brightline) are fictional samples.
 - **Pricing** (`src/data/pricing.ts`) describes the intended early-access packages; `price` is `null`, shown as
   “Price on request”, until real prices are set.
-- No invented customers, testimonials or metrics. Tools are named as examples of integrations, with
-  “availability varies”.
+- No invented customers, testimonials or metrics. The tools in the context brain are examples of what can be
+  connected.
 
 ## Code map
 
@@ -103,8 +103,9 @@ src/
     Chrome/                       Nr mark (used as Neuronium's avatar in the FAQ)
   slides/
     Hero/ Context/ Employees/ Custom/ Pricing/ Faq/ Final/
+      Context/Brain.tsx           the brain of tools and the Superagent's run through it (SVG + rAF)
     Department/                   one template for all ten departments
-      panels/                     the interface pieces of each department (management.tsx … engineering.tsx)
+      panels/                     the interfaces of each department; management.tsx is one turning scene
   data/
     departments.ts                10 departments × 10 AI employees: symbols, descriptions, headlines, availability
     architecture.ts               OS, AI Governance, AI Agents · AI Workflows · AI Skills
