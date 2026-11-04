@@ -41,7 +41,9 @@ and a running `npm run preview` (override the URL with `BASE_URL=…`). Output g
 
 Latest results (production build, headless Chromium with software WebGL):
 
-<!-- results -->
+- **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
+- **Browser**: **32 / 32 checks passed** at 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667. Every block fits without inner scroll at all six sizes. There is no horizontal overflow, no headline line is cut, no panel title is truncated, and there are no JavaScript errors. [Report](docs/validation/browser-report.md)
+- **Simulated users**: **65 / 65 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
 contact sheets for every viewport in [docs/screenshots/sheets](docs/screenshots/sheets), and
