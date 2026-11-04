@@ -94,7 +94,10 @@ export function useSlideController(count: number, initial: number) {
       const dx = e.deltaX * unit
       if (Math.abs(dx) > Math.abs(dy)) return // horizontal scrolling belongs to the content
       const dir: 1 | -1 = dy > 0 ? 1 : -1
-      const now = performance.now()
+      // Time the gesture by when each event happened, not when it is handled: if the page is busy
+      // for a moment, a queued inertia tail must not look like a pause followed by a new swipe.
+      const handled = performance.now()
+      const now = e.timeStamp > 0 && e.timeStamp <= handled + 1000 ? e.timeStamp : handled
       const abs = Math.abs(dy)
       const gap = now - lastWheel
       lastWheel = now
