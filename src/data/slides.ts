@@ -38,7 +38,7 @@ const dept = (id: DepartmentId, label: string, x: number, y: number): SlideMeta 
 
 export const SLIDES: SlideMeta[] = [
   { id: 'hero', label: 'Neuronium', light: { x: 0.7, y: 0.42, radius: 0.56, energy: 1.05, spread: 1.0 } },
-  { id: 'context', label: 'Shared context and Superagent', nav: 'platform', light: { x: 0.8, y: 0.5, radius: 0.48, energy: 0.82, spread: 1.05 } },
+  { id: 'context', label: 'Shared context and Superagent', nav: 'platform', light: { x: 0.12, y: 0.56, radius: 0.46, energy: 0.8, spread: 1.0 } },
   { id: 'employees', label: '100 AI employees', nav: 'employees', light: { x: 0.5, y: 0.62, radius: 0.55, energy: 0.8, spread: 1.15 } },
   dept('management', 'Management', 0.82, 0.42),
   dept('hr', 'HR', 0.78, 0.66),
@@ -50,7 +50,7 @@ export const SLIDES: SlideMeta[] = [
   dept('design', 'Design', 0.76, 0.58),
   dept('development', 'Development', 0.84, 0.44),
   dept('engineering', 'Engineering', 0.8, 0.68),
-  { id: 'custom', label: 'Custom use cases', nav: 'custom', light: { x: 0.74, y: 0.52, radius: 0.5, energy: 0.82, spread: 1.05 } },
+  { id: 'custom', label: 'Custom use cases', nav: 'custom', light: { x: 0.14, y: 0.6, radius: 0.46, energy: 0.8, spread: 1.0 } },
   { id: 'pricing', label: 'Pricing', nav: 'pricing', light: { x: 0.5, y: 1.08, radius: 0.55, energy: 0.85, spread: 1.15 } },
   { id: 'faq', label: 'FAQ', nav: 'faq', light: { x: 0.14, y: 0.92, radius: 0.48, energy: 0.72, spread: 1.05 } },
   { id: 'start', label: 'Turn your idea into reality', nav: 'start', light: { x: 0.5, y: 0.56, radius: 0.62, energy: 1.25, spread: 0.78 } },

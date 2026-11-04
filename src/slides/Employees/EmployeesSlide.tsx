@@ -1,5 +1,5 @@
 import { ArrowRight, Search, X } from 'lucide-react'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { FAMILY } from '../../components/Element/Element'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { DEPARTMENT_ICON } from '../../components/ui/icons'
@@ -53,6 +53,17 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
   const [tour, setTour] = useState(isWide)
   const [query, setQuery] = useState('')
   const [dsel, setDsel] = useState<DepartmentId | null>(() => (isWide() ? TOUR[0] : null))
+  const [hover, setHover] = useState<{ n?: number; d?: DepartmentId } | null>(null)
+  const hoverOff = useRef(0)
+  const hoverOn = (h: { n?: number; d?: DepartmentId }) => (e: ReactPointerEvent) => {
+    if (e.pointerType !== 'mouse') return
+    window.clearTimeout(hoverOff.current)
+    setHover(h)
+  }
+  const hoverOut = () => {
+    window.clearTimeout(hoverOff.current)
+    hoverOff.current = window.setTimeout(() => setHover(null), 140)
+  }
   const cells = useRef<(HTMLButtonElement | null)[]>([])
   const wrapRef = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState<{ x: number; y: number; side: 'r' | 'l' } | null>(null)
@@ -68,7 +79,7 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
 
   useInterval(
     () => setDsel((cur) => TOUR[(TOUR.indexOf(cur ?? TOUR[0]) + 1) % TOUR.length]),
-    active && tour && !reducedMotion && !query ? 3600 : null,
+    active && tour && !hover && !reducedMotion && !query ? 3600 : null,
   )
 
   const q = query.trim()
@@ -137,6 +148,7 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
   const onGridKey = (e: KeyboardEvent) => {
     const t = e.target as HTMLElement
     if (!t.dataset.n) return
+    setHover(null)
     const n = Number(t.dataset.n)
     const col = (n - 1) % 10
     let next: number | null = null
@@ -157,11 +169,14 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
     focusCell(next)
   }
 
-  const current = sel !== null ? employeeByN(sel) : null
+  // the card follows the pointer first, then the selection
+  const showN = hover ? (hover.n ?? null) : sel
+  const showD = hover ? (hover.d ?? null) : dsel
+  const current = showN !== null ? employeeByN(showN) : null
   const dept = current ? departmentById(current.department) : null
   const DeptIcon = dept ? DEPARTMENT_ICON[dept.id] : null
 
-  const selDept = dsel ? departmentById(dsel) : null
+  const selDept = !current && showD ? departmentById(showD) : null
   const SelDeptIcon = selDept ? DEPARTMENT_ICON[selDept.id] : null
   const close = () => {
     stopTour()
@@ -183,12 +198,10 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
               <DeptIcon size={12} strokeWidth={1.7} aria-hidden="true" />
               {dept.name}
             </button>
-            <h3 className="emp__card-name">
-              <span className="emp__card-no mono">
-                {current.n} · {current.symbol}
-              </span>
-              {highlight(current.name, q)}
-            </h3>
+            <p className="emp__card-no mono">
+              {current.n} · {current.symbol}
+            </p>
+            <h3 className="emp__card-name">{highlight(current.name, q)}</h3>
           </div>
           <button type="button" className="emp__card-x" onClick={close} aria-label="Close">
             <X size={13} strokeWidth={1.8} />
@@ -291,9 +304,6 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
               <span className="pt__n">0</span>
               <span className="pt__sym">Nr</span>
             </span>
-            <span className="pt__zero-text">
-              <b>Neuronium</b> · element 0 · AI Operating System
-            </span>
           </div>
 
           {DEPARTMENTS.map((dp, r) => {
@@ -306,6 +316,8 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
                   className={`pt__label ${rowMatches === 0 ? 'is-dim' : ''} ${current?.department === dp.id ? 'is-active' : ''}`}
                   onClick={() => pickDept(dp.id)}
                   onDoubleClick={() => goTo(dp.id)}
+                  onPointerEnter={hoverOn({ d: dp.id })}
+                  onPointerLeave={hoverOut}
                   aria-pressed={dsel === dp.id}
                   aria-label={`${dp.name}: 10 AI employees`}
                 >
@@ -331,6 +343,8 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
                       aria-pressed={isSel}
                       aria-label={`${m.n}, ${m.symbol}: ${m.name} — ${dp.name}`}
                       onClick={() => select(m.n)}
+                      onPointerEnter={hoverOn({ n: m.n })}
+                      onPointerLeave={hoverOut}
                     >
                       <span className="pt__n">{m.n}</span>
                       <span className="pt__sym">{m.symbol}</span>

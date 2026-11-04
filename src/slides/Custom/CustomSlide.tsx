@@ -1,28 +1,38 @@
-import { Blocks, Cpu, ShieldCheck, UserCheck, Workflow, type LucideIcon } from 'lucide-react'
+import {
+  Blocks,
+  CalendarDays,
+  Clock,
+  Database,
+  FileText,
+  HardDrive,
+  ListChecks,
+  ListTodo,
+  Mail,
+  PenLine,
+  Plug,
+  Presentation,
+  Search,
+  Send,
+  ShieldAlert,
+  Sparkles,
+  UserCheck,
+} from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
-import { Sym, Type } from '../../components/Kit/Kit'
+import { Type } from '../../components/Kit/Kit'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { EXECUTION_ICON } from '../../components/ui/icons'
 import { EXECUTION } from '../../data/architecture'
+import { FlowGraph, FLOW_TIMING, type FlowCase } from './Flow'
 import './Custom.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-
-type Kind = 'workflow' | 'agent' | 'skill' | 'person'
-const KIND: Record<Kind, { label: string; icon: LucideIcon }> = {
-  workflow: { label: 'Workflow', icon: Workflow },
-  agent: { label: 'Agent', icon: Cpu },
-  skill: { label: 'Skill', icon: Blocks },
-  person: { label: 'Approval', icon: UserCheck },
-}
 
 interface UseCase {
   n: number
   symbol: string
   name: string
   goal: string
-  steps: { kind: Kind; text: string; uses?: number[] }[]
-  access: string
+  flow: FlowCase
 }
 
 /** Example custom AI employees. They continue the table: element 101 and beyond. */
@@ -31,57 +41,75 @@ const CASES: UseCase[] = [
     n: 101,
     symbol: 'Ts',
     name: 'Tender Scout',
-    goal: 'Find public tenders that fit our offers and prepare a bid draft.',
-    steps: [
-      { kind: 'workflow', text: 'Every morning at 8:00' },
-      { kind: 'agent', text: 'Search new public tenders', uses: [61] },
-      { kind: 'skill', text: 'Match tenders to our offers', uses: [41] },
-      { kind: 'workflow', text: 'Draft the bid from templates', uses: [73] },
-      { kind: 'person', text: 'You approve before it is sent' },
-      { kind: 'workflow', text: 'Track it as a task', uses: [4] },
-    ],
-    access: 'Read: Drive, offers · Write: tasks',
+    goal: 'Finds public tenders that fit our offers and prepares the bid.',
+    flow: {
+      main: [
+        { kind: 'system', icon: Clock, label: 'Every day, 8:00' },
+        { kind: 'llm', icon: Search, label: 'Find new tenders' },
+        { kind: 'llm', icon: Sparkles, label: 'Match to our offers' },
+        { kind: 'llm', icon: FileText, label: 'Draft the bid' },
+        { kind: 'human', icon: UserCheck, label: 'You approve' },
+        { kind: 'system', icon: Send, label: 'Submit and add a task' },
+      ],
+      side: { kind: 'system', icon: HardDrive, label: 'Offers · Drive', into: 2 },
+      loop: [4, 3],
+    },
   },
   {
     n: 102,
     symbol: 'Iu',
     name: 'Investor Update',
-    goal: 'Send investors a monthly update with real numbers and a short story.',
-    steps: [
-      { kind: 'workflow', text: 'First Monday of the month' },
-      { kind: 'skill', text: 'Collect sales and marketing numbers', uses: [50, 29] },
-      { kind: 'agent', text: 'Write the update', uses: [69] },
-      { kind: 'workflow', text: 'Design a two-page deck', uses: [73] },
-      { kind: 'person', text: 'The founder approves' },
-      { kind: 'workflow', text: 'Draft the email to investors', uses: [9] },
-    ],
-    access: 'Read: analytics, Drive · Write: email drafts',
+    goal: 'Sends investors a monthly update with real numbers and a short story.',
+    flow: {
+      main: [
+        { kind: 'system', icon: CalendarDays, label: 'First Monday' },
+        { kind: 'system', icon: Database, label: 'Pull the numbers' },
+        { kind: 'llm', icon: PenLine, label: 'Write the update' },
+        { kind: 'llm', icon: Presentation, label: 'Two-page deck' },
+        { kind: 'human', icon: UserCheck, label: 'Founder approves' },
+        { kind: 'system', icon: Mail, label: 'Email investors' },
+      ],
+      side: { kind: 'system', icon: FileText, label: 'Last month · Docs', into: 2 },
+      loop: [4, 3],
+    },
   },
   {
     n: 103,
     symbol: 'Sv',
     name: 'Supplier Check',
-    goal: 'Check every new supplier before the first contract.',
-    steps: [
-      { kind: 'workflow', text: 'When a supplier is added' },
-      { kind: 'agent', text: 'Research the company', uses: [61] },
-      { kind: 'skill', text: 'Score the risks', uses: [67] },
-      { kind: 'workflow', text: 'Prepare the contract checklist', uses: [64] },
-      { kind: 'person', text: 'Procurement lead approves' },
-      { kind: 'workflow', text: 'Create the onboarding task', uses: [4] },
-    ],
-    access: 'Read: documents · Write: tasks',
+    goal: 'Checks every new supplier before the first contract.',
+    flow: {
+      main: [
+        { kind: 'system', icon: Plug, label: 'New supplier added' },
+        { kind: 'llm', icon: Search, label: 'Research the company' },
+        { kind: 'llm', icon: ShieldAlert, label: 'Score the risks' },
+        { kind: 'llm', icon: ListChecks, label: 'Contract checklist' },
+        { kind: 'human', icon: UserCheck, label: 'Procurement approves' },
+        { kind: 'system', icon: ListTodo, label: 'Onboarding task' },
+      ],
+      side: { kind: 'system', icon: Database, label: 'Registry · web', into: 2 },
+      loop: [4, 3],
+    },
   },
 ]
+
+const narrow = () => window.matchMedia?.('(max-width: 600px)').matches ?? false
 
 export function CustomSlide({ active, shown }: SlideProps) {
   const { reducedMotion } = useDeck()
   const [k, setK] = useState(0)
-  const [step, setStep] = useState(reducedMotion ? 99 : 0)
   const uc = CASES[k]
   const live = active && !reducedMotion
+  const [vertical, setVertical] = useState(narrow)
+  useEffect(() => {
+    const mq = window.matchMedia?.('(max-width: 600px)')
+    if (!mq) return
+    const on = () => setVertical(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
 
-  // Steps snap in one by one; then the next example follows unless someone picked one.
+  // The graph builds, data runs through it once, then the next example follows — unless someone picked one.
   const [auto, setAuto] = useState(true)
   useEffect(() => {
     if (!shown) {
@@ -91,22 +119,10 @@ export function CustomSlide({ active, shown }: SlideProps) {
   }, [shown])
 
   useEffect(() => {
-    if (!live) {
-      setStep(99)
-      return
-    }
-    setStep(0)
-    let i = 0
-    const t = window.setInterval(() => {
-      i += 1
-      setStep(i)
-      if (i > uc.steps.length + 6) {
-        window.clearInterval(t)
-        if (auto) setK((x) => (x + 1) % CASES.length)
-      }
-    }, 650)
-    return () => window.clearInterval(t)
-  }, [k, live, auto, uc.steps.length])
+    if (!live || !auto) return
+    const t = window.setTimeout(() => setK((x) => (x + 1) % CASES.length), (FLOW_TIMING.START + FLOW_TIMING.RUN * 1.15) * 1000)
+    return () => window.clearTimeout(t)
+  }, [k, live, auto])
 
   const pick = (i: number) => {
     setAuto(false)
@@ -175,44 +191,14 @@ export function CustomSlide({ active, shown }: SlideProps) {
               <p className="cu__goal">{uc.goal}</p>
             </div>
           </div>
-
-          <ol className="cu__steps">
-            {uc.steps.map((s, i) => {
-              const K = KIND[s.kind]
-              return (
-                <li key={i} className={`cu__step cu__step--${s.kind} ${i < step ? 'is-in' : ''} ${i === step - 1 && live ? 'is-now' : ''}`}>
-                  <span className="cu__step-kind">
-                    <K.icon size={12} strokeWidth={1.8} aria-hidden="true" />
-                    {K.label}
-                  </span>
-                  <span className="cu__step-text">{s.text}</span>
-                  {s.uses && (
-                    <span className="cu__uses" aria-label="Uses AI employees">
-                      {s.uses.map((n) => (
-                        <Sym key={n} n={n} />
-                      ))}
-                    </span>
-                  )}
-                </li>
-              )
-            })}
-          </ol>
-
-          <div className="cu__gov">
-            <ShieldCheck size={13} strokeWidth={1.7} aria-hidden="true" />
-            <span>
-              <b>Policy</b> no outside messages without approval
-            </span>
-            <span>
-              <b>Access</b> {uc.access}
-            </span>
-            <span>
-              <b>Oversight</b> approval step
-            </span>
-            <span>
-              <b>Control</b> pause · version history
-            </span>
+          <div className="cu__graph" key={`${uc.n}-${shown ? 'on' : 'off'}`}>
+            <FlowGraph flow={uc.flow} vertical={vertical} still={reducedMotion} />
           </div>
+          <p className="cu__legend mono" aria-hidden="true">
+            <span className="is-system">System</span>
+            <span className="is-human">Human</span>
+            <span className="is-llm">LLM</span>
+          </p>
         </div>
       </section>
     </div>

@@ -280,8 +280,8 @@
   padding: 0 10px 0 9px;
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 520;
+  color: var(--fg);
   text-align: left;
   cursor: pointer;
   transition:
@@ -430,9 +430,10 @@
 }
 
 .emp__card-no {
-  margin-right: 8px;
-  font-size: 10.5px;
+  margin-top: 6px;
+  font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.06em;
   color: color-mix(in oklab, var(--fam) 60%, #fff);
 }
 

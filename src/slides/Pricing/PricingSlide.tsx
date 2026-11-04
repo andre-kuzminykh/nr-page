@@ -71,9 +71,6 @@ export function PricingSlide(_: SlideProps) {
         Get Early Access
         <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
       </button>
-      <p className="pr__note rv" style={d(700)}>
-        Plans describe the intended early-access packages. Scope and price are confirmed individually.
-      </p>
     </div>
   )
 }

@@ -301,17 +301,17 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
         let z = dc > -1e8 ? clamp((dc - P.arr[i]) / (420 * FADE), 0, 1) : 0
         if (isCore) z = 0
         if (k < 0 || z >= 1) {
-          set(base, 'r', isCore ? f1(R * 0.92) : '0')
+          set(base, 'r', '0')
           set(halo, 'r', '0')
           set(ripple, 'r', '0')
-          set(icon, 'opacity', isCore ? '1' : '0')
+          set(icon, 'opacity', '0')
           g.classList.remove('is-named')
           return
         }
         const w = Math.exp(-(((wc - P.arr[i]) / 420) ** 2))
         z *= z
         const s = backOut(clamp(k / 560, 0, 1)) * (1 + 0.18 * w) * (1 - z)
-        const r0 = isCore ? R * 0.92 : V[n.v][2]
+        const r0 = V[n.v][2]
         set(base, 'r', f1(Math.max(r0, (isCore ? R * 1.08 : R) * s)))
         set(base, 'opacity', (1 - z * 0.6).toFixed(2))
         const rp = clamp(k / 950, 0, 1)
@@ -319,8 +319,8 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
         set(ripple, 'opacity', (0.9 * (1 - rp)).toFixed(2))
         set(halo, 'r', f1((R + 6) * Math.min(1, s) + 4 * w))
         set(halo, 'opacity', ((0.16 + 0.05 * Math.sin(T / 650 + i) + 0.3 * w) * (1 - z)).toFixed(2))
-        const si = isCore ? 1 : backOut(clamp((k - 150) / 440, 0, 1))
-        set(icon, 'opacity', isCore ? '1' : (clamp((k - 150) / 220, 0, 1) * (1 - z)).toFixed(2))
+        const si = backOut(clamp((k - 150) / 440, 0, 1))
+        set(icon, 'opacity', (clamp((k - 150) / 220, 0, 1) * (1 - z)).toFixed(2))
         set(icon, 'transform', `scale(${Math.max(0.001, si * (1 + 0.12 * w) * (1 - z)).toFixed(3)})`)
         g.classList.toggle('is-named', !fixed && k > 80 && k < (isCore ? 2600 : 2000))
       })
@@ -485,8 +485,8 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
             className={`cb-n ${i === 0 ? 'cb-n--core' : ''}`} transform={`translate(${x} ${y})`}>
             <circle r={0} fill="none" stroke={hue(x)} strokeWidth={1.4} />
             <circle r={0} fill={hue(x)} />
-            <circle r={i === 0 ? R * 0.92 : 0} fill="#130d1f" stroke={hue(x, true)} strokeWidth={1.6} />
-            <g opacity={i === 0 ? 1 : 0}>
+            <circle r={0} fill="#130d1f" stroke={hue(x, true)} strokeWidth={1.6} />
+            <g opacity={0}>
               <Icon x={-IS / 2} y={-IS / 2} width={IS} height={IS} color={hue(x, true)} strokeWidth={1.9} aria-hidden="true" />
             </g>
             <text className="cb-lab" x={lx} y={f1(R + (phone ? 21 : 17))} textAnchor={anchor}>

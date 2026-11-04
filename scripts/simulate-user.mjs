@@ -227,8 +227,16 @@ const waitFor = async (fn, ms = 4500) => {
   await sleep(1300)
   await page.getByRole('tab', { name: 'Investor Update' }).click()
   await sleep(3200)
-  const uc = await page.evaluate(() => ({ n: document.querySelector('.cu__el-n')?.textContent, steps: document.querySelectorAll('.cu__step.is-in').length }))
-  await step(page, 'desktop', 'Picks the “Investor Update” example', 'Element 102 builds itself step by step, reusing AI employees, with an approval step', uc.n === '102' && uc.steps >= 3, JSON.stringify(uc))
+  const uc = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    return {
+      n: s.querySelector('.cu__el-n')?.textContent,
+      nodes: s.querySelectorAll('.fl-n').length,
+      human: s.querySelectorAll('.fl-n--human').length,
+      llm: s.querySelectorAll('.fl-n--llm').length,
+    }
+  })
+  await step(page, 'desktop', 'Picks the “Investor Update” example', 'Element 102 is drawn as a node graph — system, LLM and a human approval — with data running through it', uc.n === '102' && uc.nodes === 7 && uc.human === 1 && uc.llm >= 2, JSON.stringify(uc))
 
   // Pricing
   await page.locator('.nav__item', { hasText: 'Pricing' }).click()

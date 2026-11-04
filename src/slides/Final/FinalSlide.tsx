@@ -43,9 +43,7 @@ export function FinalSlide(_: SlideProps) {
   }
 
   const message: Record<Status, string> = {
-    idle: IDEA_ENDPOINT
-      ? 'Your idea goes straight to the Neuronium team.'
-      : `Opens your email app with the idea addressed to ${CONTACT_EMAIL}.`,
+    idle: '',
     short: 'Write a few words about your idea first.',
     sending: 'Sending…',
     sent: 'Thank you — your idea has reached the Neuronium team.',
@@ -65,7 +63,7 @@ export function FinalSlide(_: SlideProps) {
           </span>
         </h2>
         <p className="fin__sub rv rv--blur" style={d(360)}>
-          Build the business. Not the toolchain. Run AI Business with Neuronium.
+          Run AI Business with Neuronium.
         </p>
 
         <form className={`fin__form rv fin__form--${status}`} style={d(480)} onSubmit={submit}>

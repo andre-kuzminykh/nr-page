@@ -596,6 +596,16 @@
   flex-shrink: 0;
 }
 
+/* product: the tasks it is made of, as compact cards */
+.mgx[data-view='product'] .mgx-t {
+  font-size: 11.5px;
+  box-shadow: inset 3px 0 0 var(--pc);
+}
+
+.mgx[data-view='product'] .mgx-t__proj {
+  display: none;
+}
+
 /* list */
 .mgx[data-view='tasks'] .mgx-t {
   border-color: transparent;

@@ -127,8 +127,10 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
         </div>
 
         <div className="dept__caption rv" style={d(520)} aria-live="polite">
+          <p key={`s${sel}`} className="dept__cap-n mono">
+            {current.n} · {current.symbol}
+          </p>
           <p key={`n${sel}`} className="dept__cap-name">
-            <span className="dept__cap-n">{current.n}</span>
             {current.name}
           </p>
           <p key={`d${sel}`} className="dept__cap-desc">

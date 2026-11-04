@@ -283,6 +283,15 @@ async function functionalPass(browser) {
     return !/Product scope|availability varies|Pick an element/i.test(s.innerText) && !s.querySelector('.pt__sweep')
   })
   check('Periodic table: no scope notes, no placeholder text, no light sweep over the table', quiet)
+  await page.locator('.pt__label', { hasText: 'Analytics' }).hover()
+  await sleep(350)
+  const hovD = await page.$eval('.emp__card--dept .emp__dept-name', (e) => e.textContent).catch(() => null)
+  await page.locator('.pt__cell[data-n="44"]').hover()
+  await sleep(350)
+  const hovE = await page.evaluate(() => ({ no: document.querySelector('.emp__card .emp__card-no')?.textContent.trim(), name: document.querySelector('.emp__card .emp__card-name')?.textContent.trim() }))
+  await page.mouse.move(5, 450)
+  await sleep(400)
+  check('Periodic table: hovering a department or an element explains it on the left — “44 · Sq” above “Personalized Sequences”', hovD === 'Analytics' && hovE.no === '44 · Sq' && hovE.name === 'Personalized Sequences', `${hovD} · ${hovE.no} / ${hovE.name}`)
   await page.locator('.pt__label', { hasText: 'Marketing' }).click()
   await sleep(500)
   const dsel = await page.evaluate(() => ({
@@ -379,17 +388,31 @@ async function functionalPass(browser) {
   })
   check('Management board: tasks move on from To do to In progress to Done', boardSteps[0] !== boardSteps[1])
 
-  // Custom use cases
+  // Custom use cases: the AI employee as a node graph
   await go('custom')
   await page.getByRole('tab', { name: 'Supplier Check' }).click()
-  await sleep(500)
-  const cu = await page.evaluate(() => ({ el: document.querySelector('.cu__el-n')?.textContent, gov: document.querySelector('.cu__gov')?.textContent }))
-  check('Use cases: examples switch; a custom AI employee continues the table (element 103)', cu.el === '103' && /Policy/.test(cu.gov) && /Control/.test(cu.gov), JSON.stringify(cu))
+  await sleep(2600)
+  const cu = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    const nodes = [...s.querySelectorAll('.fl-n')]
+    return {
+      el: s.querySelector('.cu__el-n')?.textContent,
+      nodes: nodes.length,
+      kinds: [...new Set(nodes.map((n) => [...n.classList].find((c) => c.startsWith('fl-n--'))))].sort().join(','),
+      flows: s.querySelectorAll('.fl-e__flow').length,
+      flowing: [...s.querySelectorAll('.fl-e__flow')].filter((e) => Number(getComputedStyle(e).opacity) > 0.5).length,
+    }
+  })
+  check(
+    'Use cases: a custom AI employee as a node graph — grey system, orange human, violet LLM — with data streaming along the connections (element 103)',
+    cu.el === '103' && cu.nodes === 7 && cu.kinds === 'fl-n--human,fl-n--llm,fl-n--system' && cu.flows === 7 && cu.flowing >= 5,
+    JSON.stringify(cu),
+  )
 
   // Pricing — no invented prices
   await go('pricing')
   const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent.trim()))
-  check('Pricing: three plans, prices on request (no invented numbers)', prices.length === 3 && prices.every((p) => !/\d/.test(p)), prices.join(' | '))
+  check('Pricing: three plans, prices on request (no invented numbers), no fine print', prices.length === 3 && prices.every((p) => !/\d/.test(p)) && (await page.locator('.slide[data-state="active"] .pr__note').count()) === 0, prices.join(' | '))
 
   // FAQ
   await go('faq')
@@ -403,6 +426,8 @@ async function functionalPass(browser) {
   const fin = await page.evaluate(() => ({
     title: [...document.querySelectorAll('.fin__title .mask')].map((m) => m.textContent.trim()).join(' '),
     centerMark: !!document.querySelector('.fin .brand-mark'),
+    sub: document.querySelector('.fin__sub')?.textContent.trim(),
+    idle: document.querySelector('#fin-status')?.textContent.trim(),
   }))
   const active = page.locator('.slide[data-state="active"]')
   await active.getByRole('button', { name: /Get Early Access/ }).click()
@@ -413,8 +438,8 @@ async function functionalPass(browser) {
   await sleep(300)
   const sentMsg = await page.locator('#fin-status').innerText()
   check(
-    'Final: “Turn your Idea into Reality.”, no extra logo, idea input; empty input is caught; submit hands off honestly',
-    fin.title === 'Turn your Idea into Reality.' && !fin.centerMark && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
+    'Final: “Turn your Idea into Reality.”, “Run AI Business with Neuronium.”, idea input with no hint text; empty input is caught; submit hands off honestly',
+    fin.title === 'Turn your Idea into Reality.' && !fin.centerMark && fin.sub === 'Run AI Business with Neuronium.' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
     sentMsg,
   )
   await active.getByRole('button', { name: /Explore AI Employees/ }).click()

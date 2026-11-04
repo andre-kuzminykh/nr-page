@@ -22,8 +22,9 @@ import type { DepartmentStage, PanelRenderProps } from '../types'
 import './management.css'
 
 /**
- * Management is one interface that keeps turning: knowledge → notes → goals → the product → its tasks,
- * which then appear as a Gantt chart, a calendar and a board — the same six tasks moving between views.
+ * Management is one interface that keeps turning, AI employee by AI employee in order: knowledge → notes →
+ * goals → tasks → board → projects → product → calendar → inbox → team. From the task list on, the same
+ * six tasks stay on screen and glide between the views.
  */
 type View = 'knowledge' | 'notes' | 'goals' | 'product' | 'tasks' | 'gantt' | 'calendar' | 'board' | 'inbox' | 'team'
 
@@ -44,7 +45,7 @@ const HEAD: Record<View, { icon: LucideIcon; title: string; meta: string }> = {
   knowledge: { icon: Search, title: 'Knowledge', meta: 'Drive · Meet' },
   notes: { icon: Video, title: 'Weekly review', meta: 'Google Meet' },
   goals: { icon: Target, title: 'Goals', meta: 'This quarter' },
-  product: { icon: Package, title: 'Product', meta: 'Mobile App' },
+  product: { icon: Package, title: 'Product', meta: '6 tasks' },
   tasks: { icon: ListChecks, title: 'Tasks', meta: 'From the product' },
   gantt: { icon: ChartGantt, title: 'Projects', meta: '6 weeks' },
   calendar: { icon: CalendarDays, title: 'Calendar', meta: 'This week' },
@@ -100,7 +101,7 @@ function place(view: View, i: number, step: number): { x: number; y: number; w: 
       return { x: col * 33.8, y: 14 + row * 15.5, w: 32.4, h: 13, on: true }
     }
     case 'product':
-      return { x: 30, y: 60, w: 40, h: 8, on: false }
+      return { x: (i % 2) * 51, y: 54 + Math.floor(i / 2) * 15, w: 49, h: 12, on: true }
     default:
       return { x: 30, y: 46, w: 40, h: 10, on: false }
   }
@@ -253,17 +254,6 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
                 </div>
               ))}
             </dl>
-            <p className="mgx-label">Features</p>
-            <div className="mgx-feats">
-              {['Sheets import', 'Client portal', 'PDF export', 'Pricing'].map((f, k) => (
-                <span key={f} className="k-chip" style={{ '--k': k } as CSSProperties}>
-                  {f}
-                </span>
-              ))}
-            </div>
-            <p className="mgx-make">
-              <ListChecks size={13} strokeWidth={1.8} aria-hidden="true" /> Breaking it into tasks…
-            </p>
           </section>
 
           {/* ---------- 4 Tasks (list) ---------- */}
@@ -375,7 +365,7 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
           </section>
 
           {/* ---------- the same six tasks, moving between views ---------- */}
-          <div className="mgx-tasks" aria-hidden={!['tasks', 'gantt', 'calendar', 'board'].includes(view)}>
+          <div className="mgx-tasks" aria-hidden={!['tasks', 'board', 'gantt', 'product', 'calendar'].includes(view)}>
             {TASKS.map((task, k) => {
               const r = place(view, k, step)
               const done = view === 'board' ? task.k[step] === 2 : task.k[0] === 2
@@ -404,7 +394,5 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
 export const management: DepartmentStage = {
   layout: 'quad',
   panels: [],
-  // the order tells one story: knowledge → notes → goals → product → tasks → projects → calendar → board
-  order: [1, 2, 3, 7, 4, 6, 8, 5, 9, 10],
   scene: (p) => <ManagementScene {...p} />,
 }
