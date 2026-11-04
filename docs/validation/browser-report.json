@@ -16,6 +16,11 @@
       "detail": ""
     },
     {
+      "name": "Hero: NEURONIUM fills its column exactly at 1280, 1920, 2560 and 1440 px wide",
+      "ok": true,
+      "detail": "1280:fits · 1920:fits · 2560:fits · 1440:fits"
+    },
+    {
       "name": "Top menu: transparent, logo is the two letters Nr (no tile), Platform · AI Employees · Departments · Use cases · Pricing · FAQ, Get Early Access",
       "ok": true,
       "detail": "{\"logo\":\"Nr\",\"logoTile\":false,\"items\":[\"Platform\",\"AI Employees\",\"Departments\",\"Use cases\",\"Pricing\",\"FAQ\"],\"cta\":\"Get Early Access\",\"bg\":\"rgba(0, 0, 0, 0)\",\"counter\":false}"
@@ -46,9 +51,19 @@
       "detail": "16,0,1,0"
     },
     {
-      "name": "Shared context: 12 source icons, Superagent plan across AI employees, AI Governance (Policy · Access · Oversight · Control)",
+      "name": "Shared context: a brain of 12 tools around the AI Superagent; the agent runs along the connections and the tools light up",
       "ok": true,
-      "detail": "{\"sources\":12,\"steps\":6,\"running\":2}"
+      "detail": "7 lit, 24 connections on the way"
+    },
+    {
+      "name": "Shared context: no extra copy — just the title and the brain",
+      "ok": true,
+      "detail": "Shared context. One Superagent. AI SUPERAGENT GMAIL CALENDAR"
+    },
+    {
+      "name": "Periodic table: until someone interacts, it walks through the departments and explains each one",
+      "ok": true,
+      "detail": "Management → HR"
     },
     {
       "name": "Periodic table: all 100 AI employees, 10 per department, in order",
@@ -59,6 +74,21 @@
       "name": "Periodic table: unique symbols, Nr is element 0, no column numbers or ranges",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "Periodic table: no scope notes, no placeholder text, no light sweep over the table",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Periodic table: hovering a department or an element explains it on the left — “44 · Sq” above “Personalized Sequences”",
+      "ok": true,
+      "detail": "Analytics · 44 · Sq / Personalized Sequences"
+    },
+    {
+      "name": "Periodic table: a department is picked from its row — the row lights up, a card explains it in words (no tiles) and opens the block",
+      "ok": true,
+      "detail": "{\"row\":\"Marketing\",\"card\":\"Marketing\",\"words\":true,\"tiles\":0,\"pressed\":\"Marketing\"}"
     },
     {
       "name": "Periodic table: search by tool, empty state",
@@ -76,27 +106,37 @@
       "detail": "{\"i\":7,\"sel\":\"Lq\"}"
     },
     {
-      "name": "Departments: 10 blocks × 10 AI employees; each one focuses a panel and lights up its own part of the interface",
+      "name": "Departments: 10 blocks × 10 AI employees, one interface at a time; each AI employee brings its interface forward and lights up its own part",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "Use cases: examples switch; a custom AI employee continues the table (element 103)",
+      "name": "Management: one interface — the same six tasks turn from a list into a Gantt chart, a calendar and a board",
       "ok": true,
-      "detail": "{\"el\":\"103\",\"gov\":\"Policy no outside messages without approvalAccess Read: documents · Write: tasksOversight approval stepControl pause · version history\"}"
+      "detail": "tasks:6 gantt:6 calendar:6 board:6"
     },
     {
-      "name": "Pricing: three plans, prices on request (no invented numbers)",
+      "name": "Management board: tasks move on from To do to In progress to Done",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Use cases: a custom AI employee as a node graph — grey system, orange human, violet LLM — with data streaming along the connections (element 103)",
+      "ok": true,
+      "detail": "{\"el\":\"103\",\"nodes\":7,\"kinds\":\"fl-n--human,fl-n--llm,fl-n--system\",\"flows\":7,\"flowing\":5}"
+    },
+    {
+      "name": "Pricing: three plans, prices on request (no invented numbers), no fine print",
       "ok": true,
       "detail": "Price on request | Price on request | Price on request"
     },
     {
-      "name": "FAQ: questions answer as Neuronium",
+      "name": "FAQ: answers open in place, one at a time — opening one closes the others",
       "ok": true,
       "detail": "You do. AI Governance is part of the system: policies, acces"
     },
     {
-      "name": "Final: “Turn your Idea into Reality.”, no extra logo, idea input; empty input is caught; submit hands off honestly",
+      "name": "Final: “Turn your Idea into Reality.”, “Run AI Business with Neuronium.”, idea input with no hint text; empty input is caught; submit hands off honestly",
       "ok": true,
       "detail": "Your email app should open with the idea. If it doesn’t, write to admin@andre.technology."
     },
@@ -124,6 +164,11 @@
       "name": "Reduced motion: content is fully visible without motion; background stays as a still overlap",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "Layout 1920x1080-dark: 17 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "ok": true,
+      "detail": "all slides fit without inner scroll"
     },
     {
       "name": "Layout 1440x900-dark: 17 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
@@ -162,6 +207,193 @@
     }
   ],
   "layout": [
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 1,
+      "id": "hero",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 1
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 2,
+      "id": "context",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 2
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 3,
+      "id": "employees",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 3
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 4,
+      "id": "management",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 4
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 5,
+      "id": "hr",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 5
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 6,
+      "id": "marketing",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 6
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 7,
+      "id": "smm",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 8,
+      "id": "sales",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 8
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 9,
+      "id": "support",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 9
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 10,
+      "id": "analytics",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 10
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 11,
+      "id": "design",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 11
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 12,
+      "id": "development",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 12
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 13,
+      "id": "engineering",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 13
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 14,
+      "id": "custom",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 14
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 15,
+      "id": "pricing",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 15
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 16,
+      "id": "faq",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 16
+    },
+    {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 17,
+      "id": "start",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 17
+    },
     {
       "viewport": "1440x900",
       "theme": "dark",
@@ -1286,7 +1518,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-04T00:49:05.717Z",
+  "startedAt": "2026-11-04T03:03:01.789Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 40
+  "fps": 42
 }
