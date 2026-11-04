@@ -4,6 +4,9 @@
   left: 0;
   right: 0;
   z-index: 30;
+  /* same column as the blocks, so the logo lines up with the content on wide screens */
+  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  margin: 0 auto;
   display: flex;
   align-items: center;
   gap: 20px;

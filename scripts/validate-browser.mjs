@@ -1,5 +1,5 @@
 // Browser validation for the Neuronium landing.
-// Visits all 17 blocks at 6 viewports, takes screenshots, checks horizontal overflow and
+// Visits all 17 blocks at 7 viewports, takes screenshots, checks horizontal overflow and
 // JavaScript errors, then runs functional checks (menu, navigation, shared context, the
 // periodic table of 100 AI employees, all 10 departments, use cases, pricing, FAQ, final
 // idea input, touch, reduced motion).
@@ -26,6 +26,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
 const OUT = path.resolve('validation')
 const SHOTS = path.join(OUT, 'screenshots')
 const VIEWPORTS = [
+  [1920, 1080],
   [1440, 900],
   [1280, 800],
   [1024, 768],
@@ -153,6 +154,21 @@ async function functionalPass(browser) {
     [...document.querySelectorAll('.hero__slot')].some((s) => getComputedStyle(s).overflow === 'hidden'),
   )
   check('Hero: letters are not clipped by their reveal mask', !clipped)
+  // The word fills its column exactly — on wide screens the column stops at 1400px, the window does not.
+  const heroFit = []
+  for (const [w, h] of [[1280, 800], [1920, 1080], [2560, 1440], [1440, 900]]) {
+    await page.setViewportSize({ width: w, height: h })
+    await sleep(350)
+    heroFit.push(
+      await page.evaluate((w) => {
+        const main = document.querySelector('.hero__main').getBoundingClientRect()
+        const slots = [...document.querySelectorAll('.hero__slot')].map((s) => s.getBoundingClientRect())
+        const ok = slots[0].left >= main.left - 1 && slots.at(-1).right <= main.right + 1 && slots.at(-1).right >= main.right - 24
+        return `${w}:${ok ? 'fits' : `${Math.round(slots[0].left)}–${Math.round(slots.at(-1).right)} vs ${Math.round(main.left)}–${Math.round(main.right)}`}`
+      }, w),
+    )
+  }
+  check('Hero: NEURONIUM fills its column exactly at 1280, 1920, 2560 and 1440 px wide', heroFit.every((x) => x.endsWith('fits')), heroFit.join(' · '))
 
   // Top menu
   const nav = await page.evaluate(() => ({
