@@ -1,7 +1,6 @@
 import { ArrowRight, Search, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
-import { Element, FAMILY } from '../../components/Element/Element'
-import { Sym } from '../../components/Kit/Kit'
+import { FAMILY } from '../../components/Element/Element'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { DEPARTMENT_ICON } from '../../components/ui/icons'
 import { AI_EMPLOYEES, DEPARTMENTS, departmentById, employeeByN, rowOf, type DepartmentId } from '../../data/departments'
@@ -11,8 +10,8 @@ import './Employees.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 const normalize = (s: string) => s.toLowerCase().normalize('NFKD')
-/** A short tour across the table, one AI employee per department, until someone interacts. */
-const TOUR = [1, 13, 22, 38, 47, 57, 63, 78, 87, 97]
+/** Until someone interacts, the table walks through its departments one by one. */
+const TOUR: DepartmentId[] = DEPARTMENTS.map((dp) => dp.id)
 /** Wide screens show the card beside the table; narrower ones open it over the table, on tap only. */
 const WIDE = '(min-width: 1101px)'
 const PHONE = '(max-width: 700px)'
@@ -50,26 +49,26 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
   // On phones the card takes the place of the copy and the search, so the table stays in full view.
   const phone = useMedia(PHONE)
   const inText = wide || phone
-  const [sel, setSel] = useState<number | null>(() => (isWide() ? TOUR[0] : null))
+  const [sel, setSel] = useState<number | null>(null)
   const [tour, setTour] = useState(isWide)
   const [query, setQuery] = useState('')
-  const [dsel, setDsel] = useState<DepartmentId | null>(null)
+  const [dsel, setDsel] = useState<DepartmentId | null>(() => (isWide() ? TOUR[0] : null))
   const cells = useRef<(HTMLButtonElement | null)[]>([])
   const wrapRef = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState<{ x: number; y: number; side: 'r' | 'l' } | null>(null)
 
   useEffect(() => {
     if (!shown) {
-      setSel(isWide() ? TOUR[0] : null)
+      setSel(null)
       setTour(isWide())
       setQuery('')
-      setDsel(null)
+      setDsel(isWide() ? TOUR[0] : null)
     }
   }, [shown])
 
   useInterval(
-    () => setSel((s) => TOUR[(TOUR.indexOf(s ?? TOUR[0]) + 1) % TOUR.length]),
-    active && tour && !reducedMotion && !query ? 3000 : null,
+    () => setDsel((cur) => TOUR[(TOUR.indexOf(cur ?? TOUR[0]) + 1) % TOUR.length]),
+    active && tour && !reducedMotion && !query ? 3600 : null,
   )
 
   const q = query.trim()
@@ -124,9 +123,10 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
 
   /** Picking a department lights its row and opens its card; picking it again closes it. */
   const pickDept = (id: DepartmentId) => {
+    const touring = tour
     stopTour()
     setSel(null)
-    setDsel((cur) => (cur === id ? null : id))
+    setDsel((cur) => (cur === id && !touring ? null : id))
   }
 
   const focusCell = (n: number) => {
@@ -178,13 +178,17 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
         aria-live="polite"
       >
         <div className="emp__card-top">
-          <Element n={current.n} symbol={current.symbol} family={rowOf(current.n)} size="sm" />
           <div className="emp__card-head">
             <button type="button" className="emp__card-dept" onClick={() => pickDept(dept.id)}>
               <DeptIcon size={12} strokeWidth={1.7} aria-hidden="true" />
               {dept.name}
             </button>
-            <h3 className="emp__card-name">{highlight(current.name, q)}</h3>
+            <h3 className="emp__card-name">
+              <span className="emp__card-no mono">
+                {current.n} · {current.symbol}
+              </span>
+              {highlight(current.name, q)}
+            </h3>
           </div>
           <button type="button" className="emp__card-x" onClick={close} aria-label="Close">
             <X size={13} strokeWidth={1.8} />
@@ -212,26 +216,13 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
         style={{ '--fam': FAMILY[DEPARTMENTS.indexOf(selDept)] } as CSSProperties}
         aria-live="polite"
       >
-        <div className="emp__card-top">
-          <span className="emp__dept-ic" aria-hidden="true">
-            <SelDeptIcon size={18} strokeWidth={1.6} />
-          </span>
-          <div className="emp__card-head">
-            <p className="emp__card-dept">10 AI employees</p>
-            <h3 className="emp__card-name">{selDept.name}</h3>
-          </div>
-          <button type="button" className="emp__card-x" onClick={close} aria-label="Close">
-            <X size={13} strokeWidth={1.8} />
-          </button>
-        </div>
-        <p className="emp__card-desc">{selDept.headline.join(' ')}</p>
-        <div className="emp__card-syms">
-          {selDept.members.map((m) => (
-            <button key={m.n} type="button" className="emp__mini" onClick={() => select(m.n)} aria-label={m.name} title={m.name}>
-              <Sym n={m.n} />
-            </button>
-          ))}
-        </div>
+        <p className="emp__card-dept">
+          <SelDeptIcon size={12} strokeWidth={1.7} aria-hidden="true" />
+          Department · 10 AI employees
+        </p>
+        <h3 className="emp__dept-name">{selDept.name}</h3>
+        <p className="emp__dept-line">{selDept.headline.join(' ')}</p>
+        <p className="emp__card-desc">{selDept.description}</p>
         <div className="emp__card-foot">
           <button type="button" className="text-link" onClick={() => goTo(selDept.id)}>
             Open {selDept.name}
@@ -294,7 +285,7 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
       </div>
 
       <div className="emp__table-wrap" ref={wrapRef}>
-        <div className={`pt ${dsel ? 'has-dept' : ''}`} role="group" aria-label="Periodic table of 100 AI employees" onKeyDown={onGridKey} data-own-keys>
+        <div className={`pt ${dsel ? 'has-dept' : ''} ${tour ? 'is-tour' : ''}`} role="group" aria-label="Periodic table of 100 AI employees" onKeyDown={onGridKey} data-own-keys>
           <div className="pt__line pt__line--head rv" style={d(200)}>
             <span className="pt__zero" aria-label="Element 0: Nr, Neuronium">
               <span className="pt__n">0</span>

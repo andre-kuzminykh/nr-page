@@ -260,6 +260,11 @@ async function functionalPass(browser) {
 
   // Periodic table of 100 AI employees
   await go('employees')
+  const walk0 = await page.$eval('.pt__line.is-row .pt__label-name', (e) => e.textContent).catch(() => null)
+  await sleep(3800)
+  const walk1 = await page.$eval('.pt__line.is-row .pt__label-name', (e) => e.textContent).catch(() => null)
+  const walkCard = await page.$eval('.emp__card--dept .emp__dept-name', (e) => e.textContent).catch(() => null)
+  check('Periodic table: until someone interacts, it walks through the departments and explains each one', walk0 === 'Management' && walk1 === 'HR' && walkCard === 'HR', `${walk0} → ${walk1}`)
   const table = await page.evaluate(() =>
     [...document.querySelectorAll('.pt__line:not(.pt__line--head)')].map((row) => ({
       label: row.querySelector('.pt__label-name')?.textContent.trim(),
@@ -282,15 +287,16 @@ async function functionalPass(browser) {
   await sleep(500)
   const dsel = await page.evaluate(() => ({
     row: document.querySelector('.pt.has-dept .pt__line.is-row .pt__label-name')?.textContent,
-    card: document.querySelector('.emp__card--dept .emp__card-name')?.textContent,
-    minis: document.querySelectorAll('.emp__card--dept .emp__mini').length,
+    card: document.querySelector('.emp__card--dept .emp__dept-name')?.textContent,
+    words: (document.querySelector('.emp__card--dept .emp__card-desc')?.textContent ?? '').length > 40,
+    tiles: document.querySelectorAll('.emp__card--dept .sym, .emp__card--dept .element').length,
     pressed: document.querySelector('.pt__label[aria-pressed="true"] .pt__label-name')?.textContent,
   }))
   await page.locator('.emp__card--dept').getByRole('button', { name: /Open Marketing/ }).click()
   await page.waitForFunction((i) => Number(document.querySelector('.slide[data-state="active"]')?.dataset.slide) === i, at('marketing'), { timeout: 4000 }).catch(() => {})
   check(
-    'Periodic table: a department is picked from its row — the row lights up, a card lists its 10 AI employees and opens the block',
-    dsel.row === 'Marketing' && dsel.card === 'Marketing' && dsel.minis === 10 && dsel.pressed === 'Marketing' && (await activeIndex(page)) === at('marketing'),
+    'Periodic table: a department is picked from its row — the row lights up, a card explains it in words (no tiles) and opens the block',
+    dsel.row === 'Marketing' && dsel.card === 'Marketing' && dsel.words && dsel.tiles === 0 && dsel.pressed === 'Marketing' && (await activeIndex(page)) === at('marketing'),
     JSON.stringify(dsel),
   )
   await go('employees')
