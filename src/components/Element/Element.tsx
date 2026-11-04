@@ -13,7 +13,7 @@ interface Props {
   className?: string
 }
 
-/** A capability drawn as a chemical element — the same language as the Nr logo (element 0). */
+/** An AI employee drawn as a chemical element — Neuronium itself is element 0 (Nr). */
 export function Element({ n, symbol, name, family, size = 'md', className = '' }: Props) {
   return (
     <span

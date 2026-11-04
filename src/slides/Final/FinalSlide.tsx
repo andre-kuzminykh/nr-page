@@ -1,6 +1,5 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react'
-import { BrandMark } from '../../components/Chrome/BrandMark'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { COMPANY_URL, CONTACT_EMAIL, IDEA_ENDPOINT, MEDIA_LABEL_URL, ideaMailto } from '../../config/links'
 import './Final.css'
@@ -57,9 +56,6 @@ export function FinalSlide(_: SlideProps) {
   return (
     <div className="slide__frame fin">
       <div className="fin__center">
-        <div className="fin__mark rv rv--scale" style={d(0)}>
-          <BrandMark size={60} title="Neuronium" />
-        </div>
         <h2 className="fin__title">
           <span className="mask" style={d(80)}>
             <span>Turn your Idea</span>
@@ -69,7 +65,7 @@ export function FinalSlide(_: SlideProps) {
           </span>
         </h2>
         <p className="fin__sub rv rv--blur" style={d(360)}>
-          Build the business. Not the toolchain. Run AI Workplaces with Neuronium.
+          Build the business. Not the toolchain. Run AI Business with Neuronium.
         </p>
 
         <form className={`fin__form rv fin__form--${status}`} style={d(480)} onSubmit={submit}>
@@ -107,8 +103,8 @@ export function FinalSlide(_: SlideProps) {
           {message[status]}
         </p>
 
-        <button type="button" className="text-link fin__explore rv rv--fade" style={d(640)} onClick={() => goTo('capabilities')}>
-          Explore Capabilities
+        <button type="button" className="text-link fin__explore rv rv--fade" style={d(640)} onClick={() => goTo('employees')}>
+          Explore AI Employees
           <ArrowRight size={13} strokeWidth={1.8} aria-hidden="true" />
         </button>
       </div>

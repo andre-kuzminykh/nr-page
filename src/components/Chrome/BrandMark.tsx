@@ -1,8 +1,5 @@
-/**
- * Neuronium logo — the "Nr" element tile: atomic number 0, symbol Nr, name Neuronium.
- * Drawn as SVG so it stays crisp at any size; text widths are fixed with textLength.
- */
-export function BrandMark({ size = 44, title }: { size?: number; title?: string }) {
+/** Neuronium mark: the Nr element tile — two letters, nothing else. */
+export function BrandMark({ size = 40, title }: { size?: number; title?: string }) {
   return (
     <svg
       className="brand-mark"
@@ -13,33 +10,19 @@ export function BrandMark({ size = 44, title }: { size?: number; title?: string 
       aria-label={title}
       aria-hidden={title ? undefined : true}
     >
-      <rect width="100" height="100" rx="13" fill="#000" />
-      <text x="18.5" y="23" fill="#fff" fontSize="11.5" fontWeight="500" className="brand-mark__text">
-        0
-      </text>
+      <rect width="100" height="100" rx="20" fill="#000" />
       <text
-        x="17"
+        x="50"
         y="68"
+        textAnchor="middle"
         fill="#fff"
         fontSize="52"
         fontWeight="700"
-        textLength="66"
+        textLength="62"
         lengthAdjust="spacingAndGlyphs"
         className="brand-mark__text"
       >
         Nr
-      </text>
-      <text
-        x="18"
-        y="86.5"
-        fill="#fff"
-        fontSize="12.5"
-        fontWeight="600"
-        textLength="65"
-        lengthAdjust="spacingAndGlyphs"
-        className="brand-mark__text"
-      >
-        Neuronium
       </text>
     </svg>
   )

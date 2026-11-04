@@ -1,0 +1,501 @@
+/* =========================================================
+   Interface kit — panels and the small parts inside them.
+   --fam is the accent of the department the panel belongs to.
+   ========================================================= */
+
+.pn {
+  --fam: #c43cf2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0) 42%),
+    rgb(14 12 21 / 0.8);
+  border: 1px solid rgb(255 255 255 / 0.085);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 40px 80px -44px rgb(0 0 0 / 0.85);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--fg);
+  cursor: default;
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 700ms var(--ease-out),
+    border-color 600ms,
+    box-shadow 700ms var(--ease-out),
+    filter 600ms;
+}
+
+.pn.is-focus {
+  border-color: color-mix(in oklab, var(--fam) 48%, rgb(255 255 255 / 0.1));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 0 0 1px color-mix(in oklab, var(--fam) 22%, transparent),
+    0 34px 90px -36px color-mix(in oklab, var(--fam) 70%, transparent);
+  transform: translateY(-3px);
+}
+
+.pn.is-dim {
+  opacity: 0.5;
+  filter: saturate(0.55);
+}
+
+.pn.is-dim:hover {
+  opacity: 0.8;
+}
+
+.pn__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+  flex-shrink: 0;
+}
+
+.pn__head svg {
+  color: var(--fam);
+}
+
+.pn__title {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 540;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* When space runs out the meta gives way first, so the title stays readable. */
+.pn__meta {
+  flex: 0 1000 auto;
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pn__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+  padding: 12px 14px 14px;
+  overflow: hidden;
+}
+
+/* ---------- hot section: lights up for the selected AI employee ---------- */
+.hot {
+  position: relative;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition:
+    background-color 500ms var(--ease-out),
+    border-color 500ms var(--ease-out);
+}
+
+.hot.is-hot {
+  background: color-mix(in oklab, var(--fam) 10%, transparent);
+  border-color: color-mix(in oklab, var(--fam) 42%, transparent);
+}
+
+.sym.hot__tag {
+  position: absolute;
+  top: -4px;
+  right: -5px;
+  animation: k-pop 420ms var(--ease-out);
+}
+
+@keyframes k-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* ---------- small parts ---------- */
+.sym {
+  --fam: #c43cf2;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.14),
+    0 0 14px -4px var(--fam);
+  flex-shrink: 0;
+}
+
+.sym::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--fam);
+}
+
+.k-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.k-muted {
+  color: var(--muted);
+}
+
+.k-mono {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.k-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.k-row > .k-grow {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.k-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.k-list > * {
+  padding: 6px 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.k-list > *:last-child {
+  border-bottom: 0;
+}
+
+.k-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.k-chip.is-on {
+  border-color: color-mix(in oklab, var(--fam) 60%, transparent);
+  background: color-mix(in oklab, var(--fam) 16%, transparent);
+  color: var(--fg);
+}
+
+.k-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.k-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 17px;
+  padding: 0 6px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: color-mix(in oklab, var(--fam) 65%, #fff);
+  background: color-mix(in oklab, var(--fam) 18%, transparent);
+  white-space: nowrap;
+}
+
+.k-tag.is-ok {
+  color: #8ff0c0;
+  background: rgb(62 207 142 / 0.14);
+}
+
+.k-tag.is-warn {
+  color: #ffc58f;
+  background: rgb(249 137 75 / 0.16);
+}
+
+.k-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fam);
+  flex-shrink: 0;
+}
+
+.k-dot.is-ok {
+  background: #3ecf8e;
+}
+
+.k-dot.is-live {
+  background: #ff5a6e;
+  box-shadow: 0 0 0 0 rgb(255 90 110 / 0.6);
+  animation: k-ping 1.8s ease-out infinite;
+}
+
+@keyframes k-ping {
+  70% {
+    box-shadow: 0 0 0 6px rgb(255 90 110 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 90 110 / 0);
+  }
+}
+
+.k-av {
+  --h: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: hsl(calc(265 + var(--h) * 28) 45% 32%);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1.5px rgb(14 12 21);
+}
+
+.k-avs {
+  display: inline-flex;
+}
+
+.k-avs .k-av + .k-av {
+  margin-left: -6px;
+}
+
+.k-check {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  flex-shrink: 0;
+}
+
+.k-check.is-done {
+  border-color: transparent;
+  background: var(--fam);
+}
+
+.k-check.is-done::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1.5px;
+  width: 3px;
+  height: 6px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.k-bar {
+  --v: 0.5;
+  position: relative;
+  display: block;
+  height: 4px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.08);
+  overflow: hidden;
+  flex: 1;
+  min-width: 30px;
+}
+
+.k-bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--v) * 100%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--fam) 70%, #fff 0%), color-mix(in oklab, var(--fam) 60%, #fff));
+}
+
+[data-shown] .k-bar__fill {
+  animation: k-grow 1.3s var(--ease-out) 0.5s backwards;
+}
+
+@keyframes k-grow {
+  from {
+    width: 0;
+  }
+}
+
+.k-spark {
+  display: block;
+  width: 100%;
+  height: 38px;
+  overflow: visible;
+}
+
+.k-spark__line {
+  fill: none;
+  stroke: var(--fam);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+[data-shown] .k-spark__line {
+  animation: k-draw 1.6s var(--ease-out) 0.4s backwards;
+}
+
+@keyframes k-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.k-spark__area {
+  fill: color-mix(in oklab, var(--fam) 18%, transparent);
+}
+
+.k-spark__dot {
+  fill: #fff;
+  vector-effect: non-scaling-stroke;
+}
+
+.k-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 52px;
+}
+
+.k-bars__col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.k-bars__bar {
+  width: 100%;
+  height: calc(var(--v) * 100%);
+  min-height: 2px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--fam) 75%, #fff), color-mix(in oklab, var(--fam) 35%, transparent));
+  transform-origin: 50% 100%;
+}
+
+[data-shown] .k-bars__bar {
+  animation: k-rise 1s var(--ease-out) backwards;
+  animation-delay: calc(0.45s + var(--i) * 60ms);
+}
+
+@keyframes k-rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.k-bars__lab {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--muted);
+}
+
+.k-bars:has(.k-bars__lab) {
+  height: 64px;
+}
+
+/* typing */
+.type {
+  position: relative;
+}
+
+.type__caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  margin: 0 1px -0.16em;
+  background: var(--fam);
+  animation: k-blink 0.9s steps(1) infinite;
+}
+
+.type__ghost {
+  visibility: hidden;
+}
+
+@keyframes k-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* fade-up used for content that appears while a panel is focused */
+.k-in {
+  animation: k-in 520ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+@keyframes k-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k-in,
+  .hot__tag {
+    animation: none;
+  }
+}

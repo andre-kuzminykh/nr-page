@@ -12,14 +12,7 @@
   margin: auto 0;
 }
 
-.fin__mark .brand-mark {
-  display: block;
-  border-radius: 13%;
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.16), 0 20px 50px -18px rgb(0 0 0 / 0.7);
-}
-
 .fin__title {
-  margin-top: clamp(18px, 3.4vh, 36px);
   font-size: clamp(42px, min(8.4vw, 12.8vh), 144px);
   font-weight: 520;
   line-height: 0.94;

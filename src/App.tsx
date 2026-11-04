@@ -1,37 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
-import { TopBar } from './components/Chrome/TopBar'
 import { LightField } from './components/LightField/LightField'
+import { TopNav } from './components/Nav/TopNav'
 import { ProgressBar } from './components/ProgressBar/ProgressBar'
 import { DeckContext, type DeckApi, type SlideProps } from './components/SlideController/DeckContext'
 import { Slide } from './components/SlideController/Slide'
 import { TRANSITION_MS, useSlideController } from './components/SlideController/useSlideController'
 import { SLIDES, slideIndex } from './data/slides'
 import { useReducedMotion } from './hooks/useReducedMotion'
-import { ArchitectureSlide } from './slides/Architecture/ArchitectureSlide'
-import { BusinessContextSlide } from './slides/BusinessContext/BusinessContextSlide'
-import { BusinessTypesSlide } from './slides/BusinessTypes/BusinessTypesSlide'
-import { CapabilitiesSlide } from './slides/Capabilities/CapabilitiesSlide'
-import { ConfigurationSlide } from './slides/Configuration/ConfigurationSlide'
+import { ContextSlide } from './slides/Context/ContextSlide'
+import { CustomSlide } from './slides/Custom/CustomSlide'
+import { DepartmentSlide } from './slides/Department/DepartmentSlide'
 import { EmployeesSlide } from './slides/Employees/EmployeesSlide'
-import { ExecutionSlide } from './slides/Execution/ExecutionSlide'
+import { FaqSlide } from './slides/Faq/FaqSlide'
 import { FinalSlide } from './slides/Final/FinalSlide'
 import { HeroSlide } from './slides/Hero/HeroSlide'
-import { ManagementSlide } from './slides/Management/ManagementSlide'
-import { WhatIsSlide } from './slides/WhatIs/WhatIsSlide'
-import { WorkflowSlide } from './slides/Workflow/WorkflowSlide'
+import { PricingSlide } from './slides/Pricing/PricingSlide'
 
 const COMPONENTS: Record<string, ComponentType<SlideProps>> = {
   hero: HeroSlide,
-  what: WhatIsSlide,
-  architecture: ArchitectureSlide,
-  'business-types': BusinessTypesSlide,
+  context: ContextSlide,
   employees: EmployeesSlide,
-  management: ManagementSlide,
-  workflow: WorkflowSlide,
-  execution: ExecutionSlide,
-  context: BusinessContextSlide,
-  capabilities: CapabilitiesSlide,
-  configuration: ConfigurationSlide,
+  custom: CustomSlide,
+  pricing: PricingSlide,
+  faq: FaqSlide,
   start: FinalSlide,
 }
 
@@ -61,7 +52,7 @@ export function App() {
     const hash = `#${SLIDES[index].id}`
     if (window.location.hash !== hash) history.replaceState(null, '', hash)
     document.title =
-      index === 0 ? 'Neuronium — Run AI Workplaces.' : `${SLIDES[index].label} — Neuronium`
+      index === 0 ? 'Neuronium — AI Operating System' : `${SLIDES[index].label} — Neuronium`
   }, [index])
 
   useEffect(() => {
@@ -105,14 +96,16 @@ export function App() {
 
   return (
     <DeckContext.Provider value={api}>
-      <a className="skip-link" href="#capabilities" onClick={(e) => { e.preventDefault(); goTo('capabilities') }}>
-        Skip to capabilities
+      <a className="skip-link" href="#employees" onClick={(e) => { e.preventDefault(); goTo('employees') }}>
+        Skip to the AI employees
       </a>
       <LightField preset={SLIDES[index].light} reducedMotion={reducedMotion} pulseKey={index} />
-      <TopBar onHome={() => go(0)} />
+      <TopNav />
       <main className="stage" aria-roledescription="carousel" aria-label="Neuronium">
         {SLIDES.map((s, i) => {
           const Component = COMPONENTS[s.id]
+          const isActive = i === index
+          const isShown = shown.includes(i)
           const state = i === index ? 'active' : i < index ? 'before' : 'after'
           return (
             <Slide
@@ -125,10 +118,14 @@ export function App() {
               position={i}
               total={count}
               state={state}
-              shown={shown.includes(i)}
+              shown={isShown}
               className={`slide--${s.id}`}
             >
-              <Component active={i === index} shown={shown.includes(i)} />
+              {s.department ? (
+                <DepartmentSlide department={s.department} active={isActive} shown={isShown} />
+              ) : (
+                <Component active={isActive} shown={isShown} />
+              )}
             </Slide>
           )
         })}

@@ -85,8 +85,10 @@ export function useSlideController(count: number, initial: number) {
     let lastInner = 0
     let gesture = { consumed: false, acc: 0, inner: false }
 
+    const navOpen = () => document.documentElement.dataset.navOpen === 'true'
+
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) return // pinch-zoom
+      if (e.ctrlKey || navOpen()) return // pinch-zoom, or a menu is open
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1
       const dy = e.deltaY * unit
       const dx = e.deltaX * unit
@@ -124,7 +126,7 @@ export function useSlideController(count: number, initial: number) {
 
     // ---------- keyboard ----------
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey) return
+      if (e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey || navOpen()) return
       const active = document.activeElement
       if (isEditable(active)) return
       if (active?.closest('[data-own-keys]') && e.key.startsWith('Arrow')) return
@@ -180,7 +182,7 @@ export function useSlideController(count: number, initial: number) {
     } | null = null
 
     const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) {
+      if (e.touches.length !== 1 || navOpen()) {
         touch = null
         return
       }

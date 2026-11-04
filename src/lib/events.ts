@@ -1,13 +1,10 @@
-import type { EmployeeId } from '../data/employees'
+/** Cross-block hand-off: open a department with one of its AI employees selected. */
+const FOCUS_EVENT = 'neuronium:focus-employee'
 
-/** Cross-slide hand-off: open the capabilities catalog on a given AI Employee. */
-const CATALOG_EVENT = 'neuronium:catalog'
+export const focusEmployee = (n: number) => window.dispatchEvent(new CustomEvent<number>(FOCUS_EVENT, { detail: n }))
 
-export const openCatalogAt = (id: EmployeeId) =>
-  window.dispatchEvent(new CustomEvent<EmployeeId>(CATALOG_EVENT, { detail: id }))
-
-export const onCatalogRequest = (fn: (id: EmployeeId) => void) => {
-  const handler = (e: Event) => fn((e as CustomEvent<EmployeeId>).detail)
-  window.addEventListener(CATALOG_EVENT, handler)
-  return () => window.removeEventListener(CATALOG_EVENT, handler)
+export const onFocusEmployee = (fn: (n: number) => void) => {
+  const handler = (e: Event) => fn((e as CustomEvent<number>).detail)
+  window.addEventListener(FOCUS_EVENT, handler)
+  return () => window.removeEventListener(FOCUS_EVENT, handler)
 }
