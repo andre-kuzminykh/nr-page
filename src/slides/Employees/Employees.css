@@ -69,6 +69,19 @@
   display: none;
 }
 
+.emp__count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, #c43cf2 30%, transparent);
+  color: #fff;
+  font-size: 10px;
+}
+
+.emp__count.is-none {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--muted);
+}
+
 .emp__clear {
   display: grid;
   place-items: center;
@@ -77,12 +90,7 @@
   border-radius: 50%;
 }
 
-.emp__status {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+
 
 /* ---------- periodic table ---------- */
 .emp__table-wrap {
@@ -92,7 +100,7 @@
 .pt {
   --cell: min(6.4vh, 4.15vw, 62px);
   --gap: max(3px, calc(var(--cell) * 0.07));
-  --label: clamp(104px, 8.4vw, 124px);
+  --label: clamp(116px, 8.9vw, 134px);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -262,43 +270,25 @@
   transform: translate(0, 0);
 }
 
-/* a slow light sweep across the table */
-.pt__sweep {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.07) 48%, rgb(242 68 154 / 0.06) 52%, transparent 62%);
-  background-size: 300% 100%;
-  background-position: 100% 0;
-  mix-blend-mode: screen;
-}
-
-[data-shown] .pt__sweep {
-  animation: pt-sweep 9s var(--ease-in-out) 2.4s infinite;
-}
-
-@keyframes pt-sweep {
-  0% {
-    background-position: 100% 0;
-  }
-  45%,
-  100% {
-    background-position: 0% 0;
-  }
-}
-
 .pt__label {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
-  height: 100%;
-  padding-right: 6px;
+  height: calc(var(--cell) * 0.66);
+  margin-right: 6px;
+  padding: 0 10px 0 9px;
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
   text-align: left;
-  transition: color 300ms, opacity 300ms;
+  cursor: pointer;
+  transition:
+    color 300ms,
+    opacity 300ms,
+    background-color 300ms,
+    box-shadow 300ms;
 }
 
 .pt__label svg {
@@ -322,12 +312,56 @@
 }
 
 .pt__label:hover,
+.pt__label:focus-visible,
 .pt__label.is-active {
   color: var(--fg);
+  background: color-mix(in oklab, var(--fam) 13%, transparent);
+}
+
+.pt__label:focus-visible {
+  outline: 1.5px solid #fff;
+  outline-offset: 2px;
+}
+
+.pt__label[aria-pressed='true'] {
+  color: #fff;
+  background: color-mix(in oklab, var(--fam) 30%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fam) 70%, transparent);
 }
 
 .pt__label.is-dim {
   opacity: 0.35;
+}
+
+/* hovering a department previews its row */
+.pt__line:has(.pt__label:hover) .pt__cell {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--fam) 80%, transparent),
+    0 8px 22px -14px var(--fam);
+}
+
+/* a picked department: its ten elements rise and glow, the others step back */
+.pt.has-dept .pt__cell {
+  transition:
+    opacity 450ms var(--ease-out),
+    transform 450ms var(--ease-out),
+    box-shadow 450ms var(--ease-out);
+  transition-delay: calc(var(--c) * 28ms);
+}
+
+.pt.has-dept .pt__line:not(.is-row) .pt__cell {
+  opacity: 0.2;
+}
+
+.pt.has-dept .pt__line:not(.is-row) .pt__label {
+  opacity: 0.55;
+}
+
+.pt.has-dept .pt__line.is-row .pt__cell {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1.5px var(--fam),
+    0 14px 30px -12px var(--fam);
 }
 
 /* ---------- selected element card ---------- */
@@ -365,20 +399,50 @@
   box-shadow: 0 30px 70px -40px color-mix(in oklab, var(--fam) 70%, transparent);
 }
 
-.emp__card--side .emp__card-foot {
-  margin-top: auto;
+.emp__dept-ic {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--fam) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--fam) 55%, transparent);
+  color: color-mix(in oklab, var(--fam) 45%, #fff);
 }
 
-.emp__card--empty {
-  justify-content: center;
-  align-items: center;
-  border-style: dashed;
-  border-color: var(--line-strong);
-  background: transparent;
-  box-shadow: none;
-  font-size: 13px;
-  color: var(--muted);
-  text-align: center;
+.emp__card-syms {
+  display: grid;
+  grid-template-columns: repeat(5, max-content);
+  gap: 6px 8px;
+}
+
+.emp__mini {
+  border-radius: 6px;
+  transition: transform 200ms var(--ease-out);
+}
+
+.emp__mini:hover,
+.emp__mini:focus-visible {
+  transform: translateY(-2px);
+}
+
+.emp__card--dock {
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  width: auto;
+}
+
+.emp__card--dock.is-top {
+  top: 0;
+  bottom: auto;
+}
+
+.emp__card--side .emp__card-foot {
+  margin-top: auto;
+  justify-content: flex-end;
 }
 
 .emp__card--l {
@@ -401,6 +465,11 @@
 .emp__card-head {
   flex: 1;
   min-width: 0;
+}
+
+button.emp__card-dept:hover,
+button.emp__card-dept:focus-visible {
+  color: #fff;
 }
 
 .emp__card-dept {
@@ -446,7 +515,7 @@
 .emp__card-foot {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -486,7 +555,7 @@ mark {
   }
   .pt {
     --cell: min(6vh, 4.9vw, 58px);
-    --label: 116px;
+    --label: 122px;
   }
 }
 
@@ -578,8 +647,34 @@ mark {
   }
 }
 
+@media (max-width: 700px) {
+  .emp.has-card .emp__copy,
+  .emp.has-card .emp__search {
+    display: none;
+  }
+  .emp__side,
+  .emp__card--side {
+    min-height: 0;
+  }
+  .emp__card--side {
+    padding: 12px;
+    gap: 8px;
+  }
+  .emp__mini .sym {
+    min-width: 34px;
+    height: 34px;
+  }
+}
+
 @media (max-width: 700px) and (max-height: 720px) {
   .emp__copy {
     display: none;
   }
+}
+
+.emp__mini .sym {
+  min-width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  font-size: 13px;
 }
