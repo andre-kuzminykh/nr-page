@@ -391,7 +391,8 @@ async function functionalPass(browser) {
   // Custom use cases: the AI employee as a node graph
   await go('custom')
   await page.getByRole('tab', { name: 'Supplier Check' }).click()
-  await sleep(2600)
+  // the graph draws itself, then the data starts to stream (about 2.5 s, longer under software rendering)
+  await page.waitForFunction(() => [...document.querySelectorAll('.slide[data-state="active"] .fl-e__flow')].filter((e) => Number(getComputedStyle(e).opacity) > 0.5).length >= 5, null, { timeout: 8000 }).catch(() => {})
   const cu = await page.evaluate(() => {
     const s = document.querySelector('.slide[data-state="active"]')
     const nodes = [...s.querySelectorAll('.fl-n')]
