@@ -144,7 +144,7 @@ const waitFor = async (fn, ms = 4500) => {
   await search.press('Escape')
   await sleep(300)
   const back = await page.locator('#emp-status').innerText()
-  await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', /product scope/i.test(back) && (await page.locator('.pt__cell.is-dim').count()) === 0)
+  await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', back.trim() === '' && (await page.locator('.pt__cell.is-dim').count()) === 0)
   await page.locator('.pt__cell[data-n="63"]').click()
   await sleep(300)
   await page.locator('.emp__card').getByRole('button', { name: /Open Analytics/ }).click()
@@ -157,8 +157,16 @@ const waitFor = async (fn, ms = 4500) => {
   await page.evaluate(() => (location.hash = '#employees'))
   await sleep(1400)
   await page.locator('.pt__label', { hasText: 'Design' }).click()
+  await sleep(600)
+  const dc = await page.evaluate(() => ({
+    row: document.querySelector('.pt__line.is-row .pt__label-name')?.textContent,
+    dim: document.querySelectorAll('.pt.has-dept .pt__line:not(.is-row) .pt__cell').length,
+    card: document.querySelector('.emp__card--dept')?.innerText ?? '',
+  }))
+  await step(page, 'desktop', 'Picks the “Design” department in the table', 'Its row lights up, the rest steps back; a card shows its headline and 10 AI employees', dc.row === 'Design' && dc.dim === 90 && /From design system/.test(dc.card), JSON.stringify({ row: dc.row, dim: dc.dim }))
+  await page.locator('.emp__card--dept').getByRole('button', { name: /Open Design/ }).click()
   await sleep(1500)
-  await step(page, 'desktop', 'Clicks the “Design” row label', 'Lands on the Design block', (await idx(page)) === at('design'))
+  await step(page, 'desktop', 'Clicks “Open Design” on the card', 'Lands on the Design block', (await idx(page)) === at('design'))
 
   // A department block
   await page.locator('.nav__item', { hasText: /^Design/ }).click()
@@ -177,7 +185,7 @@ const waitFor = async (fn, ms = 4500) => {
     const n = await selName(page)
     return n !== a0 ? n : null
   }, 5000)
-  const lit = await page.evaluate(() => document.querySelectorAll('.slide[data-state="active"] .dept__stage .hot.is-hot').length)
+  const lit = await page.evaluate(() => document.querySelectorAll('.slide[data-state="active"] .dept__slot.is-focus .is-hot').length)
   await step(page, 'desktop', 'Opens Management from the menu and waits', 'AI employees play one after another; each lights up its own part of the interface', a0 === 'Knowledge Management' && a1 === 'Note Taking' && lit > 0, `${a0} → ${a1}`)
   await page.locator('.slide[data-state="active"] #tab-4').click()
   await sleep(400)
@@ -186,11 +194,11 @@ const waitFor = async (fn, ms = 4500) => {
     return {
       cap: s.querySelector('.dept__cap-name')?.textContent,
       auto: !!s.querySelector('.dept__strip.is-auto'),
-      focus: s.querySelector('.dept__slot.is-focus .pn__title')?.textContent,
-      hot: s.querySelector('.dept__slot.is-focus .hot.is-hot') !== null,
+      view: s.querySelector('.mgx')?.dataset.view,
+      hot: s.querySelector('.dept__slot.is-focus .is-hot') !== null,
     }
   })
-  await step(page, 'desktop', 'Clicks element 4 (Tm)', 'Autoplay stops; Task Management’s panel comes forward and its part lights up', /Task Management/.test(tm.cap) && !tm.auto && tm.hot, JSON.stringify(tm))
+  await step(page, 'desktop', 'Clicks element 4 (Tm)', 'Autoplay stops; the interface turns to the task list made from the product', /Task Management/.test(tm.cap) && !tm.auto && tm.hot && tm.view === 'tasks', JSON.stringify(tm))
   await page.keyboard.press('ArrowRight')
   await sleep(300)
   const kbDept = await page.evaluate(() => ({ sel: document.querySelector('.slide[data-state="active"] .dept__el[aria-selected="true"]')?.dataset.name, focus: document.activeElement?.dataset.name }))
@@ -205,9 +213,14 @@ const waitFor = async (fn, ms = 4500) => {
   // Platform: shared context and the Superagent
   await page.locator('.nav__item', { hasText: 'Platform' }).click()
   await sleep(5600)
-  const plan = await page.$$eval('.slide[data-state="active"] .ctx__step', (els) => els.map((e) => (e.className.match(/is-(\w+)/) || [])[1]))
-  const chips = await page.$$eval('.slide[data-state="active"] .ctx__chips .is-on', (els) => els.length)
-  await step(page, 'desktop', 'Opens Platform and watches', 'Context arrives from the sources, then the Superagent works through AI employees', chips === 4 && (plan.includes('run') || plan.includes('done')), plan.join(' '))
+  const brain = await page.evaluate(() => {
+    const nodes = [...document.querySelectorAll('.slide[data-state="active"] .cb-n')]
+    return {
+      lit: nodes.filter((n) => Number(n.children[3]?.getAttribute('opacity') ?? 0) > 0.5).length,
+      way: document.querySelectorAll('.slide[data-state="active"] .cb line[display="inline"]').length,
+    }
+  })
+  await step(page, 'desktop', 'Opens Platform and watches', 'A brain of tools: the Superagent runs along the connections and the tools light up one by one', brain.lit >= 4 && brain.way > 6, JSON.stringify(brain))
 
   // Use cases
   await page.locator('.nav__item', { hasText: 'Use cases' }).click()

@@ -237,20 +237,26 @@ async function functionalPass(browser) {
   const up = await activeIndex(page)
   check('Keyboard: End / Home / ArrowDown / ArrowUp', end === SLIDES.length - 1 && home === 0 && down === 1 && up === 0, `${end},${home},${down},${up}`)
 
-  // Shared context and Superagent
+  // Shared context: a brain of tools, one Superagent running through it
   await go('context')
   await sleep(4200)
-  const cx = await page.evaluate(() => ({
-    sources: document.querySelectorAll('.ctx__src').length,
-    steps: document.querySelectorAll('.ctx__step').length,
-    running: document.querySelectorAll('.ctx__step.is-run, .ctx__step.is-done').length,
-    gov: document.querySelector('.ctx__gov')?.textContent,
-  }))
+  const cx = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    const nodes = [...s.querySelectorAll('.cb-n')]
+    return {
+      nodes: nodes.length,
+      labels: nodes.map((n) => n.querySelector('.cb-lab')?.textContent).join('|'),
+      lit: nodes.filter((n) => Number(n.children[3]?.getAttribute('opacity') ?? 0) > 0.5).length,
+      way: s.querySelectorAll('.cb line[display="inline"]').length,
+      text: s.querySelector('.slide__frame').innerText.replace(/\s+/g, ' ').trim(),
+    }
+  })
   check(
-    'Shared context: 12 source icons, Superagent plan across AI employees, AI Governance (Policy · Access · Oversight · Control)',
-    cx.sources === 12 && cx.steps === 6 && cx.running > 0 && /Policy · Access · Oversight · Control/.test(cx.gov || ''),
-    JSON.stringify({ ...cx, gov: undefined }),
+    'Shared context: a brain of 12 tools around the AI Superagent; the agent runs along the connections and the tools light up',
+    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && cx.lit >= 3 && cx.way > 4,
+    `${cx.lit} lit, ${cx.way} connections on the way`,
   )
+  check('Shared context: no extra copy — just the title and the brain', /^Shared context\. One Superagent\./.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
 
   // Periodic table of 100 AI employees
   await go('employees')
@@ -267,6 +273,27 @@ async function functionalPass(browser) {
   const zero = await page.locator('.pt__zero .pt__sym').innerText()
   const ranges = await page.locator('.pt__col, .dept__count:has-text("–")').count()
   check('Periodic table: unique symbols, Nr is element 0, no column numbers or ranges', new Set(syms).size === 100 && !syms.includes('Nr') && zero === 'Nr' && ranges === 0)
+  const quiet = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    return !/Product scope|availability varies|Pick an element/i.test(s.innerText) && !s.querySelector('.pt__sweep')
+  })
+  check('Periodic table: no scope notes, no placeholder text, no light sweep over the table', quiet)
+  await page.locator('.pt__label', { hasText: 'Marketing' }).click()
+  await sleep(500)
+  const dsel = await page.evaluate(() => ({
+    row: document.querySelector('.pt.has-dept .pt__line.is-row .pt__label-name')?.textContent,
+    card: document.querySelector('.emp__card--dept .emp__card-name')?.textContent,
+    minis: document.querySelectorAll('.emp__card--dept .emp__mini').length,
+    pressed: document.querySelector('.pt__label[aria-pressed="true"] .pt__label-name')?.textContent,
+  }))
+  await page.locator('.emp__card--dept').getByRole('button', { name: /Open Marketing/ }).click()
+  await page.waitForFunction((i) => Number(document.querySelector('.slide[data-state="active"]')?.dataset.slide) === i, at('marketing'), { timeout: 4000 }).catch(() => {})
+  check(
+    'Periodic table: a department is picked from its row — the row lights up, a card lists its 10 AI employees and opens the block',
+    dsel.row === 'Marketing' && dsel.card === 'Marketing' && dsel.minis === 10 && dsel.pressed === 'Marketing' && (await activeIndex(page)) === at('marketing'),
+    JSON.stringify(dsel),
+  )
+  await go('employees')
 
   const search = page.getByRole('searchbox', { name: 'Search AI employees' })
   await search.fill('Apollo')
@@ -307,14 +334,44 @@ async function functionalPass(browser) {
       await slide.locator(`#tab-${m.n}`).click()
       await sleep(80)
       const state = await slide.evaluate((el) => ({
-        hot: el.querySelectorAll('.dept__stage .hot.is-hot').length,
+        hot: el.querySelectorAll('.dept__slot.is-focus .is-hot').length,
         focus: el.querySelectorAll('.dept__stage .pn.is-focus').length,
+        windows: el.querySelectorAll('.dept__slot.is-focus').length,
         cap: el.querySelector('.dept__cap-desc')?.textContent,
       }))
-      if (!state.hot || state.focus !== 1 || state.cap !== m.description) missing.push(`${m.n} ${m.name}`)
+      if (!state.hot || state.focus !== 1 || state.windows !== 1 || state.cap !== m.description) missing.push(`${m.n} ${m.name}`)
     }
   }
-  check('Departments: 10 blocks × 10 AI employees; each one focuses a panel and lights up its own part of the interface', missing.length === 0, missing.slice(0, 6).join(', '))
+  check('Departments: 10 blocks × 10 AI employees, one interface at a time; each AI employee brings its interface forward and lights up its own part', missing.length === 0, missing.slice(0, 6).join(', '))
+
+  // Management: the same six tasks become a list, a Gantt chart, a calendar and a board
+  await go('management')
+  const slideM = page.locator('.slide[data-state="active"]')
+  const tasksIn = async (n) => {
+    await slideM.locator(`#tab-${n}`).click()
+    await sleep(1300)
+    return slideM.evaluate((el) => ({
+      view: el.querySelector('.mgx')?.dataset.view,
+      on: el.querySelectorAll('.mgx-t.is-on').length,
+      boxes: [...el.querySelectorAll('.mgx-t')].map((t) => {
+        const r = t.getBoundingClientRect()
+        return `${Math.round(r.width)}x${Math.round(r.height)}`
+      }).join(','),
+    }))
+  }
+  const story = [await tasksIn(4), await tasksIn(6), await tasksIn(8), await tasksIn(5)]
+  check(
+    'Management: one interface — the same six tasks turn from a list into a Gantt chart, a calendar and a board',
+    story.map((x) => x.view).join('>') === 'tasks>gantt>calendar>board' && story.every((x) => x.on === 6) && new Set(story.map((x) => x.boxes)).size === 4,
+    story.map((x) => `${x.view}:${x.on}`).join(' '),
+  )
+  const boardSteps = await slideM.evaluate(async () => {
+    const col = () => [...document.querySelectorAll('.slide[data-state="active"] .mgx-t')].map((t) => Math.round(t.getBoundingClientRect().left)).join(',')
+    const a = col()
+    await new Promise((r) => setTimeout(r, 3600))
+    return [a, col()]
+  })
+  check('Management board: tasks move on from To do to In progress to Done', boardSteps[0] !== boardSteps[1])
 
   // Custom use cases
   await go('custom')
