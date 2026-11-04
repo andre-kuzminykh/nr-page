@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { FAMILY } from '../../components/Element/Element'
 import { Panel, useParallax } from '../../components/Kit/Kit'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
@@ -10,13 +10,13 @@ import { STAGES } from './panels'
 import './Department.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-const CYCLE_MS = 3400
-const DEPTH = [5, 9, 13, 7]
+/** Each AI employee's piece of interface plays for five seconds, then the next one comes. */
+const CYCLE_MS = 5000
 
 /**
- * A department block: its ten AI employees as elements, and the pieces of interface
- * they work in. Selecting an AI employee (or letting it cycle) brings its panel into
- * focus and lights up the exact part of the interface it is responsible for.
+ * A department block: its ten AI employees as elements and one interface at a time.
+ * Every five seconds the next AI employee takes over: its interface comes forward and the
+ * exact part it is responsible for lights up. Picking an element stops the autoplay.
  */
 export function DepartmentSlide({ department, active, shown }: SlideProps & { department: DepartmentId }) {
   const { reducedMotion } = useDeck()
@@ -25,17 +25,18 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   const Icon = DEPARTMENT_ICON[department]
   const stage = STAGES[department]
   const first = dept.members[0].n
-  const [sel, setSel] = useState(first)
+  const order = useMemo(() => stage.order ?? dept.members.map((m) => m.n), [stage, dept])
+  const [sel, setSel] = useState(order[0])
   const [auto, setAuto] = useState(true)
   const tabs = useRef<(HTMLButtonElement | null)[]>([])
   const stageRef = useParallax<HTMLDivElement>(active && !reducedMotion)
 
   useEffect(() => {
     if (!shown) {
-      setSel(first)
+      setSel(order[0])
       setAuto(true)
     }
-  }, [shown, first])
+  }, [shown, order])
 
   useEffect(
     () =>
@@ -49,7 +50,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   )
 
   useInterval(
-    () => setSel((s) => (s - first + 1) % 10 + first),
+    () => setSel((s) => order[(order.indexOf(s) + 1) % order.length]),
     active && auto && !reducedMotion ? CYCLE_MS : null,
   )
 
@@ -141,29 +142,28 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
         id={`stage-${department}`}
         role="tabpanel"
         aria-labelledby={`tab-${sel}`}
-        className={`dept__stage dept__stage--${stage.layout}`}
+        className="dept__stage"
       >
-        {stage.panels.map((p, i) => (
-          <div
-            key={p.title}
-            className={`dept__slot ${i === focusIdx ? 'is-focus' : ''}`}
-            style={{ gridArea: p.area, '--i': i, '--depth': DEPTH[i] } as CSSProperties}
-          >
-            <Panel
-              title={p.title}
-              icon={p.icon}
-              meta={p.meta}
-              focus={i === focusIdx}
-              dim={i !== focusIdx}
-              onClick={() => {
-                if (!p.members.includes(sel)) pick(p.members[0])
-              }}
-            >
-              {p.render({ sel, live: live && i === focusIdx })}
-            </Panel>
+        {stage.scene ? (
+          <div className="dept__slot is-focus">
+            <div className="dept__scale">{stage.scene({ sel, live })}</div>
           </div>
-        ))}
-        <p className="dept__note mono">Interface preview · sample data</p>
+        ) : (
+          stage.panels.map((p, i) => (
+            <div
+              key={p.title}
+              className={`dept__slot ${i === focusIdx ? 'is-focus' : ''}`}
+              aria-hidden={i !== focusIdx}
+              inert={i !== focusIdx}
+            >
+              <div className="dept__scale">
+                <Panel title={p.title} icon={p.icon} meta={p.meta} focus={i === focusIdx}>
+                  {p.render({ sel, live: live && i === focusIdx })}
+                </Panel>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   )

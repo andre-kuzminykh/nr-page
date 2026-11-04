@@ -22,4 +22,8 @@ export interface PanelDef {
 export interface DepartmentStage {
   layout: 'tall-left' | 'tall-right' | 'top-wide' | 'quad'
   panels: PanelDef[]
+  /** The order the block plays its AI employees in (default: 1–10 of the department). */
+  order?: number[]
+  /** One continuous interface instead of separate panels. */
+  scene?: (p: PanelRenderProps) => ReactNode
 }

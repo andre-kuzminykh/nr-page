@@ -1,0 +1,802 @@
+/* =========================================================
+   Management — one interface that turns from view to view.
+   Six tasks keep their identity and glide between the list,
+   the Gantt chart, the calendar and the board.
+   ========================================================= */
+.mgx {
+  --p0: #a979ff;
+  --p1: #e86bd0;
+  --p2: #ff9a5c;
+  height: calc(var(--wh, 560px) / var(--pz, 1));
+}
+
+.mgx__head {
+  animation: k-in 520ms var(--ease-out);
+}
+
+.mgx__body {
+  padding: 14px 16px 16px;
+}
+
+.mgx__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------- views ---------- */
+.mgx-v {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 450ms var(--ease-out),
+    transform 650ms var(--ease-out);
+}
+
+.mgx-v[data-on='true'] {
+  opacity: 1;
+  transform: none;
+  transition-delay: 120ms;
+}
+
+.mgx-label {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mgx-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.mgx-tag-r {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+@keyframes mgx-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* knowledge */
+.mgx-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.04);
+  font-size: 14px;
+}
+
+.mgx-search svg {
+  color: var(--fam);
+  flex-shrink: 0;
+}
+
+.mgx-answer {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--fam) 9%, rgb(255 255 255 / 0.03));
+  border: 1px solid color-mix(in oklab, var(--fam) 30%, transparent);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.mgx-v[data-on='true'] .mgx-answer {
+  animation: mgx-in 600ms var(--ease-out) 1700ms backwards;
+}
+
+.mgx-src {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.mgx-src span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--muted);
+}
+
+.mgx-doc {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  background: rgb(255 255 255 / 0.035);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  font-size: 12.5px;
+}
+
+.mgx-doc > svg {
+  flex-shrink: 0;
+  color: var(--fam);
+}
+
+.mgx-doc > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.mgx-quote {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mgx-late {
+  opacity: 0;
+}
+
+.mgx-v[data-on='true'] .mgx-late {
+  animation: mgx-in 500ms var(--ease-out) forwards;
+  animation-delay: calc(2300ms + var(--k) * 350ms);
+}
+
+/* product spec */
+.mgx-spec {
+  display: grid;
+  gap: 6px;
+}
+
+.mgx-spec div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.035);
+  font-size: 12.5px;
+}
+
+.mgx-spec dt {
+  color: var(--muted);
+}
+
+.mgx-v[data-on='true'] .mgx-spec div {
+  animation: mgx-in 450ms var(--ease-out) backwards;
+  animation-delay: calc(350ms + var(--k) * 220ms);
+}
+
+/* notes */
+.mgx-call {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.mgx-rec {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5f6d;
+  box-shadow: 0 0 10px #ff5f6d;
+  animation: k-blink 1.2s steps(1) infinite;
+}
+
+.mgx-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.04);
+  font-size: 13px;
+}
+
+.mgx-note--d {
+  background: color-mix(in oklab, var(--fam) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--fam) 32%, transparent);
+}
+
+.mgx-v[data-on='true'] .mgx-note {
+  animation: mgx-in 500ms var(--ease-out) backwards;
+  animation-delay: calc(500ms + var(--k) * 520ms);
+}
+
+.mgx-box {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  border: 1.5px solid rgb(255 255 255 / 0.35);
+  flex-shrink: 0;
+}
+
+/* goals */
+.mgx-goal p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  font-size: 13.5px;
+}
+
+.mgx-goal b {
+  font-size: 11px;
+  color: color-mix(in oklab, var(--fam) 60%, #fff);
+}
+
+.mgx-goal {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.035);
+}
+
+.mgx-goal__bar {
+  display: block;
+  height: 5px;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 0.08);
+  overflow: hidden;
+}
+
+.mgx-goal__bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--fam), color-mix(in oklab, var(--fam) 40%, #ff9a5c));
+  transition: width 1400ms var(--ease-out);
+}
+
+.mgx-v[data-on='true'] .mgx-goal__bar i {
+  width: var(--v);
+  transition-delay: calc(400ms + var(--k) * 300ms);
+}
+
+/* product */
+.mgx-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, var(--fam) 34%, transparent);
+  background: color-mix(in oklab, var(--fam) 10%, transparent);
+  font-size: 12.5px;
+}
+
+.mgx-product > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.mgx-product__ic {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--fam);
+}
+
+.mgx-product__name {
+  font-size: 15px;
+  font-weight: 560;
+}
+
+.mgx-feats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mgx-v[data-on='true'] .mgx-feats .k-chip {
+  animation: k-pop 450ms var(--ease-out) backwards;
+  animation-delay: calc(600ms + var(--k) * 260ms);
+}
+
+.mgx-make {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--fam) 60%, #fff);
+  opacity: 0;
+}
+
+.mgx-v[data-on='true'] .mgx-make {
+  animation: mgx-in 500ms var(--ease-out) 2600ms forwards;
+}
+
+/* list header */
+.mgx-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 10%;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* gantt */
+.mgx-weeks,
+.mgx-days,
+.mgx-cols {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mgx-weeks {
+  left: 2%;
+  right: 2%;
+  bottom: 9%;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.mgx-weeks span,
+.mgx-days span {
+  padding: 2px 0 0 6px;
+  border-left: 1px solid rgb(255 255 255 / 0.07);
+}
+
+.mgx-today {
+  position: absolute;
+  top: 8%;
+  bottom: 9%;
+  left: calc(2% + 2.35 / 6 * 96%);
+  width: 1.5px;
+  background: linear-gradient(var(--fam), transparent);
+}
+
+.mgx-today::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background: var(--fam);
+  box-shadow: 0 0 10px var(--fam);
+}
+
+.mgx-legend {
+  position: absolute;
+  left: 2%;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.mgx-legend .sym {
+  margin-left: auto;
+}
+
+.mgx-proj::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 3px;
+  background: var(--pc);
+}
+
+.mgx-proj--0 {
+  --pc: var(--p0);
+}
+.mgx-proj--1 {
+  --pc: var(--p1);
+}
+.mgx-proj--2 {
+  --pc: var(--p2);
+}
+
+/* calendar */
+.mgx-days {
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 1%;
+}
+
+.mgx-hours span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgb(255 255 255 / 0.06);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: rgb(var(--fg-rgb) / 0.3);
+  text-align: right;
+}
+
+.mgx-hours span:nth-child(1) {
+  top: 13%;
+}
+.mgx-hours span:nth-child(2) {
+  top: 27.2%;
+}
+.mgx-hours span:nth-child(3) {
+  top: 41.4%;
+}
+.mgx-hours span:nth-child(4) {
+  top: 55.6%;
+}
+.mgx-hours span:nth-child(5) {
+  top: 69.8%;
+}
+.mgx-hours span:nth-child(6) {
+  top: 84%;
+}
+
+.mgx-now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 47%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--fam) 20%, var(--fam) 80%, transparent);
+  opacity: 0.8;
+}
+
+.mgx-v[data-on='true'] .mgx-now {
+  animation: mgx-now 5s linear;
+}
+
+@keyframes mgx-now {
+  from {
+    top: 40%;
+  }
+  to {
+    top: 47%;
+  }
+}
+
+/* board */
+.mgx-cols {
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 1.4%;
+}
+
+.mgx-cols span {
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.03);
+}
+
+.mgx-cols b {
+  margin-left: 4px;
+  color: var(--fg);
+}
+
+/* ---------- the tasks ---------- */
+.mgx-tasks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mgx-t {
+  --pc: var(--p0);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    left 900ms cubic-bezier(0.65, 0, 0.35, 1),
+    top 900ms cubic-bezier(0.65, 0, 0.35, 1),
+    width 900ms cubic-bezier(0.65, 0, 0.35, 1),
+    height 900ms cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 500ms var(--ease-out),
+    background-color 600ms,
+    border-color 600ms,
+    border-radius 600ms,
+    box-shadow 600ms;
+  transition-delay: calc(var(--k) * 60ms);
+}
+
+.mgx-t--p1 {
+  --pc: var(--p1);
+}
+.mgx-t--p2 {
+  --pc: var(--p2);
+}
+
+.mgx-t.is-on {
+  opacity: 1;
+}
+
+.mgx-t__mark {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgb(255 255 255 / 0.3);
+  color: #0b0a0f;
+  transition:
+    background-color 400ms,
+    border-color 400ms;
+}
+
+.mgx-t.is-done .mgx-t__mark {
+  border-color: var(--pc);
+  background: var(--pc);
+}
+
+.mgx-t__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mgx-t__proj {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--pc) 70%, #fff);
+}
+
+.mgx-t .sym {
+  flex-shrink: 0;
+}
+
+/* list */
+.mgx[data-view='tasks'] .mgx-t {
+  border-color: transparent;
+  border-bottom-color: rgb(255 255 255 / 0.07);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 3px 0 0 var(--pc);
+}
+
+/* gantt: bars in the project colour */
+.mgx[data-view='gantt'] .mgx-t {
+  border-color: transparent;
+  border-radius: 7px;
+  background: color-mix(in oklab, var(--pc) 62%, rgb(12 10 18));
+  font-size: 11.5px;
+  font-weight: 520;
+  padding: 0 6px 0 9px;
+}
+
+.mgx[data-view='gantt'] .mgx-t__mark,
+.mgx[data-view='gantt'] .mgx-t__proj,
+.mgx[data-view='calendar'] .mgx-t__mark,
+.mgx[data-view='calendar'] .mgx-t__proj,
+.mgx[data-view='board'] .mgx-t__proj {
+  display: none;
+}
+
+/* calendar: blocks with a coloured edge */
+.mgx[data-view='calendar'] .mgx-t {
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px 8px 7px 10px;
+  border-color: transparent;
+  border-radius: 9px;
+  background: color-mix(in oklab, var(--pc) 22%, rgb(14 12 21));
+  box-shadow: inset 3px 0 0 var(--pc);
+  font-size: 11.5px;
+  white-space: normal;
+}
+
+.mgx[data-view='calendar'] .mgx-t__title {
+  flex: none;
+  width: 100%;
+  line-height: 1.3;
+}
+
+/* board: cards */
+.mgx[data-view='board'] .mgx-t {
+  background: rgb(255 255 255 / 0.07);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 3px 0 0 var(--pc),
+    0 10px 24px -16px rgb(0 0 0 / 0.8);
+  font-size: 12px;
+}
+
+.mgx[data-view='board'] .mgx-t.is-done {
+  background: rgb(255 255 255 / 0.04);
+}
+
+.mgx[data-view='board'] .mgx-t.is-done .mgx-t__title {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: rgb(255 255 255 / 0.3);
+}
+
+/* ---------- inbox and team ---------- */
+.mgx-msg,
+.mgx-person {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.04);
+  font-size: 12.5px;
+}
+
+.mgx-msg > svg {
+  flex-shrink: 0;
+  color: var(--fam);
+}
+
+.mgx-msg > div,
+.mgx-person > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.mgx-msg__from,
+.mgx-person__role {
+  font-weight: 540;
+}
+
+.mgx-msg__from {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.mgx-msg__act {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--fam) 16%, transparent);
+  color: color-mix(in oklab, var(--fam) 55%, #fff);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  white-space: nowrap;
+}
+
+.mgx-v[data-on='true'] .mgx-msg,
+.mgx-v[data-on='true'] .mgx-person {
+  animation: mgx-in 500ms var(--ease-out) backwards;
+  animation-delay: calc(300ms + var(--k) * 450ms);
+}
+
+.mgx-v[data-on='true'] .mgx-msg__act {
+  animation: k-pop 450ms var(--ease-out) backwards;
+  animation-delay: calc(900ms + var(--k) * 450ms);
+}
+
+.mgx-person__load {
+  width: 26%;
+}
+
+.mgx-v[data-on='true'] .mgx-person__load i {
+  width: var(--v);
+  transition-delay: calc(600ms + var(--k) * 300ms);
+}
+
+@media (max-width: 860px) {
+  .mgx {
+    height: clamp(250px, calc(100svh - 520px), 420px);
+  }
+  .mgx__body {
+    padding: 12px 12px 12px;
+  }
+  .mgx-t {
+    font-size: 11px;
+    gap: 6px;
+    padding: 0 7px;
+  }
+  .mgx-t__proj {
+    display: none;
+  }
+  .mgx[data-view='calendar'] .mgx-t {
+    padding: 5px 5px 5px 7px;
+    font-size: 10px;
+  }
+  .mgx[data-view='calendar'] .mgx-t .sym {
+    display: none;
+  }
+  .mgx[data-view='gantt'] .mgx-t {
+    font-size: 10px;
+  }
+  .mgx[data-view='gantt'] .mgx-t .sym {
+    display: none;
+  }
+  .mgx-hours span {
+    color: transparent;
+  }
+  .mgx-search {
+    font-size: 12.5px;
+  }
+  .mgx-answer,
+  .mgx-note,
+  .mgx-goal p,
+  .mgx-msg,
+  .mgx-person {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .mgx {
+    height: clamp(190px, calc(100svh - 480px), 250px);
+  }
+  .mgx-v {
+    gap: 7px;
+  }
+  .mgx-goal {
+    padding: 7px 10px;
+  }
+  .mgx-msg,
+  .mgx-person {
+    padding: 6px 10px;
+  }
+  .mgx-foot,
+  .mgx-late,
+  .mgx-spec {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mgx-t,
+  .mgx-v {
+    transition: none;
+  }
+}

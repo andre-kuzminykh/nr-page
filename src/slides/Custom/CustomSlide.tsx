@@ -161,7 +161,6 @@ export function CustomSlide({ active, shown }: SlideProps) {
         <div className="pn__head">
           <Blocks size={14} strokeWidth={1.7} aria-hidden="true" />
           <span className="pn__title">New AI employee</span>
-          <span className="pn__meta">Example</span>
         </div>
         <div className="pn__body cu__body" key={uc.n}>
           <div className="cu__id">
