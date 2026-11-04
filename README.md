@@ -1,9 +1,10 @@
-# Neuronium — Run AI Workplaces.
+# Neuronium — Run AI Business with AI Operating System.
 
 Interactive landing for **Neuronium**, the AI Operating System by Andre AI Technologies (a Dataist AI label).
-Twelve full-screen modules, one gesture per module, over one continuous WebGL light field.
+Seventeen full-screen blocks, one gesture per block, over one continuous WebGL light field.
+100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
-![Desktop, all 12 slides](docs/screenshots/sheets/1440x900.jpg)
+![Desktop, all 17 blocks](docs/screenshots/sheets/1440x900.jpg)
 
 ## Run it
 
@@ -22,16 +23,16 @@ There is no registration backend in this project, so nothing pretends to submit:
 
 | Variable | Used by | Default |
 |---|---|---|
-| `VITE_EARLY_ACCESS_URL` | “Get Early Access” links | `mailto:admin@andre.technology` (published on andre.technology) |
-| `VITE_IDEA_ENDPOINT` | “Turn your Idea into Reality” input on the last slide | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
+| `VITE_EARLY_ACCESS_URL` | “Get Early Access” buttons | `mailto:admin@andre.technology` (published on andre.technology) |
+| `VITE_IDEA_ENDPOINT` | “Turn your Idea into Reality” input on the last block | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
 
 Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
 
 ## Checks
 
 ```bash
-npm run validate:data      # all 100 capabilities: names, order, numbering, unique element symbols
-npm run validate:browser   # 12 slides × 6 viewports, overflow, navigation, catalog, forms, touch, reduced motion
+npm run validate:data      # 100 AI employees: names, order, numbering, unique element symbols
+npm run validate:browser   # 17 blocks × 6 viewports + functional checks (menu, table, departments, forms, touch…)
 npm run simulate           # simulated visitors: trackpad/desktop, phone with swipes, keyboard only
 ```
 
@@ -40,72 +41,90 @@ and a running `npm run preview` (override the URL with `BASE_URL=…`). Output g
 
 Latest results (production build, headless Chromium with software WebGL):
 
-- **Data** — 10 AI Employees × 10 = 100 capabilities (elements 1–100), exact canonical names and order.
-- **Browser** — **36 / 36 checks passed** at 1440×900, 1280×800, 1024×768, 768×1024, 390×844, 375×667: no horizontal overflow anywhere, no JavaScript errors. [Report](docs/validation/browser-report.md)
-- **Simulated users** — **53 / 53 steps** behaved as expected; on a phone every slide is reached with one swipe. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+<!-- results -->
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
 contact sheets for every viewport in [docs/screenshots/sheets](docs/screenshots/sheets), and
-[reduced motion](docs/screenshots/reduced-motion-architecture.jpg).
+[reduced motion](docs/screenshots/reduced-motion-management.jpg).
 
-## The 12 modules
+## The 17 blocks
 
-| # | Module | What it does |
+| # | Block | What it shows |
 |---|---|---|
-| 01 | Hero | “Run AI Workplaces.” — Build AI-Native products. Run AI-First businesses. |
-| 02 | What is Neuronium | Separate tools (chats, automations, documents, agents…) assemble into one system with shared context. |
-| 03 | Complete architecture | Neuronium (AI Governance inside: Policy · Access · Oversight · Control) → AI Business (AI Identity · AI Knowledge Graph · AI Superagent) → AI-Native above AI-First → 2×5 AI Employees → AI Agents · AI Workflows · AI Skills. |
-| 04 | AI Business types | AI-Native vs AI-First: what it is, standard process, role of people, structure — with live control-loop diagrams. |
-| 05 | AI Employees | Interactive 2×5 grid (Management selected), each with its responsibility and its 10 elements. |
-| 06 | Management | AI Manager demo: one task registry shown as Kanban, Gantt, Calendar and Registry; goals/products/projects filters; dependencies; a task hands off from Analytics to Design. |
-| 07 | How work moves | Illustrative idea-to-product path across real AI Employees; Management coordinates; SMM and Support alongside. |
-| 08 | Execution | Live graph: fixed vs re-plannable steps, new context triggers re-planning, a skill is versioned after checks & tests. |
-| 09 | Business context | Sources via MCP & integrations → AI Identity + AI Knowledge Graph (readable relationships, query trails) → AI Superagent. Superagent ≠ AI Manager. |
-| 10 | Capabilities | **Periodic table**: Neuronium is element 0 (Nr); the 100 capabilities are elements 1–100, one period per AI Employee. Search, category rows, keyboard navigation, detail tile. |
-| 11 | Business configuration | Pick AI-Native or AI-First, compose AI Employees, live JSON — copy or download. Nothing is deployed. |
-| 12 | Turn your Idea into Reality | Write the idea straight into the input; “Get Early Access”; “Explore Capabilities”. |
+| 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System.” |
+| 02 | Shared context · Superagent | Files, calendars, conversations and tools (examples, connected through MCP and integrations) become one business context — AI Identity and the AI Knowledge Graph. The AI Superagent plans the work across AI employees; AI Governance (Policy · Access · Oversight · Control) keeps outgoing emails waiting for approval. |
+| 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. Search (by name, tool or symbol), arrow keys, a short tour, a card with “Open *department*”. |
+| 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block shows its ten AI employees as elements next to 3–4 pieces of interface. The selected AI employee brings its panel forward and lights up exactly the part of the interface it does; the block plays through all ten until you pick one. |
+| 14 | Use cases | Your own AI employee from AI Agents, AI Workflows and AI Skills on the shared context, with AI Governance on every step. It joins the table as element 101 and beyond. Three worked examples. |
+| 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. |
+| 16 | FAQ | Eight questions, answered as a conversation with Neuronium. |
+| 17 | Turn your Idea into Reality | The idea goes straight into the input → “Get Early Access”; “Explore AI Employees”. |
+
+| Department | Headline | Interface pieces |
+|---|---|---|
+| Management | From goals and tasks to your calendar. | Weekly review (Google Meet notes) · Goals and tasks · Board and timeline · Calendar, inbox and team |
+| HR | The skills you need. Grown or hired. | Skills map · Hiring · People |
+| Marketing | From a business idea to a product concept. | Market map · Customers · Product concept |
+| SMM | Content for every social channel. | Content plan · Studio · Publish and listen |
+| Sales | Sales, organized. First contact to purchase. | Offers and audience · Sequence · Conversations · Qualify, book, measure |
+| Support | Support on every channel. | Inbox · Ticket · Into the product |
+| Analytics | Research, requirements and decisions. | Deep research · Decide · Requirements (PRD · BRD · TRD) |
+| Design | From design system to tested prototype. | Prototype · Design system · Flows and pages |
+| Development | Code written, tested and reviewed. | Pull request · Codebase · AI and integrations |
+| Engineering | Ship safely. Stay up. | Pipeline · Access and security · Health · Recovery and incidents |
 
 ## Product truth vs. website demo
 
-- **Capability data** (`src/data/employees.ts`) carries an `availability` per capability:
+- **AI employee data** (`src/data/departments.ts`) carries an `availability` per AI employee:
   `available`, `in-development`, `planned` or `scope`. Everything is `scope` (“Product scope”) until
-  confirmed — the catalog states that the map describes intended scope. Mark confirmed items there.
-- **Illustrative** (labelled on screen, sample data, not connected to production): the AI Manager board,
-  the cross-functional workflow, the execution run, the knowledge-graph slice and the configuration JSON.
-- No invented customers, testimonials, metrics, pricing or integrations. Integrations are shown as
-  examples referenced in the capability scope, with “availability varies”.
+  confirmed — the table says that availability varies by release. Mark confirmed items there.
+- **Illustrative** (labelled “Interface preview · sample data” on screen, not connected to production): every
+  piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
+  (Northwind Studio, Brightline) are fictional samples.
+- **Pricing** (`src/data/pricing.ts`) describes the intended early-access packages; `price` is `null`, shown as
+  “Price on request”, until real prices are set.
+- No invented customers, testimonials or metrics. Tools are named as examples of integrations, with
+  “availability varies”.
 
 ## Code map
 
 ```
 src/
-  App.tsx                         deck assembly, deep links (#capabilities …), focus & live region
+  App.tsx                         deck assembly, deep links (#sales …), focus & live region
   components/
-    SlideController/              one gesture = one slide: wheel/trackpad, keys, touch, inner-scroll rules
+    SlideController/              one gesture = one block: wheel/trackpad, keys, touch, inner-scroll rules
     LightField/                   continuous WebGL background (shader.ts) + CSS fallback
     ProgressBar/                  bottom violet→orange progress rule
-    Chrome/                       transparent top bar with the Nr logo (BrandMark)
-    Element/                      capability-as-element tile, family colours
-    ui/                           eyebrow, icons, AI Agents · Workflows · Skills line
-  slides/                         one folder per module (component + CSS)
+    Nav/                          transparent top menu: Nr logo, sections, Departments dropdown, phone sheet
+    Kit/                          interface-piece kit: Panel, Hot (lit section), Sym (mini element), Type, charts
+    Element/                      element tile and department colours
+    Chrome/                       Nr mark (used as Neuronium's avatar in the FAQ)
+  slides/
+    Hero/ Context/ Employees/ Custom/ Pricing/ Faq/ Final/
+    Department/                   one template for all ten departments
+      panels/                     the interface pieces of each department (management.tsx … engineering.tsx)
   data/
-    employees.ts                  10 AI Employees × 10 capabilities, symbols, descriptions, availability
-    architecture.ts               OS, governance, AI Business components, business types, execution units
-    slides.ts                     slide order, labels and light composition per slide
+    departments.ts                10 departments × 10 AI employees: symbols, descriptions, headlines, availability
+    architecture.ts               OS, AI Governance, AI Agents · AI Workflows · AI Skills
+    pricing.ts, faq.ts            plans and questions
+    slides.ts                     block order, menu groups and light composition per block
   config/links.ts                 CTA destinations and the idea endpoint
 scripts/                          validate-data, validate-browser, simulate-user
 ```
 
 ## Design notes
 
-- **Palette** follows the Nr artwork: electric violet → magenta → pink → orange on `#0B0A0F`; dark theme only.
-- **Type**: Geist (display & text) with JetBrains Mono for system labels — a nod to andre.technology.
-- **Light field**: two anisotropic potentials (violet, orange) that orbit, rotate and stretch; they never separate,
-  and their overlap computes a third light (lavender → magenta → pink → peach). Rendered as a clean synthetic
-  gradient with animated film grain; resolution adapts to frame time, pauses in hidden tabs, freezes for reduced motion.
-- **Motion**: ~820 ms slide transitions (fade, translate, soft blur); every element reveals automatically on arrival.
-- **Navigation**: a trackpad flick with inertia counts as one gesture; inner areas (JSON preview, management board)
-  scroll first, and the slide only turns after a pause at their edge. Arrow keys inside the periodic table, AI
-  Employees grid and catalog search stay inside them; PageUp/PageDown always move slides.
-- **Accessibility**: inactive slides are `inert`, slide changes are announced, all controls are keyboard
+- **Palette** follows the Nr artwork: electric violet → magenta → pink → orange on `#0B0A0F`; dark only.
+  Each department takes its own colour along that gradient.
+- **Type**: Geist (display & text) with JetBrains Mono for system labels. The logo is the two letters **Nr**.
+  Headlines are sized so their longest line always fits; nothing is cut by the reveal masks.
+- **Light field**: two anisotropic potentials (violet, orange) that orbit, rotate and stretch; their overlap
+  computes a third light. A clean synthetic gradient with slow film grain; resolution adapts to frame time,
+  rendering pauses in hidden tabs and freezes for reduced motion.
+- **Motion**: ~820 ms block transitions; headlines rise line by line; interface pieces enter in 3D and follow the
+  pointer with a light parallax; the selected AI employee’s panel lifts, the others dim.
+- **Navigation**: a trackpad flick with inertia counts as one gesture; while a menu is open the deck stays put.
+  Arrow keys inside the periodic table, the department elements and the FAQ stay inside them; PageUp/PageDown
+  always move blocks. On phones only the focused piece of interface is shown and the table opens cards on tap.
+- **Accessibility**: inactive blocks are `inert`, block changes are announced, all controls are keyboard
   reachable with visible focus, `prefers-reduced-motion` removes motion but keeps a still light overlap.
