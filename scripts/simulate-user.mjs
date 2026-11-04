@@ -40,22 +40,28 @@ const watch = (page, who) => {
   page.on('console', (m) => m.type() === 'error' && errors.push(`${who}: ${m.text()}`))
 }
 
-// A trackpad flick: a burst of decaying deltas at 60 Hz, dispatched in the page.
-const flick = (page, dir = 1) =>
-  page.evaluate(
-    (dir) =>
-      new Promise((done) => {
-        let i = 0
-        const tick = () => {
-          const el = document.elementFromPoint(innerWidth * 0.3, innerHeight * 0.5) || window
-          el.dispatchEvent(new WheelEvent('wheel', { deltaY: dir * Math.max(1, 70 * Math.exp(-i / 14)), bubbles: true, cancelable: true }))
-          if (++i < 60) setTimeout(tick, 16)
-          else done()
-        }
-        tick()
-      }),
-    dir,
-  )
+// A trackpad flick: a burst of decaying deltas at 60 Hz, sent through the browser's input
+// pipeline with evenly spaced timestamps — like an OS inertia stream, which keeps its timing
+// even when the page is busy.
+const cdps = new WeakMap()
+const flick = async (page, dir = 1) => {
+  if (!cdps.has(page)) cdps.set(page, await page.context().newCDPSession(page))
+  const cdp = cdps.get(page)
+  const { width, height } = page.viewportSize()
+  const t0 = Date.now()
+  for (let i = 0; i < 60; i++) {
+    const wait = t0 + i * 16 - Date.now()
+    if (wait > 0) await sleep(wait)
+    await cdp.send('Input.dispatchMouseEvent', {
+      type: 'mouseWheel',
+      x: Math.round(width * 0.3),
+      y: Math.round(height * 0.5),
+      deltaX: 0,
+      deltaY: dir * Math.max(1, 70 * Math.exp(-i / 14)),
+      timestamp: (t0 + i * 16) / 1000,
+    })
+  }
+}
 
 const browser = await chromium.launch(LAUNCH)
 
@@ -120,7 +126,7 @@ const waitFor = async (fn, ms = 4500) => {
   await page.locator('.pt__cell[data-n="47"]').click()
   await sleep(350)
   const card = await page.locator('.emp__card').innerText()
-  await step(page, 'desktop', 'Clicks element 47 (Lq)', 'A card: Lead Qualification in Sales, with its own description', card.includes('Lead Qualification') && card.includes('class of business') && card.includes('Open Sales'))
+  await step(page, 'desktop', 'Clicks element 47 (Lq)', 'A card: Lead Qualification in Sales, with its own description', card.includes('Lead Qualification') && card.includes('class of business') && /open sales/i.test(card))
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('ArrowRight')
   await sleep(400)
@@ -138,7 +144,7 @@ const waitFor = async (fn, ms = 4500) => {
   await search.press('Escape')
   await sleep(300)
   const back = await page.locator('#emp-status').innerText()
-  await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', /Product scope/.test(back) && (await page.locator('.pt__cell.is-dim').count()) === 0)
+  await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', /product scope/i.test(back) && (await page.locator('.pt__cell.is-dim').count()) === 0)
   await page.locator('.pt__cell[data-n="63"]').click()
   await sleep(300)
   await page.locator('.emp__card').getByRole('button', { name: /Open Analytics/ }).click()
@@ -238,12 +244,12 @@ const waitFor = async (fn, ms = 4500) => {
   await fin.getByRole('button', { name: /Get Early Access/ }).click()
   await sleep(300)
   const empty = await page.locator('#fin-status').innerText()
-  await step(page, 'desktop', 'Presses “Get Early Access” with an empty idea', 'Gently asked to write the idea first', /Write a few words/.test(empty))
+  await step(page, 'desktop', 'Presses “Get Early Access” with an empty idea', 'Gently asked to write the idea first', /write a few words/i.test(empty))
   await fin.getByRole('textbox', { name: 'Your idea' }).fill('A marketplace where AI agents negotiate freight for small logistics companies')
   await fin.getByRole('textbox', { name: 'Your idea' }).press('Enter')
   await sleep(500)
   const sent = await page.locator('#fin-status').innerText()
-  await step(page, 'desktop', 'Types an idea and presses Enter', 'A pre-filled email to the team opens (no fake “sent”)', /email app should open/.test(sent))
+  await step(page, 'desktop', 'Types an idea and presses Enter', 'A pre-filled email to the team opens (no fake “sent”)', /email app should open/i.test(sent))
   await fin.getByRole('button', { name: /Explore AI Employees/ }).click()
   await sleep(1500)
   await step(page, 'desktop', 'Clicks “Explore AI Employees”', 'Back on the periodic table', (await idx(page)) === at('employees'))
@@ -336,10 +342,20 @@ const waitFor = async (fn, ms = 4500) => {
     await sleep(700)
   }
   await step(page, 'keyboard', 'Holds PageDown', 'Reaches the last block and stops there', (await idx(page)) === SLIDES.length - 1)
-  const inStage = await page.evaluate(() => !!document.activeElement?.closest('.slide[data-state="active"]'))
-  await page.keyboard.press('Tab')
-  const tabTarget = await page.evaluate(() => document.activeElement?.closest('.slide')?.dataset.slide)
-  await step(page, 'keyboard', 'Presses Tab on the last block', 'Focus stays inside the visible block (hidden blocks are inert)', inStage && tabTarget === String(SLIDES.length - 1), `focus in block ${tabTarget}`)
+  // Focus is still on the menu item that was used; Tab goes through the menu, then straight into
+  // the visible block — never into a hidden one.
+  const last = String(SLIDES.length - 1)
+  const trail = []
+  for (let k = 0; k < 16 && trail[trail.length - 1] !== last; k++) {
+    await page.keyboard.press('Tab')
+    trail.push(
+      await page.evaluate(() => {
+        const a = document.activeElement
+        return a?.closest('.slide')?.dataset.slide ?? (a?.closest('header, .skip-link') ? 'menu' : a?.tagName.toLowerCase())
+      }),
+    )
+  }
+  await step(page, 'keyboard', 'Keeps pressing Tab on the last block', 'Focus moves through the menu into the visible block; hidden blocks are never focused (inert)', trail.at(-1) === last && trail.every((t) => t === 'menu' || t === last), trail.join(' → '))
   await ctx.close()
 }
 

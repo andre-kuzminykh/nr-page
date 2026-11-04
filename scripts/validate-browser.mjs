@@ -192,18 +192,15 @@ async function functionalPass(browser) {
   await page.mouse.wheel(0, 120)
   await sleep(1100)
   check('Mouse wheel: one notch moves exactly one block', (await activeIndex(page)) === 1)
-  await page.evaluate(
-    () =>
-      new Promise((done) => {
-        let i = 0
-        const tick = () => {
-          window.dispatchEvent(new WheelEvent('wheel', { deltaY: Math.max(1, 60 * Math.exp(-i / 18)), cancelable: true, bubbles: true }))
-          if (++i < 90) setTimeout(tick, 16)
-          else done()
-        }
-        tick()
-      }),
-  )
+  // A long trackpad gesture with inertia, sent through the browser's input pipeline with
+  // evenly spaced timestamps (as an OS inertia stream would be).
+  const cdpWheel = await ctx.newCDPSession(page)
+  const t0 = Date.now()
+  for (let i = 0; i < 90; i++) {
+    const wait = t0 + i * 16 - Date.now()
+    if (wait > 0) await sleep(wait)
+    await cdpWheel.send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 700, y: 450, deltaX: 0, deltaY: Math.max(1, 60 * Math.exp(-i / 18)), timestamp: (t0 + i * 16) / 1000 })
+  }
   await sleep(1100)
   check('Trackpad inertia: one long gesture moves exactly one block', (await activeIndex(page)) === 2)
   const sameCanvas = await page.evaluate((c) => c === document.querySelector('.light-field__canvas'), canvasBefore)
