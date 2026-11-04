@@ -56,7 +56,8 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
   const [hover, setHover] = useState<{ n?: number; d?: DepartmentId } | null>(null)
   const hoverOff = useRef(0)
   const hoverOn = (h: { n?: number; d?: DepartmentId }) => (e: ReactPointerEvent) => {
-    if (e.pointerType !== 'mouse') return
+    // only beside the table: where the card sits above it, it would move the table under the pointer
+    if (e.pointerType !== 'mouse' || !wide) return
     window.clearTimeout(hoverOff.current)
     setHover(h)
   }

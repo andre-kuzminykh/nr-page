@@ -9,6 +9,7 @@
 .emp__text {
   display: flex;
   flex-direction: column;
+  align-self: start;
   gap: clamp(14px, 2.4vh, 24px);
   max-width: 28rem;
   container-type: inline-size;
@@ -385,8 +386,10 @@
 }
 
 /* On wide screens the card sits in the text column, so the table stays fully visible. */
+/* On wide screens the card sits in the text column, so the table stays fully visible.
+   It is set as type, not as a box: what the department or the AI employee does, large enough to read. */
 .emp__side {
-  min-height: 178px;
+  min-height: 250px;
 }
 
 .emp__card--side {
@@ -394,65 +397,53 @@
   top: auto;
   left: auto;
   width: 100%;
-  min-height: 178px;
-  background: rgb(12 10 18 / 0.72);
-  box-shadow: 0 30px 70px -40px color-mix(in oklab, var(--fam) 70%, transparent);
+  min-height: 250px;
+  padding: 18px 0 0;
+  gap: 10px;
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--fam) 55%, transparent);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
-
-
-
-
-
-
-
-
-.emp__dept-name {
-  margin-top: 2px;
-  font-size: clamp(22px, 1.9vw, 28px);
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-.emp__dept-line {
-  font-size: 15px;
-  line-height: 1.35;
-  color: color-mix(in oklab, var(--fam) 35%, #fff);
-}
-
-.emp__card--dept {
-  gap: 8px;
-}
-
-.emp__card--dept .emp__card-desc {
-  margin-top: 2px;
-}
-
-.emp__card-no {
-  margin-top: 6px;
+.emp__card--side .emp__card-dept {
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: color-mix(in oklab, var(--fam) 60%, #fff);
 }
 
-/* while the table walks through its departments, the other rows only step back a little */
-.pt.has-dept.is-tour .pt__line:not(.is-row) .pt__cell {
-  opacity: 0.5;
+.emp__card--side .emp__dept-name {
+  font-size: clamp(28px, 2.6vw, 38px);
 }
 
-.emp__card--dock {
-  left: 0;
+.emp__card--side .emp__dept-line {
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+}
+
+.emp__card--side .emp__card-no {
+  font-size: 12.5px;
+}
+
+.emp__card--side .emp__card-name {
+  margin-top: 2px;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.emp__card--side .emp__card-desc {
+  font-size: clamp(15px, 1.22vw, 17.5px);
+  line-height: 1.55;
+  color: rgb(var(--fg-rgb) / 0.74);
+}
+
+.emp__card--side .emp__card-x {
+  position: absolute;
+  top: 12px;
   right: 0;
-  top: auto;
-  bottom: 0;
-  width: auto;
-}
-
-.emp__card--dock.is-top {
-  top: 0;
-  bottom: auto;
 }
 
 .emp__card--side .emp__card-foot {
@@ -670,10 +661,20 @@ mark {
   .emp__side,
   .emp__card--side {
     min-height: 0;
+    padding-top: 12px;
+    gap: 6px;
   }
-  .emp__card--side {
-    padding: 12px;
-    gap: 8px;
+  .emp__card--side .emp__dept-name {
+    font-size: 24px;
+  }
+  .emp__card--side .emp__dept-line {
+    font-size: 16px;
+  }
+  .emp__card--side .emp__card-name {
+    font-size: 21px;
+  }
+  .emp__card--side .emp__card-desc {
+    font-size: 13.5px;
   }
 }
 

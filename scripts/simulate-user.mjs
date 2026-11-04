@@ -250,13 +250,16 @@ const waitFor = async (fn, ms = 4500) => {
   // FAQ
   await page.locator('.nav__item', { hasText: 'FAQ' }).click()
   await sleep(1300)
-  await page.getByRole('tab', { name: /Is it available today/ }).click()
-  await sleep(300)
-  const faqA = await page.locator('#faq-answer .sr-only').innerText()
+  await page.getByRole('button', { name: /Is it available today/ }).click()
+  await sleep(700)
+  const faqA = await page.evaluate(() => ({
+    open: document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]').length,
+    text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
+  }))
   await page.keyboard.press('ArrowDown')
   await sleep(300)
   const nextQ = await page.evaluate(() => document.activeElement?.textContent)
-  await step(page, 'desktop', 'Asks “Is it available today?”, then presses ↓', 'Neuronium answers honestly (early access); ↓ moves to the next question, not the next block', /early access/i.test(faqA) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.slice(0, 70))
+  await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.text.slice(0, 70))
 
   // Final: idea
   await page.locator('.nav__cta').click()

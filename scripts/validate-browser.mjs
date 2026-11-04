@@ -416,10 +416,13 @@ async function functionalPass(browser) {
 
   // FAQ
   await go('faq')
-  await page.getByRole('tab', { name: /Who stays in control/ }).click()
-  await sleep(300)
-  const faqA = await page.locator('#faq-answer .sr-only').innerText()
-  check('FAQ: questions answer as Neuronium', /AI Governance/.test(faqA), faqA.slice(0, 60))
+  await page.getByRole('button', { name: /Who stays in control/ }).click()
+  await sleep(700)
+  const faqState = await page.evaluate(() => ({
+    open: [...document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]')].map((b) => b.textContent),
+    text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
+  }))
+  check('FAQ: answers open in place, one at a time — opening one closes the others', faqState.open.length === 1 && /Who stays in control/.test(faqState.open[0]) && /AI Governance/.test(faqState.text), faqState.text.slice(0, 60))
 
   // Final
   await go('start')
