@@ -1,7 +1,8 @@
 // Browser validation for the Neuronium landing.
-// Visits all 12 slides at 6 viewports (dark theme only), takes screenshots, checks horizontal
-// overflow and JavaScript errors, then runs functional checks (navigation, architecture,
-// AI Employees, catalog, configuration, touch, reduced motion).
+// Visits all 17 blocks at 6 viewports, takes screenshots, checks horizontal overflow and
+// JavaScript errors, then runs functional checks (menu, navigation, shared context, the
+// periodic table of 100 AI employees, all 10 departments, use cases, pricing, FAQ, final
+// idea input, touch, reduced motion).
 //
 // Usage:  npm run build && npm run preview   (in one terminal)
 //         BASE_URL=http://127.0.0.1:4173/ npm run validate:browser
@@ -9,7 +10,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { CAPABILITIES, EMPLOYEES } from '../src/data/employees.ts'
+import { AI_EMPLOYEES, DEPARTMENTS } from '../src/data/departments.ts'
 import { SLIDES } from '../src/data/slides.ts'
 
 const require = createRequire(import.meta.url)
@@ -88,6 +89,19 @@ async function layoutPass(browser) {
               offenders.push(`${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} [${Math.round(r.left)}–${Math.round(r.right)}]`)
             }
           })
+          // Headline lines are revealed through masks: a line wider than its mask is cut off.
+          const clipped = [...(slide?.querySelectorAll('.mask > span') ?? [])]
+            .filter((sp) => {
+              const r = document.createRange()
+              r.selectNodeContents(sp)
+              return r.getBoundingClientRect().width > sp.parentElement.getBoundingClientRect().width + 1
+            })
+            .map((sp) => `cut: ${sp.textContent.trim().slice(0, 28)}`)
+          // Panel titles of visible interface pieces must be readable in full.
+          const truncated = [...(slide?.querySelectorAll('.pn__title') ?? [])]
+            .filter((t) => t.checkVisibility({ opacityProperty: true, visibilityProperty: true }) && t.scrollWidth > t.clientWidth + 1)
+            .map((t) => `title: ${t.textContent.trim()}`)
+          offenders.push(...clipped, ...truncated)
           return {
             docOverflowX: document.documentElement.scrollWidth - vw,
             frameOverflowY: frame ? frame.scrollHeight - frame.clientHeight : 0,
@@ -103,34 +117,81 @@ async function layoutPass(browser) {
       const rows = results.layout.filter((r) => r.viewport === `${w}x${h}` && r.theme === theme)
       const bad = rows.filter((r) => !r.reached || r.docOverflowX > 0 || r.offenders.length || r.progress !== r.slide)
       const scrolls = rows.filter((r) => r.frameOverflowY > 2).map((r) => r.slide)
-      check(`Layout ${label}: 12 slides reached by keyboard, no horizontal overflow, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX })) ) : scrolls.length ? `inner scroll used on slide(s) ${scrolls.join(', ')}` : 'all slides fit without inner scroll')
+      check(`Layout ${label}: 17 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX })) ) : scrolls.length ? `inner scroll used on slide(s) ${scrolls.join(', ')}` : 'all slides fit without inner scroll')
     }
   }
 }
 
 async function functionalPass(browser) {
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' })
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
   const page = await ctx.newPage()
   trackErrors(page, 'functional')
+  const go = async (id) => {
+    await page.evaluate((h) => (location.hash = h), `#${id}`)
+    await sleep(1300)
+  }
+  const at = (id) => SLIDES.findIndex((s) => s.id === id)
   await page.goto(BASE, { waitUntil: 'networkidle' })
   await sleep(1200)
 
   // Background
   const bg = await page.evaluate(() => {
     const c = document.querySelector('.light-field__canvas')
-    return { canvas: !!c, ready: c?.dataset.ready === 'true', fallback: !!document.querySelector('.light-field__fallback') }
+    return { canvas: !!c, ready: c?.dataset.ready === 'true' }
   })
   check('Continuous light background renders with WebGL (single persistent canvas)', bg.canvas && bg.ready, JSON.stringify(bg))
   const canvasBefore = await page.evaluateHandle(() => document.querySelector('.light-field__canvas'))
 
-  // Wheel: one notch = one slide
+  // Hero
+  const hero = await page.evaluate(() => ({
+    word: document.querySelector('.hero__word')?.getAttribute('aria-label'),
+    letters: [...document.querySelectorAll('.hero__ch')].map((c) => c.textContent).join(''),
+    line: [...document.querySelectorAll('.hero__line > span')].map((s) => s.textContent.trim()).join(' '),
+  }))
+  check('Hero: NEURONIUM, then “Run AI Business with AI Operating System.”', hero.word === 'Neuronium' && hero.letters === 'NEURONIUM' && hero.line === 'Run AI Business with AI Operating System.', hero.line)
+  const clipped = await page.evaluate(() =>
+    [...document.querySelectorAll('.hero__slot')].some((s) => getComputedStyle(s).overflow === 'hidden'),
+  )
+  check('Hero: letters are not clipped by their reveal mask', !clipped)
+
+  // Top menu
+  const nav = await page.evaluate(() => ({
+    logo: document.querySelector('.nav__brand')?.textContent.trim(),
+    logoTile: !!document.querySelector('.nav__brand svg, .nav__brand rect') || getComputedStyle(document.querySelector('.nav__logo')).backgroundColor !== 'rgba(0, 0, 0, 0)',
+    items: [...document.querySelectorAll('.nav__menu .nav__item')].map((b) => b.textContent.trim()),
+    cta: document.querySelector('.nav__cta')?.textContent.trim(),
+    bg: getComputedStyle(document.querySelector('.nav')).backgroundColor,
+    counter: !!document.querySelector('.topbar__counter, .slide-index, .theme-switch'),
+  }))
+  check(
+    'Top menu: transparent, logo is the two letters Nr (no tile), Platform · AI Employees · Departments · Use cases · Pricing · FAQ, Get Early Access',
+    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === 'Platform|AI Employees|Departments|Use cases|Pricing|FAQ' && /Get Early Access/.test(nav.cta) && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
+    JSON.stringify(nav),
+  )
+  await page.locator('.nav__item', { hasText: 'Pricing' }).click()
+  await sleep(1300)
+  const onPricing = (await activeIndex(page)) === at('pricing')
+  await page.locator('.nav__item', { hasText: 'Departments' }).click()
+  await sleep(300)
+  const ddItems = await page.$$eval('.nav__panel .nav__dept-name', (els) => els.map((e) => e.textContent.trim()))
+  await page.mouse.wheel(0, 200)
+  await sleep(900)
+  const stayedWhileOpen = (await activeIndex(page)) === at('pricing')
+  await page.locator('.nav__dept', { hasText: 'Sales' }).click()
+  await sleep(1400)
+  const navLabel = await page.$eval('.nav__dd .nav__item', (b) => b.textContent.trim())
+  check(
+    'Menu: jumps to sections; Departments opens all 10; scrolling is ignored while it is open',
+    onPricing && ddItems.join('|') === DEPARTMENTS.map((d) => d.name).join('|') && stayedWhileOpen && (await activeIndex(page)) === at('sales') && navLabel === 'Sales',
+    `dropdown: ${ddItems.length} · label: ${navLabel}`,
+  )
+
+  // Wheel and trackpad
+  await go('hero')
   await page.mouse.move(700, 450)
   await page.mouse.wheel(0, 120)
   await sleep(1100)
-  check('Mouse wheel: one notch moves exactly one slide', (await activeIndex(page)) === 1)
-
-  // Trackpad: a long inertial gesture still moves only one slide
-  // Dispatched in-page at a real 16 ms cadence (driver round-trips would add artificial pauses).
+  check('Mouse wheel: one notch moves exactly one block', (await activeIndex(page)) === 1)
   await page.evaluate(
     () =>
       new Promise((done) => {
@@ -144,10 +205,9 @@ async function functionalPass(browser) {
       }),
   )
   await sleep(1100)
-  check('Trackpad inertia: one long gesture moves exactly one slide', (await activeIndex(page)) === 2)
-
+  check('Trackpad inertia: one long gesture moves exactly one block', (await activeIndex(page)) === 2)
   const sameCanvas = await page.evaluate((c) => c === document.querySelector('.light-field__canvas'), canvasBefore)
-  check('Background persists across slides (canvas not re-created)', sameCanvas)
+  check('Background persists across blocks (canvas not re-created)', sameCanvas)
 
   // Keyboard
   await page.keyboard.press('End')
@@ -162,68 +222,25 @@ async function functionalPass(browser) {
   await page.keyboard.press('ArrowUp')
   await sleep(900)
   const up = await activeIndex(page)
-  check('Keyboard: End / Home / ArrowDown / ArrowUp', end === 11 && home === 0 && down === 1 && up === 0, `${end},${home},${down},${up}`)
+  check('Keyboard: End / Home / ArrowDown / ArrowUp', end === SLIDES.length - 1 && home === 0 && down === 1 && up === 0, `${end},${home},${down},${up}`)
 
-  // Hero CTA
-  await page.getByRole('button', { name: 'Explore Neuronium' }).click()
-  await sleep(1300)
-  check('Hero CTA "Explore Neuronium" opens the architecture', (await activeIndex(page)) === 2)
-
-  // Architecture
-  const arch = await page.evaluate(() => {
-    const os = document.querySelector('.arch__os')
-    const gov = document.querySelector('.arch__gov')
-    const biz = document.querySelector('.arch__biz')
-    const native = document.querySelector('.arch__type--native')
-    const first = document.querySelector('.arch__type--first')
-    const tiles = [...document.querySelectorAll('.arch__tile')]
-    const rows = {}
-    tiles.forEach((t) => {
-      const y = t.offsetTop
-      ;(rows[y] ||= []).push(t.textContent.trim())
-    })
-    return {
-      govInsideOS: !!(os && gov && os.contains(gov)),
-      govFunctions: [...document.querySelectorAll('.arch__gov-list li')].map((l) => l.textContent.trim()),
-      comps: [...document.querySelectorAll('.arch__comp-name')].map((c) => c.textContent.trim()),
-      bizBelowOS: biz.getBoundingClientRect().top > os.getBoundingClientRect().bottom,
-      nativeAboveFirst: native.getBoundingClientRect().bottom <= first.getBoundingClientRect().top + 1,
-      rows: Object.values(rows),
-      exec: [...document.querySelectorAll('.arch__exec .exec-line__item')].map((e) => e.textContent.trim()),
-    }
-  })
-  check('Architecture: AI Governance (Policy, Access, Oversight, Control) is inside the Neuronium block', arch.govInsideOS && arch.govFunctions.join() === 'Policy,Access,Oversight,Control')
-  check('Architecture: AI Business = AI Identity | AI Knowledge Graph | AI Superagent', arch.bizBelowOS && arch.comps.join('|') === 'AI Identity|AI Knowledge Graph|AI Superagent')
-  check('Architecture: AI-Native is above AI-First', arch.nativeAboveFirst)
-  check(
-    'Architecture: AI-First grid is 2×5 in the approved order (Management first tile)',
-    arch.rows.length === 2 &&
-      arch.rows[0].join() === 'Management,HR,Marketing,SMM,Sales' &&
-      arch.rows[1].join() === 'Support,Analytics,Design,Development,Engineering',
-    JSON.stringify(arch.rows),
-  )
-  check('Architecture: one slim line AI Agents · AI Workflows · AI Skills', arch.exec.join() === 'AI Agents,AI Workflows,AI Skills')
-
-  // AI Employees
-  await page.evaluate(() => (location.hash = '#employees'))
-  await sleep(1300)
-  const emp = await page.evaluate(() => ({
-    tabs: [...document.querySelectorAll('.emp__tile .emp__name')].map((t) => t.textContent.trim()),
-    selected: document.querySelector('.emp__tile[aria-selected="true"] .emp__name')?.textContent.trim(),
+  // Shared context and Superagent
+  await go('context')
+  await sleep(4200)
+  const cx = await page.evaluate(() => ({
+    sources: document.querySelectorAll('.ctx__src').length,
+    steps: document.querySelectorAll('.ctx__step').length,
+    running: document.querySelectorAll('.ctx__step.is-run, .ctx__step.is-done').length,
+    gov: document.querySelector('.ctx__gov')?.textContent,
   }))
-  check('AI Employees: 10 tiles in order, Management selected by default', emp.tabs.length === 10 && emp.tabs[0] === 'Management' && emp.selected === 'Management')
-  await page.getByRole('tab', { name: /HR/ }).click()
-  await sleep(400)
-  const hrPanel = await page.locator('#emp-panel').innerText()
-  await page.keyboard.press('ArrowRight')
-  await sleep(300)
-  const afterArrow = await page.evaluate(() => document.querySelector('.emp__tile[aria-selected="true"] .emp__name')?.textContent.trim())
-  check('AI Employees: click and arrow keys change the responsibility panel', hrPanel.includes('Job Description') && afterArrow === 'Marketing', `after ArrowRight: ${afterArrow}`)
-  check('AI Employees: arrow keys inside the grid do not change the slide', (await activeIndex(page)) === 4)
+  check(
+    'Shared context: 12 source icons, Superagent plan across AI employees, AI Governance (Policy · Access · Oversight · Control)',
+    cx.sources === 12 && cx.steps === 6 && cx.running > 0 && /Policy · Access · Oversight · Control/.test(cx.gov || ''),
+    JSON.stringify({ ...cx, gov: undefined }),
+  )
 
-  // Capabilities catalog — periodic table
-  await page.evaluate(() => (location.hash = '#capabilities'))
-  await sleep(1400)
+  // Periodic table of 100 AI employees
+  await go('employees')
   const table = await page.evaluate(() =>
     [...document.querySelectorAll('.pt__line:not(.pt__line--head)')].map((row) => ({
       label: row.querySelector('.pt__label-name')?.textContent.trim(),
@@ -231,71 +248,86 @@ async function functionalPass(browser) {
     })),
   )
   const seen = table.flatMap((r) => r.cells.map((c) => `${r.label}::${c.n}::${c.name}`))
-  const expected = CAPABILITIES.map((c) => `${EMPLOYEES.find((e) => e.id === c.employee).name}::${c.n}::${c.name}`)
-  check('Catalog: periodic table holds all 100 elements, 10 per AI Employee, in order', seen.length === 100 && seen.join('|') === expected.join('|'), `${seen.length} elements`)
+  const expected = AI_EMPLOYEES.map((e) => `${DEPARTMENTS.find((d) => d.id === e.department).name}::${e.n}::${e.name}`)
+  check('Periodic table: all 100 AI employees, 10 per department, in order', seen.length === 100 && seen.join('|') === expected.join('|'), `${seen.length} elements`)
   const syms = table.flatMap((r) => r.cells.map((c) => c.sym))
   const zero = await page.locator('.pt__zero .pt__sym').innerText()
-  check('Catalog: every element has a unique symbol; Nr is element 0', new Set(syms).size === 100 && !syms.includes('Nr') && zero === 'Nr')
+  const ranges = await page.locator('.pt__col, .dept__count:has-text("–")').count()
+  check('Periodic table: unique symbols, Nr is element 0, no column numbers or ranges', new Set(syms).size === 100 && !syms.includes('Nr') && zero === 'Nr' && ranges === 0)
 
-  const search = page.getByRole('searchbox', { name: 'Search capabilities' })
+  const search = page.getByRole('searchbox', { name: 'Search AI employees' })
   await search.fill('Apollo')
   await sleep(250)
   const apollo = await page.$$eval('.pt__cell.is-match', (els) => els.map((x) => x.dataset.name))
   await search.fill('zzzz-none')
   await sleep(250)
-  const nothing = await page.locator('#cat-status').innerText()
-  await search.fill('management')
-  await sleep(250)
-  const many = await page.$$eval('.pt__cell.is-match', (els) => els.length)
-  check('Catalog search: finds by tool name, shows an empty state, searches across categories', apollo.includes('Audience Discovery') && /nothing matches/i.test(nothing) && many > 10, `apollo→${apollo.join(', ')}; "management"→${many}`)
+  const nothing = await page.locator('#emp-status').innerText()
   await search.fill('')
-  await page.locator('.pt__cell[data-n="1"]').click()
+  check('Periodic table: search by tool, empty state', apollo.includes('Audience Discovery') && /nothing matches/i.test(nothing), apollo.join(', '))
+
+  await page.locator('.pt__cell[data-n="47"]').click()
+  await sleep(300)
+  const card = await page.locator('.emp__card').innerText()
   await page.keyboard.press('ArrowDown')
-  await page.keyboard.press('ArrowDown')
-  await page.keyboard.press('ArrowRight')
   await sleep(250)
-  const sel = await page.$eval('.pt__cell.is-sel', (e) => e.dataset.name)
-  const detail = await page.locator('.cat__detail').innerText()
-  check('Catalog: arrow keys move through the table and update the detail', sel === 'Competitor Analysis' && detail.includes('Competitor Analysis') && (await activeIndex(page)) === 9, sel)
-  await page.locator('.pt__label', { hasText: 'Engineering' }).click()
-  await sleep(200)
-  check('Catalog: choosing a category selects its first element', (await page.$eval('.pt__cell.is-sel', (e) => e.dataset.n)) === '91')
+  const afterKey = await page.$eval('.pt__cell.is-sel', (e) => e.dataset.n)
+  check('Periodic table: a card opens on the element; arrow keys move through the table', card.includes('Lead Qualification') && afterKey === '57' && (await activeIndex(page)) === at('employees'), afterKey)
+  await page.locator('.pt__cell[data-n="47"]').click()
+  await sleep(300)
+  await page.locator('.emp__card').getByRole('button', { name: /Open Sales/ }).click()
+  await page.waitForFunction((i) => Number(document.querySelector('.slide[data-state="active"]')?.dataset.slide) === i, at('sales'), { timeout: 4000 }).catch(() => {})
+  await sleep(900)
+  const handed = await page.evaluate(() => ({
+    i: Number(document.querySelector('.slide[data-state="active"]').dataset.slide),
+    sel: document.querySelector('.slide[data-state="active"] .dept__el[aria-selected="true"] .dept__el-sym')?.textContent,
+  }))
+  check('Periodic table → department: “Open Sales” opens Sales with Lead Qualification selected', handed.i === at('sales') && handed.sel === 'Lq', JSON.stringify(handed))
 
-  // Configuration
-  await page.evaluate(() => (location.hash = '#configuration'))
-  await sleep(1400)
-  await page.getByRole('radio', { name: /AI-Native/ }).click()
-  await sleep(300)
-  const nativeJson = await page.locator('.cfg__json').innerText()
-  const teamVisible = await page.locator('.cfg__team').count()
-  await page.getByRole('radio', { name: /AI-First/ }).click()
-  await sleep(300)
-  await page.locator('.cfg__emp', { hasText: 'HR' }).click()
-  await page.getByPlaceholder('e.g. Northwind Studio').fill('Test Co')
-  await sleep(200)
-  const firstJson = await page.locator('.cfg__json').innerText()
-  check('Configuration: AI-Native hides the 10-employee grid', teamVisible === 0 && nativeJson.includes('"AI-Native"') && !nativeJson.includes('aiEmployees'))
-  check('Configuration: AI-First composes employees into live JSON', firstJson.includes('"HR"') && firstJson.includes('"Test Co"') && firstJson.includes('"AI-First"'))
-  await page.locator('.cfg__quick').getByRole('button', { name: 'Select all' }).click()
-  await sleep(200)
-  const pre = page.locator('.slide[data-state="active"] .cfg__json')
-  const pbox = await pre.boundingBox()
-  await page.mouse.move(pbox.x + pbox.width / 2, pbox.y + pbox.height / 2)
-  for (let i = 0; i < 8; i++) {
-    await page.mouse.wheel(0, 120)
-    await sleep(40)
+  // All 10 departments: every AI employee lights up its own part of the interface
+  const missing = []
+  for (const dpt of DEPARTMENTS) {
+    await go(dpt.id)
+    const slide = page.locator('.slide[data-state="active"]')
+    const els = await slide.locator('.dept__el').evaluateAll((b) => b.map((x) => x.dataset.name))
+    if (els.join('|') !== dpt.members.map((m) => m.name).join('|')) missing.push(`${dpt.name}: wrong elements`)
+    for (const m of dpt.members) {
+      await slide.locator(`#tab-${m.n}`).click()
+      await sleep(80)
+      const state = await slide.evaluate((el) => ({
+        hot: el.querySelectorAll('.dept__stage .hot.is-hot').length,
+        focus: el.querySelectorAll('.dept__stage .pn.is-focus').length,
+        cap: el.querySelector('.dept__cap-desc')?.textContent,
+      }))
+      if (!state.hot || state.focus !== 1 || state.cap !== m.description) missing.push(`${m.n} ${m.name}`)
+    }
   }
-  await sleep(1000)
-  const preTop = await pre.evaluate((el) => el.scrollTop)
-  check('Inner scroll: the JSON preview scrolls without changing the slide', preTop > 0 && (await activeIndex(page)) === 10, `scrollTop ${preTop}`)
+  check('Departments: 10 blocks × 10 AI employees; each one focuses a panel and lights up its own part of the interface', missing.length === 0, missing.slice(0, 6).join(', '))
 
-  const cfgHref = await page.locator('.slide[data-state="active"]').getByRole('link', { name: /Get Early Access/ }).getAttribute('href')
-  check('"Get Early Access" links point to a real destination (no fake sign-up)', /^(https?:|mailto:)/.test(cfgHref || ''), cfgHref)
+  // Custom use cases
+  await go('custom')
+  await page.getByRole('tab', { name: 'Supplier Check' }).click()
+  await sleep(500)
+  const cu = await page.evaluate(() => ({ el: document.querySelector('.cu__el-n')?.textContent, gov: document.querySelector('.cu__gov')?.textContent }))
+  check('Use cases: examples switch; a custom AI employee continues the table (element 103)', cu.el === '103' && /Policy/.test(cu.gov) && /Control/.test(cu.gov), JSON.stringify(cu))
 
-  // Final slide: write the idea straight into the input
-  await page.evaluate(() => (location.hash = '#start'))
-  await sleep(1400)
-  const title = await page.locator('.fin__title').innerText()
+  // Pricing — no invented prices
+  await go('pricing')
+  const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent.trim()))
+  check('Pricing: three plans, prices on request (no invented numbers)', prices.length === 3 && prices.every((p) => !/\d/.test(p)), prices.join(' | '))
+
+  // FAQ
+  await go('faq')
+  await page.getByRole('tab', { name: /Who stays in control/ }).click()
+  await sleep(300)
+  const faqA = await page.locator('#faq-answer .sr-only').innerText()
+  check('FAQ: questions answer as Neuronium', /AI Governance/.test(faqA), faqA.slice(0, 60))
+
+  // Final
+  await go('start')
+  const fin = await page.evaluate(() => ({
+    title: [...document.querySelectorAll('.fin__title .mask')].map((m) => m.textContent.trim()).join(' '),
+    centerMark: !!document.querySelector('.fin .brand-mark'),
+  }))
   const active = page.locator('.slide[data-state="active"]')
   await active.getByRole('button', { name: /Get Early Access/ }).click()
   await sleep(200)
@@ -305,27 +337,17 @@ async function functionalPass(browser) {
   await sleep(300)
   const sentMsg = await page.locator('#fin-status').innerText()
   check(
-    'Final slide: "Turn your Idea into Reality" with an idea input; empty input is caught; submit hands off honestly',
-    /Turn your Idea\s+into Reality/.test(title) && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
+    'Final: “Turn your Idea into Reality.”, no extra logo, idea input; empty input is caught; submit hands off honestly',
+    fin.title === 'Turn your Idea into Reality.' && !fin.centerMark && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
     sentMsg,
   )
-  await active.getByRole('button', { name: /Explore Capabilities/ }).click()
+  await active.getByRole('button', { name: /Explore AI Employees/ }).click()
   await sleep(1300)
-  check('Final CTA "Explore Capabilities" opens the catalog', (await activeIndex(page)) === 9)
-
-  // Chrome: transparent top bar with the logo only; the progress gradient is the only bottom element
-  const chrome = await page.evaluate(() => ({
-    topbarChildren: [...document.querySelectorAll('.topbar > *')].length,
-    logo: !!document.querySelector('.topbar .brand-mark'),
-    counter: !!document.querySelector('.topbar__counter, .slide-index, .theme-switch'),
-    bg: getComputedStyle(document.querySelector('.topbar')).backgroundColor,
-  }))
-  check('Top bar: transparent, Nr logo only (no slide counter, no theme switch)', chrome.logo && !chrome.counter && chrome.topbarChildren === 1 && /rgba\(0, 0, 0, 0\)|transparent/.test(chrome.bg), JSON.stringify(chrome))
+  check('Final: “Explore AI Employees” opens the periodic table', (await activeIndex(page)) === at('employees'))
   await page.reload({ waitUntil: 'networkidle' })
-  await sleep(500)
-  check('Deep link: reload keeps the current slide', (await activeIndex(page)) === 9)
+  await sleep(600)
+  check('Deep link: reload keeps the current block', (await activeIndex(page)) === at('employees'))
 
-  // Frame rate (headless software GL — indicative only)
   const fps = await page.evaluate(
     () =>
       new Promise((res) => {
@@ -342,7 +364,7 @@ async function functionalPass(browser) {
   results.fps = fps
   await ctx.close()
 
-  // Touch swipe on a phone
+  // Phone: swipes and the menu sheet
   const m = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 })
   const mp = await m.newPage()
   trackErrors(mp, 'touch')
@@ -355,26 +377,32 @@ async function functionalPass(browser) {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
   }
   await swipe(640, 300)
-  // Let the arriving slide finish its entrance first: software GL in CI renders slowly, which
-  // would otherwise stretch the next swipe past the swipe time window.
   await sleep(2800)
   const afterUp = await activeIndex(mp)
   await swipe(300, 640)
-  await sleep(1200)
+  await sleep(1400)
   const afterDown = await activeIndex(mp)
-  check('Touch: swipe up → next slide, swipe down → previous slide', afterUp === 1 && afterDown === 0, `${afterUp}, ${afterDown}`)
+  check('Touch: swipe up → next block, swipe down → previous block', afterUp === 1 && afterDown === 0, `${afterUp}, ${afterDown}`)
+  await mp.getByRole('button', { name: 'Open menu' }).click()
+  await sleep(400)
+  await swipe(640, 300)
+  await sleep(900)
+  const stayed = (await activeIndex(mp)) === 0
+  await mp.locator('.nav__sheet-item', { hasText: 'FAQ' }).click()
+  await sleep(1400)
+  check('Phone menu: opens full screen, blocks swipes while open, jumps to a section', stayed && (await activeIndex(mp)) === at('faq'))
   await m.close()
 
   // Reduced motion
   const r = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' })
   const rp = await r.newPage()
   trackErrors(rp, 'reduced-motion')
-  await rp.goto(BASE + '#architecture', { waitUntil: 'networkidle' })
+  await rp.goto(BASE + '#management', { waitUntil: 'networkidle' })
   await sleep(700)
   const visible = await rp.evaluate(() =>
     [...document.querySelectorAll('.slide[data-state="active"] .rv')].every((el) => Number(getComputedStyle(el).opacity) > 0.99),
   )
-  await rp.screenshot({ path: path.join(SHOTS, 'reduced-motion-architecture.jpg'), type: 'jpeg', quality: 82 })
+  await rp.screenshot({ path: path.join(SHOTS, 'reduced-motion-management.jpg'), type: 'jpeg', quality: 82 })
   check('Reduced motion: content is fully visible without motion; background stays as a still overlap', visible)
   await r.close()
 }

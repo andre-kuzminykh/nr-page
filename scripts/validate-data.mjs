@@ -1,7 +1,7 @@
-// Checks the capability data against the canonical Neuronium list (brief, section 3).
-// Every one of the 100 capabilities must exist exactly once, in the right AI Employee and order.
+// Checks the 100 AI employees against the canonical Neuronium list.
+// Every one must exist exactly once, in the right department and order, with a unique symbol.
 // Run: npm run validate:data
-import { CAPABILITIES, EMPLOYEES } from '../src/data/employees.ts'
+import { AI_EMPLOYEES as CAPABILITIES, DEPARTMENTS as EMPLOYEES } from '../src/data/departments.ts'
 
 const CANON = {
   Management: ['Knowledge Management', 'Note Taking', 'Goals Management', 'Task Management', 'Process Management', 'Project Management', 'Product Management', 'Calendar Management', 'Communication Management', 'Team Management'],
@@ -20,12 +20,13 @@ const FORBIDDEN = /market intelligence|product intelligence|media intelligence/i
 const errors = []
 const order = Object.keys(CANON)
 
-if (EMPLOYEES.length !== 10) errors.push(`Expected 10 AI Employees, found ${EMPLOYEES.length}`)
+if (EMPLOYEES.length !== 10) errors.push(`Expected 10 departments, found ${EMPLOYEES.length}`)
 EMPLOYEES.forEach((e, i) => {
-  if (e.name !== order[i]) errors.push(`Employee #${i + 1} should be ${order[i]}, found ${e.name}`)
+  if (e.name !== order[i]) errors.push(`Department #${i + 1} should be ${order[i]}, found ${e.name}`)
   const expected = CANON[e.name] ?? []
-  if (e.capabilities.length !== 10) errors.push(`${e.name}: expected 10 capabilities, found ${e.capabilities.length}`)
-  e.capabilities.forEach((c, j) => {
+  if (e.members.length !== 10) errors.push(`${e.name}: expected 10 AI employees, found ${e.members.length}`)
+  if (!e.headline?.[0] || !e.headline?.[1] || !e.description) errors.push(`${e.name}: missing headline or description`)
+  e.members.forEach((c, j) => {
     if (c.name !== expected[j]) errors.push(`${e.name} #${j + 1}: expected "${expected[j]}", found "${c.name}"`)
     if (c.n !== i * 10 + j + 1) errors.push(`${c.name}: expected number ${i * 10 + j + 1}, found ${c.n}`)
     if (!c.description || c.description.length < 20) errors.push(`${c.name}: missing description`)
@@ -42,12 +43,12 @@ const names = CAPABILITIES.map((c) => c.name)
 const dupes = names.filter((n, i) => names.indexOf(n) !== i)
 if (dupes.length) errors.push(`Duplicate capability names: ${dupes.join(', ')}`)
 const descs = CAPABILITIES.map((c) => c.description)
-if (new Set(descs).size !== descs.length) errors.push('Capability descriptions must be unique')
-if (CAPABILITIES.length !== 100) errors.push(`Expected 100 capabilities, found ${CAPABILITIES.length}`)
+if (new Set(descs).size !== descs.length) errors.push('Descriptions must be unique')
+if (CAPABILITIES.length !== 100) errors.push(`Expected 100 AI employees, found ${CAPABILITIES.length}`)
 for (const c of CAPABILITIES) if (FORBIDDEN.test(c.name + c.description)) errors.push(`Forbidden term in ${c.name}`)
 
 if (errors.length) {
-  console.error(`✗ Capability data: ${errors.length} problem(s)\n  ` + errors.join('\n  '))
+  console.error(`✗ AI employee data: ${errors.length} problem(s)\n  ` + errors.join('\n  '))
   process.exit(1)
 }
-console.log(`✓ Capability data: 10 AI Employees × 10 = ${CAPABILITIES.length} capabilities (elements 1–100), exact names, order, numbering and unique symbols`)
+console.log(`✓ AI employee data: 10 departments × 10 = ${CAPABILITIES.length} AI employees (elements 1–100), exact names, order, numbering and unique symbols`)
