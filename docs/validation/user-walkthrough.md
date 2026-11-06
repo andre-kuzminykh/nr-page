@@ -1,6 +1,6 @@
 # Simulated user walkthrough
 
-Run: 2026-11-06T14:58:56.753Z · http://127.0.0.1:4173/
+Run: 2026-11-06T15:43:30.285Z · http://127.0.0.1:4173/
 
 **31 / 31 steps behaved as expected.** JavaScript errors: 0.
 

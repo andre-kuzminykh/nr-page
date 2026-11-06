@@ -1,6 +1,6 @@
 # Neuronium landing — browser validation
 
-Run: 2026-11-06T14:51:42.895Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
+Run: 2026-11-06T15:36:13.310Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
 
 **32 / 32 checks passed.**
 
@@ -39,6 +39,6 @@ Run: 2026-11-06T14:51:42.895Z · http://127.0.0.1:4173/ · Chromium (headless, s
 | ✅ | Layout 375x667-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync | all slides fit without inner scroll |
 | ✅ | No JavaScript errors in any run |  |
 
-Indicative frame rate in headless software rendering: 35 fps (real GPUs run the light field at display refresh rate).
+Indicative frame rate in headless software rendering: 38 fps (real GPUs run the light field at display refresh rate).
 
 Screenshots: [desktop](../screenshots/desktop-1440x900), [phone](../screenshots/phone-390x844), [contact sheets for all seven viewports](../screenshots/sheets).

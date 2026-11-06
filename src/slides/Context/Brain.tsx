@@ -24,7 +24,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
  * Then a fast wave runs the whole way again, the way fades out the way it came, and it starts over.
  */
 
-/** [x, y, r, warm] — the silhouette (46 points). */
+/** [x, y, r, warm] — the silhouette (46 points); their colour follows the position (see hue). */
 const V: [number, number, number, number][] = [
   [40, 205, 2.2, 0], [50.7, 158.2, 2.6, 0], [82.8, 114.8, 2.4, 0], [130.9, 78.1, 2, 0], [189.8, 54.7, 1.9, 0],
   [254, 41.3, 2, 1], [318.2, 38, 2.3, 0], [382.4, 44.7, 2, 1], [441.2, 61.4, 2.5, 1], [494.8, 88.1, 2.5, 1],
@@ -99,12 +99,29 @@ const rnd = (i: number) => {
   const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453
   return x - Math.floor(x)
 }
-/** Colour by place: violet at the back, orange at the front. */
+/**
+ * Colour by place, left to right: violet through most of the brain, then pink, and orange only near
+ * its right side. [position 0–1, colour, light colour]
+ */
+const RAMP: [number, number[], number[]][] = [
+  [0, [138, 92, 255], [188, 160, 255]],
+  [0.5, [160, 113, 255], [200, 174, 255]],
+  [0.74, [220, 96, 216], [238, 162, 232]],
+  [0.92, [255, 138, 51], [255, 179, 122]],
+]
+const X0 = 40
+const X1 = 575
+const rgb = (c: number[]) => `rgb(${c.map(Math.round).join(',')})`
 function hue(x: number, light = false) {
-  const u = clamp((x - 100) / 420, 0, 1)
-  const a = light ? [196, 166, 255] : [160, 113, 255]
-  const b = light ? [255, 179, 122] : [255, 138, 51]
-  return `rgb(${Math.round(lerp(a[0], b[0], u))},${Math.round(lerp(a[1], b[1], u))},${Math.round(lerp(a[2], b[2], u))})`
+  const u = clamp((x - X0) / (X1 - X0), 0, 1)
+  let k = 0
+  while (k < RAMP.length - 2 && u > RAMP[k + 1][0]) k++
+  const [u0, a0, l0] = RAMP[k]
+  const [u1, a1, l1] = RAMP[k + 1]
+  const t = clamp((u - u0) / (u1 - u0), 0, 1)
+  const a = light ? l0 : a0
+  const b = light ? l1 : a1
+  return rgb(a.map((v, i) => lerp(v, b[i], t)))
 }
 
 /** Shortest way between two points along the connections. */
@@ -373,14 +390,16 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
   return (
     <svg ref={svg} className="cb" viewBox="26 22 562 362" role="img" aria-label={`Shared context: ${TOOLS.map((t) => t.label).join(', ')} — the AI Superagent runs through all of them`}>
       <defs>
-        <linearGradient id="cbL" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="570" y2="0">
-          <stop offset="0" stopColor="#8854F3" />
-          <stop offset="1" stopColor="#F97316" />
+        {/* the connections and the way follow the same colours as the points */}
+        <linearGradient id="cbL" gradientUnits="userSpaceOnUse" x1={X0} y1="0" x2={X1} y2="0">
+          {RAMP.map(([u, c]) => (
+            <stop key={u} offset={u} stopColor={rgb(c)} />
+          ))}
         </linearGradient>
-        <linearGradient id="cbP" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="520" y2="0">
-          <stop offset="0" stopColor="#b28cff" />
-          <stop offset="0.5" stopColor="#e58ad0" />
-          <stop offset="1" stopColor="#ff9a4d" />
+        <linearGradient id="cbP" gradientUnits="userSpaceOnUse" x1={X0} y1="0" x2={X1} y2="0">
+          {RAMP.map(([u, , c]) => (
+            <stop key={u} offset={u} stopColor={rgb(c)} />
+          ))}
         </linearGradient>
         <radialGradient id="cbDot">
           <stop offset="0" stopColor="#fff" />
@@ -406,7 +425,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
               cx={p[0]}
               cy={p[1]}
               r={p[2] * K}
-              fill={p[3] ? '#ff8a33' : '#a071ff'}
+              fill={hue(p[0])}
               style={{ '--d': `${d.toFixed(2)}s`, '--tw': `${(2.6 + rnd(n + 7) * 1.6).toFixed(2)}s` } as CSSProperties}
             />
           )
@@ -463,7 +482,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
                 cx={p[0]}
                 cy={p[1]}
                 r={0}
-                fill={p[3] ? '#ff8a33' : '#a071ff'}
+                fill={hue(p[0])}
               />
             </g>
           )
