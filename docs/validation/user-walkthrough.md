@@ -1,6 +1,6 @@
 # Simulated user walkthrough
 
-Run: 2026-11-06T22:06:32.216Z · http://127.0.0.1:4173/
+Run: 2026-11-06T23:41:58.388Z · http://127.0.0.1:4173/
 
 **31 / 31 steps behaved as expected.** JavaScript errors: 0.
 
@@ -16,9 +16,9 @@ Run: 2026-11-06T22:06:32.216Z · http://127.0.0.1:4173/
 | 8 | desktop | Clicks the Nr logo | Back to the first block | ✅  | [008-desktop.jpg](walkthrough/008-desktop.jpg) |
 | 9 | desktop | Looks at the menu | Only the open sections: Platform · Management · Pricing · FAQ | ✅ Platform · Management · Pricing · FAQ | [009-desktop.jpg](walkthrough/009-desktop.jpg) |
 | 10 | desktop | Opens Management from the menu | Lands on Management; only its open AI employees are there (1 · Km) | ✅ Knowledge Management · menu: Management | [010-desktop.jpg](walkthrough/010-desktop.jpg) |
-| 11 | desktop | Watches Knowledge Management (1 · Km) | A question is typed into the search and answered with references to three sources — then the next question | ✅ What did we agree on pilot pricing? → Who owns the landing page? | [011-desktop.jpg](walkthrough/011-desktop.jpg) |
+| 11 | desktop | Watches Knowledge Management (1 · Km) | A question is typed into the search bar at the bottom and answered above it, with the three things it was found in — then the next question | ✅ What did we agree on pilot pricing? → Who owns the landing page? | [011-desktop.jpg](walkthrough/011-desktop.jpg) |
 | 12 | desktop | Clicks element 1 (Km) | Knowledge Management is the title; its element is picked and the line under it counts down to the next answer | ✅ {"hot":false,"title":"Knowledge Management","picked":"Knowledge Management","load":1} | [012-desktop.jpg](walkthrough/012-desktop.jpg) |
-| 13 | desktop | Opens Platform and watches | A command is typed below the brain and sent; the Superagent runs its way, the tools it needs light up and the rest wait | ✅ {"cmd":"Find new leads and book demos","sent":true,"on":["Sheets","Apollo"],"rest":10,"way":12} | [013-desktop.jpg](walkthrough/013-desktop.jpg) |
+| 13 | desktop | Opens Platform and watches | A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear | ✅ {"cmd":"Find new leads and book demos","sent":true,"on":["Sheets","Apollo"],"rest":10,"icons":3,"way":14} | [013-desktop.jpg](walkthrough/013-desktop.jpg) |
 | 14 | desktop | Opens Pricing | One subscription for what is ready today (Knowledge Management); no invented prices | ✅ Price on request | [014-desktop.jpg](walkthrough/014-desktop.jpg) |
 | 15 | desktop | Clicks “Get Early Access” on the subscription | Goes to the final block with the idea input | ✅  | [015-desktop.jpg](walkthrough/015-desktop.jpg) |
 | 16 | desktop | Opens “Is it available today?”, then presses ↓ | The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block | ✅ Neuronium is in early access. Ready today: Knowledge Management. New A | [016-desktop.jpg](walkthrough/016-desktop.jpg) |

@@ -56,9 +56,9 @@
       "detail": "5,0,1,0"
     },
     {
-      "name": "AI Superagent: a brain of 12 tools; three commands are typed below it, each sends the agent its own way, and together they reach every tool",
+      "name": "AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the Nr bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool",
       "ok": true,
-      "detail": "Find new leads and book demos: Apollo, Sheets, Gmail, Calendar · Sum up today’s calls for the team: Meet, Docs, Slack, Telegram · Collect feedback and ship the fix: WhatsApp, Drive, Code, APIs"
+      "detail": "Find new leads and book demos: Apollo, Sheets, Gmail, Calendar · Sum up today’s calls for the team: Meet, Docs, Slack, Telegram · Collect feedback and ship the fix: WhatsApp, Drive, Code, APIs · icons at rest: 0"
     },
     {
       "name": "AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy",
@@ -71,9 +71,9 @@
       "detail": "Management: Km"
     },
     {
-      "name": "Management · Knowledge Management (1 · Km) on its own: no window, just the search — a question is typed and answered with references to three sources, then the next question",
+      "name": "Management · Knowledge Management (1 · Km) on its own: no window, just the search bar at the bottom — a question is typed and answered above it, with the three things it was found in (an icon and a name each), then the next question",
       "ok": true,
-      "detail": "What did we agree on pilot pricing? → Who owns the landing page? · {\"sources\":3,\"cites\":\"123\",\"answer\":83,\"frame\":0}"
+      "detail": "What did we agree on pilot pricing? → Who owns the landing page? · {\"sources\":3,\"plain\":true,\"cites\":0,\"answer\":80,\"frame\":0,\"lead\":0}"
     },
     {
       "name": "Pricing: one subscription for what is ready (1 · Km); its table lights only those elements; price on request, no fine print",
@@ -626,7 +626,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-06T21:59:16.766Z",
+  "startedAt": "2026-11-06T23:34:49.847Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 45
+  "fps": 44
 }
