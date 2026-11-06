@@ -18,7 +18,7 @@ import {
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Avatar, Sym, Type } from '../../../components/Kit/Kit'
 import type { DepartmentStage, PanelRenderProps } from '../types'
-import { ANSWERS, ANSWER_MS, KnowledgeSearch, answerText } from './knowledge'
+import { ANSWERS, ANSWER_MS, KnowledgeSearch } from './knowledge'
 import './management.css'
 
 /**
@@ -172,7 +172,7 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
               <div className="mgx-answer">
                 <Sym n={1} />
                 <div>
-                  <p>{answerText(ask.a)}</p>
+                  <p>{ask.a}</p>
                   <p className="mgx-src">
                     {near.map(({ icon: I, app, title }) => (
                       <span key={title}>

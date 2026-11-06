@@ -288,7 +288,7 @@ const waitFor = async (fn, ms = 4500) => {
           'desktop',
           'Watches Knowledge Management (1 · Km)',
           alone
-            ? 'A question is typed into the search and answered with references to three sources — then the next question'
+            ? 'A question is typed into the search bar at the bottom and answered above it, with the three things it was found in — then the next question'
             : 'It asks a question, answers it with its sources and the documents it was found in — then the next question',
           km.seen.length >= 2 && !!km.answer && km.sources.length === (alone ? 3 : 2),
           km.seen.join(' → '),

@@ -338,14 +338,15 @@ async function functionalPass(browser) {
       ways: Object.fromEntries(Object.entries(ways).map(([k, v]) => [k, [...v]])),
       maxWay,
       idleIcons,
+      lead: s.querySelector('.prompt__lead')?.textContent.trim(),
       text: s.querySelector('.slide__frame').innerText.replace(/\s+/g, ' ').trim(),
     }
   })
   const ways = Object.values(cx.ways)
   const reached = new Set(ways.flat())
   check(
-    'AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed below it, each sends the agent its own way and its tools appear on it, and together they reach every tool',
-    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0,
+    'AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the Nr bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool',
+    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0 && cx.lead === 'Nr',
     `${Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · ')} · icons at rest: ${cx.idleIcons}`,
   )
   check('AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy', /^AI Superagent works in the context of your business/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
@@ -532,9 +533,12 @@ async function functionalPass(browser) {
           full = alone
             ? {
                 sources: [...s.querySelectorAll('.kq-src')].filter(shown).length,
-                cites: [...s.querySelectorAll('.kq-cite')].map((c) => c.textContent).join(''),
+                // each source is just its icon and its name
+                plain: [...s.querySelectorAll('.kq-src')].every((x) => x.children.length === 2 && x.children[0].tagName === 'svg' && !/^\d/.test(x.textContent.trim())),
+                cites: s.querySelectorAll('.kq-cite, .kq-num').length,
                 answer: s.querySelector('.kq-text')?.textContent.trim().length ?? 0,
                 frame: s.querySelectorAll('.dept__stage .pn, .dept__stage .pn__head').length,
+                lead: s.querySelectorAll('.kq .prompt__lead, .kq .prompt > svg').length,
               }
             : {
                 sources: s.querySelectorAll('.mgx-answer .mgx-src span').length,
@@ -547,9 +551,9 @@ async function functionalPass(browser) {
     }, alone)
     check(
       alone
-        ? 'Management · Knowledge Management (1 · Km) on its own: no window, just the search — a question is typed and answered with references to three sources, then the next question'
+        ? 'Management · Knowledge Management (1 · Km) on its own: no window, just the search bar at the bottom — a question is typed and answered above it, with the three things it was found in (an icon and a name each), then the next question'
         : 'Management · Knowledge Management (1 · Km): asks and answers one question after another, each answer with its sources and the documents it was found in',
-      km.seen.length >= 2 && (alone ? km.full?.sources === 3 && km.full?.cites === '123' && km.full?.answer > 40 && km.full?.frame === 0 : km.view === 'knowledge' && km.full?.sources === 2 && km.full?.found === 2),
+      km.seen.length >= 2 && (alone ? km.full?.sources === 3 && km.full?.plain && km.full?.cites === 0 && km.full?.answer > 40 && km.full?.frame === 0 && km.full?.lead === 0 : km.view === 'knowledge' && km.full?.sources === 2 && km.full?.found === 2),
       `${km.seen.join(' → ')} · ${JSON.stringify(km.full)}`,
     )
   }
