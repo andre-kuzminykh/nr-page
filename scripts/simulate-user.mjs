@@ -326,10 +326,11 @@ const waitFor = async (fn, ms = 4500) => {
       sent: !!s.querySelector('.prompt.is-sent'),
       on: [...s.querySelectorAll('.cb-n.is-on:not(.cb-n--core) .cb-lab')].map((x) => x.textContent),
       rest: s.querySelectorAll('.cb-n:not(.is-on)').length,
+      icons: [...s.querySelectorAll('.cb-n')].filter((g) => Number(g.children[3]?.getAttribute('opacity') ?? 0) > 0.05).length,
       way: s.querySelectorAll('.cb line[display="inline"]').length,
     }
   })
-  await step(page, 'desktop', 'Opens Platform and watches', 'A command is typed below the brain and sent; the Superagent runs its way, the tools it needs light up and the rest wait', brain.sent && brain.on.length >= 2 && brain.rest >= 6 && brain.way > 4, JSON.stringify(brain))
+  await step(page, 'desktop', 'Opens Platform and watches', 'A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear', brain.sent && brain.on.length >= 2 && brain.rest >= 6 && brain.icons <= 6 && brain.way > 4, JSON.stringify(brain))
 
   if (has('custom')) {
     // Use cases

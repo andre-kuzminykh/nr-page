@@ -332,9 +332,8 @@ export function Brain({
         set(vh.current[i], 'r', f1((6 + 9 * s + 6 * w) * K))
         set(vh.current[i], 'opacity', (0.22 + 0.55 * s + 0.4 * w).toFixed(2))
       })
-      // tools: at rest they wait, dimmed — the whole context is always there. The ones on this way
-      // swell as the agent arrives (a ripple, the icon, the name for a moment) and settle back as
-      // the way fades out.
+      // tools: the brain shows none at rest. A tool appears only when the agent reaches it on this
+      // way (a ripple, the icon, the name for a moment) and is gone again as the way fades out.
       NODES.forEach((_, i) => {
         const g = nodes.current[i]
         if (!g) return
@@ -343,21 +342,28 @@ export function Brain({
         const k = c - P.arr[i]
         const on = k >= 0
         const z = on && dc > -1e8 ? clamp((dc - P.arr[i]) / (420 * FADE), 0, 1) ** 2 : 0
-        const w = on ? Math.exp(-(((wc - P.arr[i]) / 420) ** 2)) : 0
-        const lit = on ? backOut(clamp(k / 560, 0, 1)) * (1 - z) : 0
-        const rest = isCore ? 0.92 : 0.72
-        const s = rest + (1 - rest) * lit + 0.16 * w
+        if (!on || z >= 1) {
+          set(base, 'r', '0')
+          set(halo, 'r', '0')
+          set(ripple, 'r', '0')
+          set(icon, 'opacity', '0')
+          g.classList.remove('is-on', 'is-named')
+          return
+        }
+        const w = Math.exp(-(((wc - P.arr[i]) / 420) ** 2))
+        const s = backOut(clamp(k / 560, 0, 1)) * (1 + 0.18 * w) * (1 - z)
         set(base, 'r', f1((isCore ? R * 1.08 : R) * s))
-        set(base, 'opacity', (isCore ? 1 : 0.7 + 0.3 * lit).toFixed(2))
-        const rp = on ? clamp(k / 950, 0, 1) : 1
+        set(base, 'opacity', (1 - z * 0.6).toFixed(2))
+        const rp = clamp(k / 950, 0, 1)
         set(ripple, 'r', rp < 1 ? f1(R + 26 * out3(rp)) : '0')
         set(ripple, 'opacity', (0.9 * (1 - rp)).toFixed(2))
-        set(halo, 'r', f1((R + 6) * s + 4 * w))
-        set(halo, 'opacity', (0.05 + (0.12 + 0.05 * Math.sin(T / 650 + i)) * lit + 0.3 * w).toFixed(2))
-        set(icon, 'opacity', (isCore ? 0.75 + 0.25 * lit : 0.4 + 0.6 * lit).toFixed(2))
-        set(icon, 'transform', `scale(${(0.8 + 0.2 * lit + 0.1 * w).toFixed(3)})`)
-        g.classList.toggle('is-on', lit > 0.5)
-        g.classList.toggle('is-named', !fixed && on && k > 80 && k < (isCore ? 1800 : 2000))
+        set(halo, 'r', f1((R + 6) * Math.min(1, s) + 4 * w))
+        set(halo, 'opacity', ((0.16 + 0.05 * Math.sin(T / 650 + i) + 0.3 * w) * (1 - z)).toFixed(2))
+        const si = backOut(clamp((k - 150) / 440, 0, 1))
+        set(icon, 'opacity', (clamp((k - 150) / 220, 0, 1) * (1 - z)).toFixed(2))
+        set(icon, 'transform', `scale(${Math.max(0.001, si * (1 + 0.12 * w) * (1 - z)).toFixed(3)})`)
+        g.classList.toggle('is-on', s > 0.5)
+        g.classList.toggle('is-named', !fixed && k > 80 && k < (isCore ? 1800 : 2000))
       })
       // the agent: one bright point on each way, and the spark of the wave
       P.legs.forEach((L, i) => {
@@ -540,7 +546,6 @@ export function Brain({
             }}
             className={`cb-n ${i === 0 ? 'cb-n--core' : ''}`}
             transform={`translate(${x} ${y})`}
-            style={{ '--d': `${(0.5 + ((x - 40) / 535) * 0.9).toFixed(2)}s` } as CSSProperties}
           >
             <circle r={0} fill="none" stroke={hue(x)} strokeWidth={1.4} />
             <circle r={0} fill={hue(x)} />

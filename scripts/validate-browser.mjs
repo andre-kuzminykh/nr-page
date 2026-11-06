@@ -317,8 +317,12 @@ async function functionalPass(browser) {
     // watch the commands go by: which tools light up for each one
     const ways = {}
     let maxWay = 0
+    // while no command is running, the brain shows no tools
+    let idleIcons = 0
     const t0 = performance.now()
     while (performance.now() - t0 < 48000) {
+      if (!s.querySelector('.prompt.is-sent'))
+        idleIcons = Math.max(idleIcons, nodes.filter((g) => Number(g.children[3]?.getAttribute('opacity') ?? 0) > 0.05).length)
       const cmd = s.querySelector('.prompt__q .sr-only')?.textContent.trim()
       if (cmd) {
         ways[cmd] ??= new Set()
@@ -333,15 +337,16 @@ async function functionalPass(browser) {
       labels: nodes.map((n) => n.querySelector('.cb-lab')?.textContent).join('|'),
       ways: Object.fromEntries(Object.entries(ways).map(([k, v]) => [k, [...v]])),
       maxWay,
+      idleIcons,
       text: s.querySelector('.slide__frame').innerText.replace(/\s+/g, ' ').trim(),
     }
   })
   const ways = Object.values(cx.ways)
   const reached = new Set(ways.flat())
   check(
-    'AI Superagent: a brain of 12 tools; three commands are typed below it, each sends the agent its own way, and together they reach every tool',
-    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4,
-    Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · '),
+    'AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed below it, each sends the agent its own way and its tools appear on it, and together they reach every tool',
+    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0,
+    `${Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · ')} · icons at rest: ${cx.idleIcons}`,
   )
   check('AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy', /^AI Superagent works in the context of your business/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
 

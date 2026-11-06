@@ -50,19 +50,6 @@
   opacity: 0;
 }
 
-/* the tools appear once the brain has arrived, and wait */
-.cb-n {
-  opacity: 0;
-}
-
-.cb.is-run .cb-n {
-  animation: cb-in 0.6s ease var(--d) both;
-}
-
-.cb.is-still .cb-n {
-  opacity: 1;
-}
-
 .cb.is-run .cb-e {
   animation: cb-in 0.7s ease var(--d) both;
 }
