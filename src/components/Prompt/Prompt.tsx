@@ -1,4 +1,4 @@
-import { ArrowUp, Search, type LucideIcon } from 'lucide-react'
+import { ArrowUp } from 'lucide-react'
 import { Type } from '../Kit/Kit'
 import './Prompt.css'
 
@@ -12,19 +12,16 @@ export function Prompt({
   live,
   sent,
   onSent,
-  icon: Icon = Search,
   delay = 260,
 }: {
   text: string
   live: boolean
   sent: boolean
   onSent: () => void
-  icon?: LucideIcon
   delay?: number
 }) {
   return (
     <div className={`prompt ${live ? 'is-live' : 'is-still'} ${live && sent ? 'is-sent' : ''}`}>
-      <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
       <span className="prompt__q">
         <Type text={text} play={live} speed={30} delay={delay} onDone={onSent} />
       </span>

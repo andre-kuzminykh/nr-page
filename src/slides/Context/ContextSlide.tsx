@@ -1,4 +1,3 @@
-import { BrainCircuit } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Prompt } from '../../components/Prompt/Prompt'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
@@ -59,7 +58,6 @@ export function ContextSlide({ active, shown }: SlideProps) {
             live={live}
             sent={sent}
             onSent={() => setSent(true)}
-            icon={BrainCircuit}
             delay={cmd === 0 ? 1500 : 450}
           />
         </div>
