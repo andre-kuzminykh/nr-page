@@ -56,6 +56,14 @@ Until all 100 AI employees are open, Pricing and FAQ describe what is ready:
   the answers. The three plans and the full answers (`src/data/pricing.ts`, `src/data/faq.ts`) come back
   once all 100 are open.
 
+A department with only one open AI employee is led by it. Now that is Management with 1 · Km:
+- On the left: the title “Knowledge Management”, then “Answers from a search across your knowledge base”, then its
+  element. The line under the element fills up until the next answer.
+- On the right, no window — just a search bar. A question is typed into it and sent, and the answer streams in with
+  numbered references to three sources (`src/slides/Department/panels/knowledge.tsx`).
+- Once a second AI employee of the department opens, the department's headline, its elements and its turning
+  interface come back.
+
 The hero, Platform and the final block are always open. A closed block is not rendered at all:
 it is not in the menu, scrolling skips it, and a link to it (`#sales`) does nothing. Links that would
 lead to a closed block are hidden too — “Explore AI Employees” on the final block, “Open Sales” in the
@@ -99,7 +107,7 @@ contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screens
 
 ## The 17 blocks
 
-Built and in the code; open now: 01, 02, 04 (1 · Km only), 15 and 16 (for what is ready) and 17.
+Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15 and 16 (for what is ready) and 17.
 
 | # | Block | What it shows |
 |---|---|---|

@@ -1,0 +1,453 @@
+/* =========================================================
+   Knowledge Management on its own: no window, only the search.
+   The bar types a question, the search runs along its edge,
+   the answer streams in and three sources arrive.
+   ========================================================= */
+.kq {
+  --c1: #a071ff;
+  --c2: #e06ad8;
+  --c3: #ff8a33;
+  /* the answer starts this long after the question is sent */
+  --start: 640ms;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vh, 30px);
+  width: min(100%, 640px);
+  margin-inline: auto;
+}
+
+/* ---------- the bar ---------- */
+.kq-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: clamp(56px, 7.6vh, 68px);
+  padding: 0 10px 0 22px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgb(17 13 26 / 0.86), rgb(17 13 26 / 0.86)) padding-box,
+    linear-gradient(100deg, rgb(160 113 255 / 0.95), rgb(224 106 216 / 0.7) 55%, rgb(255 138 51 / 0.85)) border-box;
+  box-shadow:
+    0 30px 80px -34px rgb(160 113 255 / 0.75),
+    0 0 0 7px rgb(160 113 255 / 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: clamp(15px, 1.3vw, 19px);
+  letter-spacing: -0.01em;
+}
+
+.kq-bar > svg {
+  flex-shrink: 0;
+  color: var(--c1);
+}
+
+.kq-q {
+  --fam: var(--c1);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--fg);
+}
+
+.kq-go {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: clamp(38px, 5.2vh, 46px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.07);
+  color: rgb(255 255 255 / 0.45);
+  overflow: hidden;
+}
+
+.kq-go::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--grad);
+  opacity: 0;
+}
+
+.kq-go svg {
+  position: relative;
+}
+
+/* the question is sent */
+.kq.is-sent .kq-go {
+  animation: kq-press 520ms var(--ease-out) both;
+}
+
+.kq.is-sent .kq-go::before {
+  animation: kq-on 360ms ease both;
+}
+
+.kq.is-still .kq-go,
+.kq.is-sent .kq-go {
+  color: #fff;
+}
+
+/* nothing is answered before the question is sent */
+.kq.is-live:not(.is-sent) .kq-answer,
+.kq.is-live:not(.is-sent) .kq-sources {
+  visibility: hidden;
+}
+
+.kq.is-still .kq-go::before {
+  opacity: 1;
+}
+
+@keyframes kq-press {
+  0% {
+    color: rgb(255 255 255 / 0.45);
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.84);
+  }
+  100% {
+    color: #fff;
+    transform: scale(1);
+  }
+}
+
+@keyframes kq-on {
+  to {
+    opacity: 1;
+  }
+}
+
+/* the search runs along the bottom edge */
+.kq-scan {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--c1), var(--c2), var(--c3), transparent) no-repeat;
+  background-size: 45% 100%;
+  opacity: 0;
+}
+
+.kq.is-sent .kq-scan {
+  animation: kq-scan 760ms ease-in-out 80ms both;
+}
+
+@keyframes kq-scan {
+  0% {
+    opacity: 0;
+    background-position: -60% 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 160% 0;
+  }
+}
+
+/* ---------- the answer ---------- */
+.kq-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 8px;
+}
+
+.kq-km.sym {
+  flex-shrink: 0;
+  min-width: 30px;
+  height: 30px;
+  margin-top: 0.1em;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.kq.is-sent .kq-km {
+  animation: kq-rise 500ms var(--ease-out) calc(var(--start) - 120ms) backwards;
+}
+
+.kq-text {
+  font-size: clamp(17px, 1.5vw, 22px);
+  font-weight: 420;
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.kq.is-sent .kq-w {
+  animation: kq-word 560ms var(--ease-out) calc(var(--start) + var(--i) * 42ms) backwards;
+}
+
+@keyframes kq-word {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+/* a reference to a source, coloured like it */
+.kq-cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.45em;
+  height: 1.45em;
+  margin-left: 0.22em;
+  padding: 0 0.3em;
+  border-radius: 0.45em;
+  background: color-mix(in oklab, var(--cc) 28%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--cc) 60%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.56em;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 0.5em;
+  color: color-mix(in oklab, var(--cc) 45%, #fff);
+}
+
+.kq.is-sent .kq-cite {
+  animation: kq-pop 520ms var(--ease-out) calc(var(--start) + var(--i) * 42ms + 160ms) backwards;
+}
+
+@keyframes kq-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* ---------- the sources ---------- */
+.kq-sources {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kq-src {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px 14px 13px;
+  border-radius: 16px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--cc) 12%, transparent), transparent 70%),
+    rgb(15 12 22 / 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+/* a lit edge in the source's colour */
+.kq-src::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cc), transparent);
+  opacity: 0.8;
+}
+
+.kq.is-sent .kq-src {
+  animation: kq-src 640ms var(--ease-out) calc(var(--start) + 620ms + var(--k) * 170ms) backwards;
+}
+
+@keyframes kq-src {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+.kq-src__top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kq-src__top > svg {
+  flex-shrink: 0;
+  color: color-mix(in oklab, var(--cc) 55%, #fff);
+}
+
+.kq-num {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--cc) 26%, transparent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: color-mix(in oklab, var(--cc) 45%, #fff);
+}
+
+.kq-app {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kq-src__go {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: rgb(255 255 255 / 0.4);
+}
+
+.kq-src__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 520;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.kq-src__note {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- the round ends: everything steps back for the next question ---------- */
+.kq.is-live {
+  animation: kq-out 420ms ease 7560ms forwards;
+}
+
+@keyframes kq-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes kq-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- smaller windows ---------- */
+@media (max-width: 1100px) {
+  .kq-src__note {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .kq {
+    gap: 14px;
+  }
+  .kq-bar {
+    height: 50px;
+    gap: 11px;
+    padding-left: 17px;
+    padding-right: 6px;
+    font-size: 14.5px;
+  }
+  .kq-go {
+    width: 38px;
+  }
+  .kq-answer {
+    gap: 11px;
+    padding: 0 4px;
+  }
+  .kq-km.sym {
+    min-width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+  .kq-text {
+    font-size: 15.5px;
+  }
+}
+
+/* phones: the sources become a short list */
+@media (max-width: 600px) {
+  .kq-sources {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .kq-src {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
+  }
+  .kq-src::before {
+    display: none;
+  }
+  .kq-src__top {
+    display: contents;
+  }
+  .kq-num {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .kq-src__top > svg,
+  .kq-src__go {
+    display: none;
+  }
+  .kq-app {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 9.5px;
+  }
+  .kq-src__title {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .kq-bar {
+    height: 44px;
+  }
+  .kq-text {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .kq-src {
+    padding: 7px 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kq,
+  .kq * {
+    animation: none !important;
+  }
+}

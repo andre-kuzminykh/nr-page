@@ -247,7 +247,7 @@ const waitFor = async (fn, ms = 4500) => {
         const s = document.querySelector('.slide[data-state="active"]')
         return {
           els: [...s.querySelectorAll('.dept__el')].map((b) => b.dataset.name),
-          count: s.querySelector('.dept__count')?.textContent.trim(),
+          title: [...s.querySelectorAll('.dept__title .mask')].map((x) => x.textContent.trim()).join(' '),
           active: document.querySelector('.nav__item.is-active')?.textContent.trim(),
         }
       })
@@ -257,33 +257,40 @@ const waitFor = async (fn, ms = 4500) => {
         `Opens ${d.name} from the menu`,
         `Lands on ${d.name}; only its open AI employees are there (${d.members.map((m) => `${m.n} · ${m.symbol}`).join(', ')})`,
         (await idx(page)) === at(d.id) && view.active === d.name && view.els.join('|') === d.members.map((m) => m.name).join('|'),
-        `${view.count} · menu: ${view.active}`,
+        `${view.title} · menu: ${view.active}`,
       )
+      const alone = d.members.length === 1
       if (d.id === 'management' && OPEN_EMPLOYEES.includes(1)) {
-        await page.locator('.slide[data-state="active"] #tab-1').click()
-        await sleep(300)
-        const km = await page.evaluate(async () => {
+        if (!alone) {
+          await page.locator('.slide[data-state="active"] #tab-1').click()
+          await sleep(300)
+        }
+        const km = await page.evaluate(async (alone) => {
           const s = document.querySelector('.slide[data-state="active"]')
-          const ask = () => s.querySelector('.mgx-search .sr-only')?.textContent.trim()
+          const ask = () => s.querySelector(alone ? '.kq-q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
           const seen = []
           const t0 = performance.now()
-          while (performance.now() - t0 < 9000 && seen.length < 2) {
+          while (performance.now() - t0 < 12000 && seen.length < 2) {
             const q = ask()
             if (q && seen.at(-1) !== q) seen.push(q)
             await new Promise((r) => setTimeout(r, 150))
           }
+          // let the second answer arrive
+          await new Promise((r) => setTimeout(r, alone ? 4600 : 300))
           return {
             seen,
-            answer: s.querySelector('.mgx-answer p')?.textContent.trim(),
-            sources: [...s.querySelectorAll('.mgx-answer .mgx-src span')].map((x) => x.textContent.trim()),
+            answer: s.querySelector(alone ? '.kq-text' : '.mgx-answer p')?.textContent.trim(),
+            sources: [...s.querySelectorAll(alone ? '.kq-src' : '.mgx-answer .mgx-src span')].map((x) => x.textContent.trim()),
           }
-        })
+        }, alone)
         await step(
           page,
           'desktop',
           'Watches Knowledge Management (1 · Km)',
-          'It asks a question, answers it with its sources and the documents it was found in — then the next question',
-          km.seen.length >= 2 && !!km.answer && km.sources.length === 2,
+          alone
+            ? 'A question is typed into the search and answered with references to three sources — then the next question'
+            : 'It asks a question, answers it with its sources and the documents it was found in — then the next question',
+          km.seen.length >= 2 && !!km.answer && km.sources.length === (alone ? 3 : 2),
           km.seen.join(' → '),
         )
       }
@@ -292,9 +299,19 @@ const waitFor = async (fn, ms = 4500) => {
       await sleep(500)
       const sel = await page.evaluate(() => {
         const s = document.querySelector('.slide[data-state="active"]')
-        return { cap: s.querySelector('.dept__cap-name')?.textContent, no: s.querySelector('.dept__cap-n')?.textContent, hot: !!s.querySelector('.dept__slot.is-focus .is-hot') }
+        return {
+          cap: s.querySelector('.dept__cap-name')?.textContent,
+          no: s.querySelector('.dept__cap-n')?.textContent,
+          hot: !!s.querySelector('.dept__slot.is-focus .is-hot'),
+          title: [...s.querySelectorAll('.dept__title .mask')].map((x) => x.textContent.trim()).join(' '),
+          picked: s.querySelector('.dept__el[aria-selected="true"]')?.dataset.name,
+          load: s.querySelectorAll('.dept__strip.is-live .dept__el-load').length,
+        }
       })
-      await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `“${first.n} · ${first.symbol}” above ${first.name}; its part of the interface is lit`, sel.cap === first.name && sel.no === `${first.n} · ${first.symbol}` && sel.hot, JSON.stringify(sel))
+      if (alone)
+        await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === first.name && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
+      else
+        await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `“${first.n} · ${first.symbol}” above ${first.name}; its part of the interface is lit`, sel.cap === first.name && sel.no === `${first.n} · ${first.symbol}` && sel.hot, JSON.stringify(sel))
     }
   }
 
@@ -458,11 +475,22 @@ const waitFor = async (fn, ms = 4500) => {
     await sleep(600)
     const ph = await page.evaluate(() => {
       const s = document.querySelector('.slide[data-state="active"]')
+      const f = s.querySelector('.slide__frame')
       const vis = [...s.querySelectorAll('.dept__slot')].filter((x) => Number(getComputedStyle(x).opacity) > 0.5)
       const scene = s.querySelector('.mgx')
-      return { cap: s.querySelector('.dept__cap-name')?.textContent, visible: vis.length || (scene ? 1 : 0), hot: !!s.querySelector('.is-hot') }
+      return {
+        cap: s.querySelector('.dept__cap-name')?.textContent,
+        title: [...s.querySelectorAll('.dept__title .mask')].map((x) => x.textContent.trim()).join(' '),
+        visible: vis.length || (scene ? 1 : 0) || s.querySelectorAll('.dept__solo > *').length,
+        hot: !!s.querySelector('.is-hot'),
+        search: !!s.querySelector('.kq-bar'),
+        over: f.scrollHeight - f.clientHeight,
+      }
     })
-    await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `One interface at a time: ${m.name}, its part lit`, ph.cap === m.name && ph.visible === 1 && ph.hot, JSON.stringify(ph))
+    if (d.members.length === 1)
+      await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `${m.name} on its own: the search, what it does, its element — all on one screen`, ph.title === m.name && ph.visible === 1 && (d.id !== 'management' || ph.search) && ph.over <= 0, JSON.stringify(ph))
+    else
+      await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `One interface at a time: ${m.name}, its part lit`, ph.cap === m.name && ph.visible === 1 && ph.hot, JSON.stringify(ph))
   }
   await page.evaluate(() => (location.hash = '#start'))
   await sleep(1400)

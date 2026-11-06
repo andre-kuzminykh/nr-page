@@ -8,6 +8,11 @@ export interface PanelRenderProps {
   live: boolean
 }
 
+export interface SoloRenderProps extends PanelRenderProps {
+  /** Counts the rounds of a solo AI employee's show; it ticks every `ms` while the block is live. */
+  round: number
+}
+
 export interface PanelDef {
   title: string
   icon: LucideIcon
@@ -26,4 +31,9 @@ export interface DepartmentStage {
   order?: number[]
   /** One continuous interface instead of separate panels. */
   scene?: (p: PanelRenderProps) => ReactNode
+  /**
+   * While an AI employee is the only one open in its department, it can have a show of its own
+   * instead of the department's interface: one round every `ms`.
+   */
+  solo?: Partial<Record<number, { ms: number; render: (p: SoloRenderProps) => ReactNode }>>
 }

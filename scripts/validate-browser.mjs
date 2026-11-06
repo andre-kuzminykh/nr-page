@@ -89,6 +89,18 @@ async function layoutPass(browser) {
           await page.keyboard.press('PageDown')
           await sleep(SETTLE)
         }
+        // a solo show is measured at its fullest: once the answer and its sources are in
+        await page
+          .waitForFunction(
+            () => {
+              const s = document.querySelector('.slide[data-state="active"]')
+              const src = [...(s?.querySelectorAll('.kq-src') ?? [])]
+              return !s?.querySelector('.kq') || (src.length > 0 && src.every((x) => getComputedStyle(x).visibility !== 'hidden' && Number(getComputedStyle(x).opacity) > 0.95))
+            },
+            null,
+            { timeout: 9000 },
+          )
+          .catch(() => {})
         const idx = await activeIndex(page)
         const m = await page.evaluate(() => {
           const slide = document.querySelector('.slide[data-state="active"]')
@@ -407,21 +419,36 @@ async function functionalPass(browser) {
     const slide = page.locator('.slide[data-state="active"]')
     const els = await slide.locator('.dept__el').evaluateAll((b) => b.map((x) => x.dataset.name))
     if (els.join('|') !== dpt.members.map((m) => m.name).join('|')) missing.push(`${dpt.name}: wrong elements`)
-    for (const m of dpt.members) {
-      await slide.locator(`#tab-${m.n}`).click()
-      await sleep(80)
-      const state = await slide.evaluate((el) => ({
-        hot: el.querySelectorAll('.dept__slot.is-focus .is-hot').length,
-        focus: el.querySelectorAll('.dept__stage .pn.is-focus').length,
-        windows: el.querySelectorAll('.dept__slot.is-focus').length,
-        cap: el.querySelector('.dept__cap-desc')?.textContent,
+    if (dpt.members.length === 1) {
+      // one open AI employee leads the block: its name, what it does, its element and its own show
+      const [m] = dpt.members
+      const solo = await slide.evaluate((el) => ({
+        title: [...el.querySelectorAll('.dept__title .mask')].map((x) => x.textContent.trim()).join(' '),
+        desc: el.querySelector('.dept__desc')?.textContent.trim(),
+        label: el.querySelector('.dept__label')?.textContent.trim(),
+        count: el.querySelectorAll('.dept__count').length,
+        caption: el.querySelectorAll('.dept__caption').length,
+        show: el.querySelectorAll('.dept__solo > *').length,
+        load: el.querySelectorAll('.dept__el-load').length,
       }))
-      if (!state.hot || state.focus !== 1 || state.windows !== 1 || state.cap !== m.description) missing.push(`${m.n} ${m.name}`)
+      if (solo.title !== m.name || solo.desc !== (m.short ?? m.description) || solo.label !== dpt.name || solo.count || solo.caption || !solo.show || solo.load !== 1) missing.push(`${m.n} ${m.name} alone: ${JSON.stringify(solo)}`)
+    } else {
+      for (const m of dpt.members) {
+        await slide.locator(`#tab-${m.n}`).click()
+        await sleep(80)
+        const state = await slide.evaluate((el) => ({
+          hot: el.querySelectorAll('.dept__slot.is-focus .is-hot').length,
+          focus: el.querySelectorAll('.dept__stage .pn.is-focus').length,
+          windows: el.querySelectorAll('.dept__slot.is-focus').length,
+          cap: el.querySelector('.dept__cap-desc')?.textContent,
+        }))
+        if (!state.hot || state.focus !== 1 || state.windows !== 1 || state.cap !== m.description) missing.push(`${m.n} ${m.name}`)
+      }
     }
   }
   const openCount = OPEN_DEPTS.reduce((k, d) => k + d.members.length, 0)
   check(
-    `Departments: ${OPEN_DEPTS.length} open block(s) with only their open AI employees (${openCount}), one interface at a time; each AI employee brings its interface forward and lights up its own part`,
+    `Departments: ${OPEN_DEPTS.length} open block(s) with only their open AI employees (${openCount}); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element`,
     OPEN_DEPTS.length > 0 && missing.length === 0,
     missing.length ? missing.slice(0, 6).join(', ') : OPEN_DEPTS.map((d) => `${d.name}: ${d.members.map((m) => m.symbol).join(' ')}`).join(' · '),
   )
@@ -457,46 +484,53 @@ async function functionalPass(browser) {
     check('Management board: tasks move on from To do to In progress to Done', boardSteps[0] !== boardSteps[1])
   }
 
-  // Management · Knowledge: while it is the open element, it answers one question after another
+  // Management · Knowledge: it answers one question after another
   if (has('management') && openNo(1)) {
     await go('management')
-    // picking Knowledge keeps it on screen (autoplay stops when an element is picked)
-    await page.locator('.slide[data-state="active"] #tab-1').click()
-    await sleep(300)
-    const km = await page.evaluate(async () => {
+    const alone = OPEN_DEPTS.find((d) => d.id === 'management').members.length === 1
+    if (!alone) {
+      // picking Knowledge keeps it on screen (autoplay stops when an element is picked)
+      await page.locator('.slide[data-state="active"] #tab-1').click()
+      await sleep(300)
+    }
+    const km = await page.evaluate(async (alone) => {
       const s = document.querySelector('.slide[data-state="active"]')
-      const ask = () => s.querySelector('.mgx-search .sr-only')?.textContent.trim()
-      // wait for the next question, then let its answer and documents arrive
+      const ask = () => s.querySelector(alone ? '.kq-q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
+      const shown = (el) => getComputedStyle(el).visibility !== 'hidden' && Number(getComputedStyle(el).opacity) > 0.9
+      // wait for the next question, then let its answer and sources arrive
       const seen = []
       let next = 0
       let full = null
       const t0 = performance.now()
-      while (performance.now() - t0 < 16000 && !full) {
+      while (performance.now() - t0 < 18000 && !full) {
         const q = ask()
         if (q && seen.at(-1) !== q) {
           seen.push(q)
           if (seen.length === 2) next = performance.now()
         }
-        if (next && performance.now() - next > 4200) {
-          full = {
-            sources: s.querySelectorAll('.mgx-answer .mgx-src span').length,
-            found: [...s.querySelectorAll('.mgx-doc')].filter((d) => Number(getComputedStyle(d).opacity) > 0.9).length,
-          }
+        if (next && performance.now() - next > 4600) {
+          full = alone
+            ? {
+                sources: [...s.querySelectorAll('.kq-src')].filter(shown).length,
+                cites: [...s.querySelectorAll('.kq-cite')].map((c) => c.textContent).join(''),
+                answer: s.querySelector('.kq-text')?.textContent.trim().length ?? 0,
+                frame: s.querySelectorAll('.dept__stage .pn, .dept__stage .pn__head').length,
+              }
+            : {
+                sources: s.querySelectorAll('.mgx-answer .mgx-src span').length,
+                found: [...s.querySelectorAll('.mgx-doc')].filter(shown).length,
+              }
         }
         await new Promise((r) => setTimeout(r, 150))
       }
-      return {
-        view: s.querySelector('.mgx')?.dataset.view,
-        els: [...s.querySelectorAll('.dept__el')].map((b) => b.dataset.name),
-        count: s.querySelector('.dept__count')?.textContent.trim(),
-        seen,
-        full,
-      }
-    })
+      return { view: s.querySelector('.mgx')?.dataset.view, seen, full }
+    }, alone)
     check(
-      'Management · Knowledge Management (1 · Km): asks and answers one question after another, each answer with its sources and the documents it was found in',
-      km.view === 'knowledge' && km.els.join('|') === OPEN_DEPTS.find((d) => d.id === 'management').members.map((m) => m.name).join('|') && km.seen.length >= 2 && km.full?.sources === 2 && km.full?.found === 2,
-      `${km.count ?? ''} · ${km.seen.join(' → ')}`,
+      alone
+        ? 'Management · Knowledge Management (1 · Km) on its own: no window, just the search — a question is typed and answered with references to three sources, then the next question'
+        : 'Management · Knowledge Management (1 · Km): asks and answers one question after another, each answer with its sources and the documents it was found in',
+      km.seen.length >= 2 && (alone ? km.full?.sources === 3 && km.full?.cites === '123' && km.full?.answer > 40 && km.full?.frame === 0 : km.view === 'knowledge' && km.full?.sources === 2 && km.full?.found === 2),
+      `${km.seen.join(' → ')} · ${JSON.stringify(km.full)}`,
     )
   }
 

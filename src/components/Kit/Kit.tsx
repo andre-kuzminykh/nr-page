@@ -59,9 +59,23 @@ export function Sym({ n, className = '' }: { n: number; className?: string }) {
   )
 }
 
-/** Text that writes itself while `play` is on; shown in full otherwise. */
-export function Type({ text, play, speed = 22, delay = 250 }: { text: string; play: boolean; speed?: number; delay?: number }) {
+/** Text that writes itself while `play` is on; shown in full otherwise. `onDone` follows the last letter. */
+export function Type({
+  text,
+  play,
+  speed = 22,
+  delay = 250,
+  onDone,
+}: {
+  text: string
+  play: boolean
+  speed?: number
+  delay?: number
+  onDone?: () => void
+}) {
   const [count, setCount] = useState(play ? 0 : text.length)
+  const done = useRef(onDone)
+  done.current = onDone
   useEffect(() => {
     if (!play) {
       setCount(text.length)
@@ -74,7 +88,10 @@ export function Type({ text, play, speed = 22, delay = 250 }: { text: string; pl
       timer = window.setInterval(() => {
         i += 1
         setCount(i)
-        if (i >= text.length) window.clearInterval(timer)
+        if (i >= text.length) {
+          window.clearInterval(timer)
+          done.current?.()
+        }
       }, speed)
     }, delay)
     return () => {

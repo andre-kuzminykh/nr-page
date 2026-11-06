@@ -58,7 +58,7 @@
     {
       "name": "Shared context: a brain of 12 tools around the AI Superagent; the agent runs along the connections and the tools light up",
       "ok": true,
-      "detail": "7 lit, 24 connections on the way"
+      "detail": "7 lit, 28 connections on the way"
     },
     {
       "name": "Shared context: no extra copy — just the title and the brain",
@@ -66,14 +66,14 @@
       "detail": "Shared context. One Superagent. AI SUPERAGENT GMAIL CALENDAR"
     },
     {
-      "name": "Departments: 1 open block(s) with only their open AI employees (1), one interface at a time; each AI employee brings its interface forward and lights up its own part",
+      "name": "Departments: 1 open block(s) with only their open AI employees (1); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element",
       "ok": true,
       "detail": "Management: Km"
     },
     {
-      "name": "Management · Knowledge Management (1 · Km): asks and answers one question after another, each answer with its sources and the documents it was found in",
+      "name": "Management · Knowledge Management (1 · Km) on its own: no window, just the search — a question is typed and answered with references to three sources, then the next question",
       "ok": true,
-      "detail": "1 AI employee · What did we agree on pilot pricing? → Who owns the landing page?"
+      "detail": "What did we agree on pilot pricing? → Who owns the landing page? · {\"sources\":3,\"cites\":\"123\",\"answer\":83,\"frame\":0}"
     },
     {
       "name": "Pricing: one subscription for what is ready (1 · Km); its table lights only those elements; price on request, no fine print",
@@ -626,7 +626,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-06T15:36:13.310Z",
+  "startedAt": "2026-11-06T21:47:17.337Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 38
+  "fps": 42
 }
