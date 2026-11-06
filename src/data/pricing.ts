@@ -15,6 +15,17 @@ export interface Plan {
   featured?: boolean
 }
 
+/**
+ * While AI employees are still being added (see release.ts), the block shows one subscription for
+ * what is ready; its AI employees are listed from the open elements.
+ */
+export const SUBSCRIPTION = {
+  name: 'Subscription',
+  tag: 'Early access',
+  includes: ['Shared business context', 'AI Superagent'],
+  price: null as string | null,
+}
+
 export const PLANS: Plan[] = [
   {
     id: 'department',

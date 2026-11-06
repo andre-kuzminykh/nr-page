@@ -5,6 +5,9 @@
  * its element; a department block opens as soon as one of its AI employees is open. Everything else
  * stays in the code, hidden, until it is opened here.
  *
+ * Until all 100 AI employees are open, Pricing shows one subscription for what is ready and the FAQ
+ * answers for today; the full plans and answers come back once everything is open.
+ *
  * (No imports here: the validation scripts read this file directly.)
  */
 
@@ -17,8 +20,11 @@ export const OPEN_BLOCKS = {
   employees: false,
   /** custom use cases */
   custom: false,
-  pricing: false,
-  faq: false,
+  pricing: true,
+  faq: true,
 }
 
 export const isEmployeeOpen = (n: number): boolean => OPEN_EMPLOYEES.includes(n)
+
+/** All 100 AI employees are open: the whole product is on the site. */
+export const ALL_EMPLOYEES_OPEN = OPEN_EMPLOYEES.length >= 100

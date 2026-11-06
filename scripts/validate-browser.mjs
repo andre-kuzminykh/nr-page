@@ -13,7 +13,7 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { AI_EMPLOYEES, DEPARTMENTS } from '../src/data/departments.ts'
 import { ALL_SLIDES, SLIDES } from '../src/data/slides.ts'
-import { OPEN_EMPLOYEES } from '../src/data/release.ts'
+import { ALL_EMPLOYEES_OPEN, OPEN_EMPLOYEES } from '../src/data/release.ts'
 
 const require = createRequire(import.meta.url)
 
@@ -527,8 +527,28 @@ async function functionalPass(browser) {
   // Pricing — no invented prices
   if (has('pricing')) {
     await go('pricing')
-    const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent.trim()))
-    check('Pricing: three plans, prices on request (no invented numbers), no fine print', prices.length === 3 && prices.every((p) => !/\d/.test(p)) && (await page.locator('.slide[data-state="active"] .pr__note').count()) === 0, prices.join(' | '))
+    const pr = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      return {
+        prices: [...s.querySelectorAll('.pr-plan__price')].map((e) => e.textContent.trim()),
+        names: [...s.querySelectorAll('.pr-plan__name')].map((e) => e.textContent.trim()),
+        lit: [...s.querySelectorAll('.pr-plan')].map((x) => x.querySelectorAll('.pr-grid i.is-on').length),
+        list: [...s.querySelectorAll('.pr-plan__list li')].map((li) => li.textContent.trim()),
+        title: [...s.querySelectorAll('.pr__title .mask')].map((m) => m.textContent.trim()).join(' '),
+        note: s.querySelectorAll('.pr__note').length,
+      }
+    })
+    const onRequest = pr.prices.every((x) => x === 'Price on request') && pr.note === 0
+    if (ALL_EMPLOYEES_OPEN) {
+      check('Pricing: three plans, prices on request (no invented numbers), no fine print', pr.prices.length === 3 && onRequest, pr.prices.join(' | '))
+    } else {
+      const ready = OPEN_DEPTS.flatMap((dpt) => dpt.members)
+      check(
+        `Pricing: one subscription for what is ready (${ready.map((x) => `${x.n} · ${x.symbol}`).join(', ')}); its table lights only those elements; price on request, no fine print`,
+        pr.names.join('|') === 'Subscription' && pr.prices.length === 1 && pr.lit[0] === ready.length && (ready.length > 4 ? pr.list.some((li) => li.includes(`${ready.length} AI employees`)) : ready.every((x) => pr.list.some((li) => li.includes(x.name)))) && onRequest && /today/.test(pr.title),
+        `${pr.title} · ${pr.lit[0]} lit · ${pr.prices.join(' | ')}`,
+      )
+    }
   }
 
   // FAQ
@@ -541,6 +561,20 @@ async function functionalPass(browser) {
       text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
     }))
     check('FAQ: answers open in place, one at a time — opening one closes the others', faqState.open.length === 1 && /Who stays in control/.test(faqState.open[0]) && /AI Governance/.test(faqState.text), faqState.text.slice(0, 60))
+    if (!ALL_EMPLOYEES_OPEN) {
+      await page.getByRole('button', { name: /Is it available today/ }).click()
+      await sleep(700)
+      const today = await page.evaluate(() => ({
+        a: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
+        qs: [...document.querySelectorAll('.slide[data-state="active"] .faq__q-text')].map((q) => q.textContent.trim()),
+      }))
+      const ready = OPEN_DEPTS.flatMap((dpt) => dpt.members)
+      check(
+        'FAQ: answers for today — it names what is ready now — and leaves out questions about closed blocks',
+        (ready.length > 4 ? today.a.includes(`${ready.length} AI employees`) : ready.every((x) => today.a.includes(x.name))) && (has('custom') || !today.qs.some((q) => /create my own/i.test(q))),
+        `${today.qs.length} questions · ${today.a.slice(0, 90)}`,
+      )
+    }
   }
 
   // Final

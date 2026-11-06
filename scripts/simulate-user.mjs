@@ -10,7 +10,7 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { ALL_SLIDES, SLIDES } from '../src/data/slides.ts'
 import { DEPARTMENTS } from '../src/data/departments.ts'
-import { OPEN_EMPLOYEES } from '../src/data/release.ts'
+import { ALL_EMPLOYEES_OPEN, OPEN_EMPLOYEES } from '../src/data/release.ts'
 
 const require = createRequire(import.meta.url)
 let chromium
@@ -333,10 +333,19 @@ const waitFor = async (fn, ms = 4500) => {
     await page.locator('.nav__item', { hasText: 'Pricing' }).click()
     await sleep(1300)
     const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent))
-    await step(page, 'desktop', 'Opens Pricing', 'Three plans; no invented prices', prices.length === 3 && prices.every((p) => p === 'Price on request'))
+    const ready = OPEN_DEPTS.flatMap((d) => d.members)
+    const sub = await page.$$eval('.pr-plan__list li', (els) => els.map((e) => e.textContent))
+    await step(
+      page,
+      'desktop',
+      'Opens Pricing',
+      ALL_EMPLOYEES_OPEN ? 'Three plans; no invented prices' : `One subscription for what is ready today (${ready.map((m) => m.name).join(', ')}); no invented prices`,
+      prices.length === (ALL_EMPLOYEES_OPEN ? 3 : 1) && prices.every((p) => p === 'Price on request') && (ALL_EMPLOYEES_OPEN || (ready.length > 4 ? sub.some((li) => li.includes(`${ready.length} AI employees`)) : ready.every((m) => sub.some((li) => li.includes(m.name))))),
+      prices.join(' | '),
+    )
     await page.locator('.pr-plan.is-featured').getByRole('button', { name: /Get Early Access/ }).click()
     await sleep(1500)
-    await step(page, 'desktop', 'Clicks “Get Early Access” on the Company plan', 'Goes to the final block with the idea input', (await idx(page)) === at('start'))
+    await step(page, 'desktop', `Clicks “Get Early Access” on the ${ALL_EMPLOYEES_OPEN ? 'Company plan' : 'subscription'}`, 'Goes to the final block with the idea input', (await idx(page)) === at('start'))
   }
 
   if (has('faq')) {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
-import { FAQ } from '../../data/faq'
+import { QUESTIONS as FAQ } from '../../data/faq'
 import './Faq.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties

@@ -5,8 +5,9 @@ Full-screen blocks, one gesture per block, over one continuous WebGL light field
 100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
 The site opens step by step. **Open now:** the hero, Platform (shared context and the Superagent),
-Management with its first AI employee (**1 · Km**, Knowledge Management) and the final block.
-The other 13 blocks are built and stay hidden until they are opened — see [Staged release](#staged-release).
+Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ and the final
+block. Pricing and FAQ describe what is ready today. The other 11 blocks are built and stay hidden
+until they are opened — see [Staged release](#staged-release).
 
 ![Desktop, the open blocks](docs/screenshots/sheets/1440x900.jpg)
 
@@ -41,8 +42,19 @@ What is open is set in one file, [`src/data/release.ts`](src/data/release.ts):
 | `OPEN_EMPLOYEES` | AI employees by number (1–100). A department block opens as soon as one of its AI employees is open and shows only its open elements. | `[1]` — Management with 1 · Km |
 | `OPEN_BLOCKS.employees` | The periodic table of 100 AI employees | `false` |
 | `OPEN_BLOCKS.custom` | Use cases | `false` |
-| `OPEN_BLOCKS.pricing` | Pricing | `false` |
-| `OPEN_BLOCKS.faq` | FAQ | `false` |
+| `OPEN_BLOCKS.pricing` | Pricing | `true` |
+| `OPEN_BLOCKS.faq` | FAQ | `true` |
+
+Until all 100 AI employees are open, Pricing and FAQ describe what is ready:
+
+- **Pricing** shows one subscription: “One AI employee today. A hundred to come.” Its small periodic table
+  lights only the open elements, and it lists them (now 1 · Km Knowledge Management) with the shared
+  business context and the AI Superagent. Price on request.
+- **FAQ** gives the answers for today, for example “Ready today: Knowledge Management. New AI employees are
+  added one by one.” It leaves out questions about closed blocks, such as creating your own AI employees.
+- Both follow `release.ts` on their own: open another AI employee and it appears in the subscription and
+  the answers. The three plans and the full answers (`src/data/pricing.ts`, `src/data/faq.ts`) come back
+  once all 100 are open.
 
 The hero, Platform and the final block are always open. A closed block is not rendered at all:
 it is not in the menu, scrolling skips it, and a link to it (`#sales`) does nothing. Links that would
@@ -73,11 +85,12 @@ and a running `npm run preview` (override the URL with `BASE_URL=…`). Output g
 Latest results for the staged release (production build, headless Chromium with software WebGL):
 
 - **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
-- **Browser**: **29 / 29 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
+- **Browser**: **32 / 32 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
   - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
-  - Only the open blocks are on the page; the menu shows Platform · Management; links to closed blocks do nothing.
-  - Knowledge Management answers one question after another, each with its sources and the documents it was found in. [Report](docs/validation/browser-report.md)
-- **Simulated users**: **24 / 24 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+  - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ; links to closed blocks do nothing.
+  - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
+  - Pricing shows one subscription that lights only the open elements; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
+- **Simulated users**: **31 / 31 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all 17 blocks (last run: 66 / 66 walkthrough steps).
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
@@ -86,7 +99,7 @@ contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screens
 
 ## The 17 blocks
 
-Built and in the code; open now: 01, 02, 04 (1 · Km only) and 17.
+Built and in the code; open now: 01, 02, 04 (1 · Km only), 15 and 16 (for what is ready) and 17.
 
 | # | Block | What it shows |
 |---|---|---|
@@ -95,8 +108,8 @@ Built and in the code; open now: 01, 02, 04 (1 · Km only) and 17.
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
-| 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. |
-| 16 | FAQ | Eight questions that open in place — one at a time. |
+| 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. Until all 100 are open: one subscription for what is ready. |
+| 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
 | 17 | Turn your Idea into Reality | The idea goes straight into the input → “Get Early Access”; “Explore AI Employees”. |
 
 | Department | Headline | Interface pieces |
@@ -149,6 +162,7 @@ src/
     pricing.ts, faq.ts            plans and questions
     slides.ts                     block order, menu groups and light composition per block
     release.ts                    what is open on the site right now (staged release)
+    ready.ts                      the open AI employees, for Pricing and FAQ
   config/links.ts                 CTA destinations and the idea endpoint
 scripts/                          validate-data, validate-browser, simulate-user
 ```
