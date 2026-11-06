@@ -56,14 +56,14 @@
       "detail": "5,0,1,0"
     },
     {
-      "name": "Shared context: a brain of 12 tools around the AI Superagent; the agent runs along the connections and the tools light up",
+      "name": "AI Superagent: a brain of 12 tools; three commands are typed below it, each sends the agent its own way, and together they reach every tool",
       "ok": true,
-      "detail": "7 lit, 28 connections on the way"
+      "detail": "Find new leads and book demos: Apollo, Sheets, Gmail, Calendar · Sum up today’s calls for the team: Meet, Docs, Slack, Telegram · Collect feedback and ship the fix: WhatsApp, Drive, Code, APIs"
     },
     {
-      "name": "Shared context: no extra copy — just the title and the brain",
+      "name": "AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy",
       "ok": true,
-      "detail": "Shared context. One Superagent. AI SUPERAGENT GMAIL CALENDAR"
+      "detail": "AI Superagent works in the context of your business AI SUPER"
     },
     {
       "name": "Departments: 1 open block(s) with only their open AI employees (1); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element",
@@ -91,7 +91,7 @@
       "detail": "7 questions · Neuronium is in early access. Ready today: Knowledge Management. New AI employees are adde"
     },
     {
-      "name": "Final: “Turn your Idea into Reality.”, “Run AI Business with Neuronium.”, idea input with no hint text; empty input is caught; submit hands off honestly",
+      "name": "Final: “Run Your AI Business”, “with Neuronium” smaller below, idea input with no hint text; empty input is caught; submit hands off honestly",
       "ok": true,
       "detail": "Your email app should open with the idea. If it doesn’t, write to admin@andre.technology."
     },
@@ -626,7 +626,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-06T21:47:17.337Z",
+  "startedAt": "2026-11-06T21:59:16.766Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 42
+  "fps": 45
 }
