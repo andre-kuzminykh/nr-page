@@ -56,10 +56,15 @@ export function App() {
   }, [index])
 
   useEffect(() => {
-    const onHash = () => go(fromHash())
+    const onHash = () => {
+      const i = slideIndex(decodeURIComponent(window.location.hash.slice(1)))
+      // a link to a block that is not open yet goes nowhere
+      if (i >= 0) go(i)
+      else history.replaceState(null, '', `#${SLIDES[index].id}`)
+    }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
-  }, [go])
+  }, [go, index])
 
   // Keyboard & screen-reader continuity: focus follows the slide when it was left behind.
   const first = useRef(true)
@@ -88,7 +93,14 @@ export function App() {
     return () => document.removeEventListener('scroll', pin, true)
   }, [])
 
-  const goTo = useCallback((id: string) => go(slideIndex(id)), [go])
+  // a link to a block that is not open yet goes nowhere
+  const goTo = useCallback(
+    (id: string) => {
+      const i = slideIndex(id)
+      if (i >= 0) go(i)
+    },
+    [go],
+  )
   const api = useMemo<DeckApi>(
     () => ({ index, count, goTo, reducedMotion }),
     [index, count, goTo, reducedMotion],
@@ -96,8 +108,8 @@ export function App() {
 
   return (
     <DeckContext.Provider value={api}>
-      <a className="skip-link" href="#employees" onClick={(e) => { e.preventDefault(); goTo('employees') }}>
-        Skip to the AI employees
+      <a className="skip-link" href="#context" onClick={(e) => { e.preventDefault(); goTo('context') }}>
+        Skip to the platform
       </a>
       <LightField preset={SLIDES[index].light} reducedMotion={reducedMotion} pulseKey={index} />
       <TopNav />

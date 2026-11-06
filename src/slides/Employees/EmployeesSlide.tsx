@@ -5,6 +5,8 @@ import { useDeck, type SlideProps } from '../../components/SlideController/DeckC
 import { DEPARTMENT_ICON } from '../../components/ui/icons'
 import { AI_EMPLOYEES, DEPARTMENTS, departmentById, employeeByN, rowOf, type DepartmentId } from '../../data/departments'
 import { useInterval } from '../../hooks/useInterval'
+import { isEmployeeOpen } from '../../data/release.ts'
+import { isSlideOpen } from '../../data/slides'
 import { focusEmployee } from '../../lib/events'
 import './Employees.css'
 
@@ -209,19 +211,22 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
           </button>
         </div>
         <p className="emp__card-desc">{highlight(current.description, q)}</p>
-        <div className="emp__card-foot">
-          <button
-            type="button"
-            className="text-link"
-            onClick={() => {
-              focusEmployee(current.n)
-              goTo(dept.id)
-            }}
-          >
-            Open {dept.name}
-            <ArrowRight size={12} strokeWidth={1.8} aria-hidden="true" />
-          </button>
-        </div>
+        {/* only AI employees that are already open on the site lead to their department */}
+        {isSlideOpen(dept.id) && isEmployeeOpen(current.n) && (
+          <div className="emp__card-foot">
+            <button
+              type="button"
+              className="text-link"
+              onClick={() => {
+                focusEmployee(current.n)
+                goTo(dept.id)
+              }}
+            >
+              Open {dept.name}
+              <ArrowRight size={12} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          </div>
+        )}
       </article>
     ) : selDept && SelDeptIcon ? (
       <article
@@ -237,12 +242,14 @@ export function EmployeesSlide({ active, shown }: SlideProps) {
         <h3 className="emp__dept-name">{selDept.name}</h3>
         <p className="emp__dept-line">{selDept.headline.join(' ')}</p>
         <p className="emp__card-desc">{selDept.description}</p>
-        <div className="emp__card-foot">
-          <button type="button" className="text-link" onClick={() => goTo(selDept.id)}>
-            Open {selDept.name}
-            <ArrowRight size={12} strokeWidth={1.8} aria-hidden="true" />
-          </button>
-        </div>
+        {isSlideOpen(selDept.id) && (
+          <div className="emp__card-foot">
+            <button type="button" className="text-link" onClick={() => goTo(selDept.id)}>
+              Open {selDept.name}
+              <ArrowRight size={12} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          </div>
+        )}
       </article>
     ) : null
 

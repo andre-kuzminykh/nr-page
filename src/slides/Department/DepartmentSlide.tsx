@@ -4,6 +4,7 @@ import { Panel, useParallax } from '../../components/Kit/Kit'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { DEPARTMENT_ICON } from '../../components/ui/icons'
 import { DEPARTMENTS, departmentById, employeeByN, type DepartmentId } from '../../data/departments'
+import { isEmployeeOpen } from '../../data/release.ts'
 import { useInterval } from '../../hooks/useInterval'
 import { onFocusEmployee } from '../../lib/events'
 import { STAGES } from './panels'
@@ -24,8 +25,9 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   const row = DEPARTMENTS.indexOf(dept)
   const Icon = DEPARTMENT_ICON[department]
   const stage = STAGES[department]
-  const first = dept.members[0].n
-  const order = useMemo(() => stage.order ?? dept.members.map((m) => m.n), [stage, dept])
+  // only the AI employees that are open on the site
+  const members = useMemo(() => dept.members.filter((m) => isEmployeeOpen(m.n)), [dept])
+  const order = useMemo(() => (stage.order ?? dept.members.map((m) => m.n)).filter(isEmployeeOpen), [stage, dept])
   const [sel, setSel] = useState(order[0])
   const [auto, setAuto] = useState(true)
   const tabs = useRef<(HTMLButtonElement | null)[]>([])
@@ -41,12 +43,12 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   useEffect(
     () =>
       onFocusEmployee((n) => {
-        if (dept.members.some((m) => m.n === n)) {
+        if (members.some((m) => m.n === n)) {
           setSel(n)
           setAuto(false)
         }
       }),
-    [dept],
+    [members],
   )
 
   useInterval(
@@ -60,15 +62,16 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   }
 
   const onStripKey = (e: KeyboardEvent) => {
-    const i = sel - first
+    const i = members.findIndex((m) => m.n === sel)
+    const n = members.length
     let next: number | null = null
-    if (e.key === 'ArrowRight') next = (i + 1) % 10
-    if (e.key === 'ArrowLeft') next = (i + 9) % 10
+    if (e.key === 'ArrowRight') next = (i + 1) % n
+    if (e.key === 'ArrowLeft') next = (i + n - 1) % n
     if (e.key === 'Home') next = 0
-    if (e.key === 'End') next = 9
+    if (e.key === 'End') next = n - 1
     if (next === null) return
     e.preventDefault()
-    pick(first + next)
+    pick(members[next].n)
     tabs.current[next]?.focus()
   }
 
@@ -82,7 +85,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
         <p className="dept__label rv" style={d(0)}>
           <Icon size={15} strokeWidth={1.7} aria-hidden="true" />
           <span>{dept.name}</span>
-          <span className="dept__count">10 AI employees</span>
+          <span className="dept__count">{members.length === 1 ? '1 AI employee' : `${members.length} AI employees`}</span>
         </p>
         <h2 className="h2 dept__title">
           <span className="mask" style={d(60)}>
@@ -102,7 +105,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
           aria-label={`${dept.name} AI employees`}
           onKeyDown={onStripKey}
         >
-          {dept.members.map((m, i) => (
+          {members.map((m, i) => (
             <button
               key={m.n}
               ref={(el) => {

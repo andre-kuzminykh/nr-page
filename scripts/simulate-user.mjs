@@ -1,13 +1,16 @@
 // Simulated-user walkthrough: browses the landing the way people do — trackpad and
 // wheel scrolling, clicking, typing, swiping on a phone, keyboard only — and records
-// every step with a screenshot and an expectation.
+// every step with a screenshot and an expectation. While src/data/release.ts keeps blocks
+// and AI employees closed, the visitors only go where the site is open.
 //
 // Usage:  npm run build && npm run preview
 //         BASE_URL=http://127.0.0.1:4173/ npm run simulate
 import fs from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { SLIDES } from '../src/data/slides.ts'
+import { ALL_SLIDES, SLIDES } from '../src/data/slides.ts'
+import { DEPARTMENTS } from '../src/data/departments.ts'
+import { OPEN_EMPLOYEES } from '../src/data/release.ts'
 
 const require = createRequire(import.meta.url)
 let chromium
@@ -20,6 +23,7 @@ try {
 
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
 const OUT = path.resolve('validation/walkthrough')
+fs.rmSync(OUT, { recursive: true, force: true })
 fs.mkdirSync(OUT, { recursive: true })
 const LAUNCH = { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }
 const steps = []
@@ -66,6 +70,29 @@ const flick = async (page, dir = 1) => {
 const browser = await chromium.launch(LAUNCH)
 
 const at = (id) => SLIDES.findIndex((s) => s.id === id)
+const has = (id) => at(id) >= 0
+const FULL = SLIDES.length === ALL_SLIDES.length && OPEN_EMPLOYEES.length === 100
+const OPEN_DEPTS = DEPARTMENTS.filter((d) => has(d.id)).map((d) => ({ ...d, members: d.members.filter((m) => OPEN_EMPLOYEES.includes(m.n)) }))
+const NAV_LABELS = [
+  ['Platform', 'context'],
+  ['AI Employees', 'employees'],
+  [OPEN_DEPTS.length === 1 ? OPEN_DEPTS[0].name : 'Departments', OPEN_DEPTS[0]?.id],
+  ['Use cases', 'custom'],
+  ['Pricing', 'pricing'],
+  ['FAQ', 'faq'],
+]
+  .filter(([, id]) => id && has(id))
+  .map(([l]) => l)
+// Opens a department from the menu: straight from the menu while it is the only one open.
+const openDept = async (page, d) => {
+  if (OPEN_DEPTS.length === 1) await page.locator('.nav__item', { hasText: d.name }).click()
+  else {
+    await page.locator('.nav__dd .nav__item').click()
+    await sleep(300)
+    await page.locator('.nav__dept', { hasText: d.name }).click()
+  }
+  await sleep(1500)
+}
 const selName = (page) =>
   page.evaluate(() => document.querySelector('.slide[data-state="active"] .dept__el[aria-selected="true"]')?.dataset.name ?? null)
 const waitFor = async (fn, ms = 4500) => {
@@ -116,99 +143,160 @@ const waitFor = async (fn, ms = 4500) => {
   await sleep(1500)
   await step(page, 'desktop', 'Clicks the Nr logo', 'Back to the first block', (await idx(page)) === 0)
 
-  // The periodic table of 100 AI employees
-  await page.locator('.nav__item', { hasText: 'AI Employees' }).click()
-  await sleep(1200)
-  const activeNav = await page.locator('.nav__item.is-active').innerText()
-  const t0 = await page.$eval('.pt__line.is-row .pt__label-name', (e) => e.textContent).catch(() => null)
-  const t1 = await waitFor(() => page.$eval('.pt__line.is-row .pt__label-name', (e) => (e.textContent !== 'Management' ? e.textContent : null)).catch(() => null))
-  await step(page, 'desktop', 'Clicks “AI Employees” in the menu and waits', 'The table of 100; the menu marks the section; the departments light up one by one, explained in a few words on the left', (await idx(page)) === at('employees') && activeNav === 'AI Employees' && t0 === 'Management' && t1 === 'HR', `${t0} → ${t1}`)
-  await page.locator('.pt__cell[data-n="47"]').click()
-  await sleep(350)
-  const card = await page.locator('.emp__card').innerText()
-  await step(page, 'desktop', 'Clicks element 47 (Lq)', 'A card: Lead Qualification in Sales, with its own description', card.includes('Lead Qualification') && card.includes('class of business') && /open sales/i.test(card))
-  await page.keyboard.press('ArrowDown')
-  await page.keyboard.press('ArrowRight')
-  await sleep(400)
-  const kb = await page.$eval('.pt__cell.is-sel', (e) => e.dataset.n)
-  await step(page, 'desktop', 'Presses ↓ then → in the table', 'Moves to element 58 (Feature Request) without leaving the block', kb === '58' && (await idx(page)) === at('employees'), `selected ${kb}`)
-  const search = page.getByRole('searchbox', { name: 'Search AI employees' })
-  await search.fill('video')
-  await sleep(400)
-  const vid = await page.$$eval('.pt__cell.is-match', (els) => els.map((c) => c.dataset.name))
-  await step(page, 'desktop', 'Searches “video”', 'Video Generation and Video Creation light up, the rest dims', vid.includes('Video Generation') && vid.includes('Video Creation'), vid.join(', '))
-  await search.fill('qwerty')
-  await sleep(300)
-  const none = await page.locator('#emp-status').innerText()
-  await step(page, 'desktop', 'Searches nonsense', 'A clear “Nothing matches” state', /Nothing matches/i.test(none))
-  await search.press('Escape')
-  await sleep(300)
-  const back = await page.locator('#emp-status').innerText()
-  await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', back.trim() === '' && (await page.locator('.pt__cell.is-dim').count()) === 0)
-  await page.locator('.pt__cell[data-n="63"]').click()
-  await sleep(300)
-  await page.locator('.emp__card').getByRole('button', { name: /Open Analytics/ }).click()
-  await sleep(1600)
-  const an = await page.evaluate(() => {
-    const s = document.querySelector('.slide[data-state="active"]')
-    return { i: Number(s.dataset.slide), sel: s.querySelector('.dept__el[aria-selected="true"]')?.dataset.name, doc: s.querySelector('.an-tab.is-on')?.textContent.trim() }
-  })
-  await step(page, 'desktop', 'Opens PRD (63), then “Open Analytics”', 'The Analytics block opens on PRD, with the PRD document in front', an.i === at('analytics') && an.sel === 'PRD' && an.doc === 'PRD', JSON.stringify(an))
-  await page.evaluate(() => (location.hash = '#employees'))
-  await sleep(1400)
-  await page.locator('.pt__label', { hasText: 'Design' }).click()
-  await sleep(600)
-  const dc = await page.evaluate(() => ({
-    row: document.querySelector('.pt__line.is-row .pt__label-name')?.textContent,
-    dim: document.querySelectorAll('.pt.has-dept .pt__line:not(.is-row) .pt__cell').length,
-    card: document.querySelector('.emp__card--dept')?.innerText ?? '',
-  }))
-  await step(page, 'desktop', 'Picks the “Design” department in the table', 'Its row lights up, the rest steps back; a card shows its headline and 10 AI employees', dc.row === 'Design' && dc.dim === 90 && /From design system/.test(dc.card), JSON.stringify({ row: dc.row, dim: dc.dim }))
-  await page.locator('.emp__card--dept').getByRole('button', { name: /Open Design/ }).click()
-  await sleep(1500)
-  await step(page, 'desktop', 'Clicks “Open Design” on the card', 'Lands on the Design block', (await idx(page)) === at('design'))
+  if (FULL) {
+    // The periodic table of 100 AI employees
+    await page.locator('.nav__item', { hasText: 'AI Employees' }).click()
+    await sleep(1200)
+    const activeNav = await page.locator('.nav__item.is-active').innerText()
+    const t0 = await page.$eval('.pt__line.is-row .pt__label-name', (e) => e.textContent).catch(() => null)
+    const t1 = await waitFor(() => page.$eval('.pt__line.is-row .pt__label-name', (e) => (e.textContent !== 'Management' ? e.textContent : null)).catch(() => null))
+    await step(page, 'desktop', 'Clicks “AI Employees” in the menu and waits', 'The table of 100; the menu marks the section; the departments light up one by one, explained in a few words on the left', (await idx(page)) === at('employees') && activeNav === 'AI Employees' && t0 === 'Management' && t1 === 'HR', `${t0} → ${t1}`)
+    await page.locator('.pt__cell[data-n="47"]').click()
+    await sleep(350)
+    const card = await page.locator('.emp__card').innerText()
+    await step(page, 'desktop', 'Clicks element 47 (Lq)', 'A card: Lead Qualification in Sales, with its own description', card.includes('Lead Qualification') && card.includes('class of business') && /open sales/i.test(card))
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowRight')
+    await sleep(400)
+    const kb = await page.$eval('.pt__cell.is-sel', (e) => e.dataset.n)
+    await step(page, 'desktop', 'Presses ↓ then → in the table', 'Moves to element 58 (Feature Request) without leaving the block', kb === '58' && (await idx(page)) === at('employees'), `selected ${kb}`)
+    const search = page.getByRole('searchbox', { name: 'Search AI employees' })
+    await search.fill('video')
+    await sleep(400)
+    const vid = await page.$$eval('.pt__cell.is-match', (els) => els.map((c) => c.dataset.name))
+    await step(page, 'desktop', 'Searches “video”', 'Video Generation and Video Creation light up, the rest dims', vid.includes('Video Generation') && vid.includes('Video Creation'), vid.join(', '))
+    await search.fill('qwerty')
+    await sleep(300)
+    const none = await page.locator('#emp-status').innerText()
+    await step(page, 'desktop', 'Searches nonsense', 'A clear “Nothing matches” state', /Nothing matches/i.test(none))
+    await search.press('Escape')
+    await sleep(300)
+    const back = await page.locator('#emp-status').innerText()
+    await step(page, 'desktop', 'Presses Escape in the search', 'The whole table is back', back.trim() === '' && (await page.locator('.pt__cell.is-dim').count()) === 0)
+    await page.locator('.pt__cell[data-n="63"]').click()
+    await sleep(300)
+    await page.locator('.emp__card').getByRole('button', { name: /Open Analytics/ }).click()
+    await sleep(1600)
+    const an = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      return { i: Number(s.dataset.slide), sel: s.querySelector('.dept__el[aria-selected="true"]')?.dataset.name, doc: s.querySelector('.an-tab.is-on')?.textContent.trim() }
+    })
+    await step(page, 'desktop', 'Opens PRD (63), then “Open Analytics”', 'The Analytics block opens on PRD, with the PRD document in front', an.i === at('analytics') && an.sel === 'PRD' && an.doc === 'PRD', JSON.stringify(an))
+    await page.evaluate(() => (location.hash = '#employees'))
+    await sleep(1400)
+    await page.locator('.pt__label', { hasText: 'Design' }).click()
+    await sleep(600)
+    const dc = await page.evaluate(() => ({
+      row: document.querySelector('.pt__line.is-row .pt__label-name')?.textContent,
+      dim: document.querySelectorAll('.pt.has-dept .pt__line:not(.is-row) .pt__cell').length,
+      card: document.querySelector('.emp__card--dept')?.innerText ?? '',
+    }))
+    await step(page, 'desktop', 'Picks the “Design” department in the table', 'Its row lights up, the rest steps back; a card shows its headline and 10 AI employees', dc.row === 'Design' && dc.dim === 90 && /From design system/.test(dc.card), JSON.stringify({ row: dc.row, dim: dc.dim }))
+    await page.locator('.emp__card--dept').getByRole('button', { name: /Open Design/ }).click()
+    await sleep(1500)
+    await step(page, 'desktop', 'Clicks “Open Design” on the card', 'Lands on the Design block', (await idx(page)) === at('design'))
 
-  // A department block
-  await page.locator('.nav__item', { hasText: /^Design/ }).click()
-  await sleep(300)
-  const ddOpen = await page.locator('.nav__panel').count()
-  await page.keyboard.press('Escape')
-  await sleep(200)
-  const ddClosed = await page.locator('.nav__panel').count()
-  await step(page, 'desktop', 'Opens the Departments menu, presses Escape', 'The menu shows the current department and closes on Escape', ddOpen === 1 && ddClosed === 0)
-  await page.locator('.nav__item', { hasText: /^Design/ }).click()
-  await sleep(300)
-  await page.locator('.nav__dept', { hasText: 'Management' }).click()
-  await sleep(1300)
-  const a0 = await selName(page)
-  const a1 = await waitFor(async () => {
-    const n = await selName(page)
-    return n !== a0 ? n : null
-  }, 5000)
-  const lit = await page.evaluate(() => document.querySelectorAll('.slide[data-state="active"] .dept__slot.is-focus .is-hot').length)
-  await step(page, 'desktop', 'Opens Management from the menu and waits', 'AI employees play one after another; each lights up its own part of the interface', a0 === 'Knowledge Management' && a1 === 'Note Taking' && lit > 0, `${a0} → ${a1}`)
-  await page.locator('.slide[data-state="active"] #tab-4').click()
-  await sleep(400)
-  const tm = await page.evaluate(() => {
-    const s = document.querySelector('.slide[data-state="active"]')
-    return {
-      cap: s.querySelector('.dept__cap-name')?.textContent,
-      auto: !!s.querySelector('.dept__strip.is-auto'),
-      view: s.querySelector('.mgx')?.dataset.view,
-      hot: s.querySelector('.dept__slot.is-focus .is-hot') !== null,
+    // A department block
+    await page.locator('.nav__item', { hasText: /^Design/ }).click()
+    await sleep(300)
+    const ddOpen = await page.locator('.nav__panel').count()
+    await page.keyboard.press('Escape')
+    await sleep(200)
+    const ddClosed = await page.locator('.nav__panel').count()
+    await step(page, 'desktop', 'Opens the Departments menu, presses Escape', 'The menu shows the current department and closes on Escape', ddOpen === 1 && ddClosed === 0)
+    await page.locator('.nav__item', { hasText: /^Design/ }).click()
+    await sleep(300)
+    await page.locator('.nav__dept', { hasText: 'Management' }).click()
+    await sleep(1300)
+    const a0 = await selName(page)
+    const a1 = await waitFor(async () => {
+      const n = await selName(page)
+      return n !== a0 ? n : null
+    }, 5000)
+    const lit = await page.evaluate(() => document.querySelectorAll('.slide[data-state="active"] .dept__slot.is-focus .is-hot').length)
+    await step(page, 'desktop', 'Opens Management from the menu and waits', 'AI employees play one after another; each lights up its own part of the interface', a0 === 'Knowledge Management' && a1 === 'Note Taking' && lit > 0, `${a0} → ${a1}`)
+    await page.locator('.slide[data-state="active"] #tab-4').click()
+    await sleep(400)
+    const tm = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      return {
+        cap: s.querySelector('.dept__cap-name')?.textContent,
+        auto: !!s.querySelector('.dept__strip.is-auto'),
+        view: s.querySelector('.mgx')?.dataset.view,
+        hot: s.querySelector('.dept__slot.is-focus .is-hot') !== null,
+      }
+    })
+    await step(page, 'desktop', 'Clicks element 4 (Tm)', 'Autoplay stops; the interface turns to the task list made from the product', /Task Management/.test(tm.cap) && !tm.auto && tm.hot && tm.view === 'tasks', JSON.stringify(tm))
+    await page.keyboard.press('ArrowRight')
+    await sleep(300)
+    const kbDept = await page.evaluate(() => ({ sel: document.querySelector('.slide[data-state="active"] .dept__el[aria-selected="true"]')?.dataset.name, focus: document.activeElement?.dataset.name }))
+    await step(page, 'desktop', 'Presses → on the elements', 'The next AI employee (Process Management) is selected and focused; the block stays', kbDept.sel === 'Process Management' && kbDept.focus === 'Process Management' && (await idx(page)) === at('management'), JSON.stringify(kbDept))
+    await page.locator('.nav__item', { hasText: /^Management/ }).click()
+    await sleep(300)
+    await page.locator('.nav__dept', { hasText: 'Engineering' }).click()
+    await sleep(1500)
+    const eng = await page.locator('.nav__dd .nav__item').innerText()
+    await step(page, 'desktop', 'Picks Engineering in the Departments menu', 'Lands on Engineering; the menu says “Engineering”', (await idx(page)) === at('engineering') && eng.trim() === 'Engineering')
+  } else {
+    // Staged release: only what is open is on the site
+    const items = await page.$$eval('.nav__menu .nav__item', (els) => els.map((e) => e.textContent.trim()))
+    await step(page, 'desktop', 'Looks at the menu', `Only the open sections: ${NAV_LABELS.join(' · ')}`, items.join('|') === NAV_LABELS.join('|'), items.join(' · '))
+    for (const d of OPEN_DEPTS) {
+      await openDept(page, d)
+      const view = await page.evaluate(() => {
+        const s = document.querySelector('.slide[data-state="active"]')
+        return {
+          els: [...s.querySelectorAll('.dept__el')].map((b) => b.dataset.name),
+          count: s.querySelector('.dept__count')?.textContent.trim(),
+          active: document.querySelector('.nav__item.is-active')?.textContent.trim(),
+        }
+      })
+      await step(
+        page,
+        'desktop',
+        `Opens ${d.name} from the menu`,
+        `Lands on ${d.name}; only its open AI employees are there (${d.members.map((m) => `${m.n} · ${m.symbol}`).join(', ')})`,
+        (await idx(page)) === at(d.id) && view.active === d.name && view.els.join('|') === d.members.map((m) => m.name).join('|'),
+        `${view.count} · menu: ${view.active}`,
+      )
+      if (d.id === 'management' && OPEN_EMPLOYEES.includes(1)) {
+        await page.locator('.slide[data-state="active"] #tab-1').click()
+        await sleep(300)
+        const km = await page.evaluate(async () => {
+          const s = document.querySelector('.slide[data-state="active"]')
+          const ask = () => s.querySelector('.mgx-search .sr-only')?.textContent.trim()
+          const seen = []
+          const t0 = performance.now()
+          while (performance.now() - t0 < 9000 && seen.length < 2) {
+            const q = ask()
+            if (q && seen.at(-1) !== q) seen.push(q)
+            await new Promise((r) => setTimeout(r, 150))
+          }
+          return {
+            seen,
+            answer: s.querySelector('.mgx-answer p')?.textContent.trim(),
+            sources: [...s.querySelectorAll('.mgx-answer .mgx-src span')].map((x) => x.textContent.trim()),
+          }
+        })
+        await step(
+          page,
+          'desktop',
+          'Watches Knowledge Management (1 · Km)',
+          'It asks a question, answers it with its sources and the documents it was found in — then the next question',
+          km.seen.length >= 2 && !!km.answer && km.sources.length === 2,
+          km.seen.join(' → '),
+        )
+      }
+      const first = d.members[0]
+      await page.locator(`.slide[data-state="active"] #tab-${first.n}`).click()
+      await sleep(500)
+      const sel = await page.evaluate(() => {
+        const s = document.querySelector('.slide[data-state="active"]')
+        return { cap: s.querySelector('.dept__cap-name')?.textContent, no: s.querySelector('.dept__cap-n')?.textContent, hot: !!s.querySelector('.dept__slot.is-focus .is-hot') }
+      })
+      await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `“${first.n} · ${first.symbol}” above ${first.name}; its part of the interface is lit`, sel.cap === first.name && sel.no === `${first.n} · ${first.symbol}` && sel.hot, JSON.stringify(sel))
     }
-  })
-  await step(page, 'desktop', 'Clicks element 4 (Tm)', 'Autoplay stops; the interface turns to the task list made from the product', /Task Management/.test(tm.cap) && !tm.auto && tm.hot && tm.view === 'tasks', JSON.stringify(tm))
-  await page.keyboard.press('ArrowRight')
-  await sleep(300)
-  const kbDept = await page.evaluate(() => ({ sel: document.querySelector('.slide[data-state="active"] .dept__el[aria-selected="true"]')?.dataset.name, focus: document.activeElement?.dataset.name }))
-  await step(page, 'desktop', 'Presses → on the elements', 'The next AI employee (Process Management) is selected and focused; the block stays', kbDept.sel === 'Process Management' && kbDept.focus === 'Process Management' && (await idx(page)) === at('management'), JSON.stringify(kbDept))
-  await page.locator('.nav__item', { hasText: /^Management/ }).click()
-  await sleep(300)
-  await page.locator('.nav__dept', { hasText: 'Engineering' }).click()
-  await sleep(1500)
-  const eng = await page.locator('.nav__dd .nav__item').innerText()
-  await step(page, 'desktop', 'Picks Engineering in the Departments menu', 'Lands on Engineering; the menu says “Engineering”', (await idx(page)) === at('engineering') && eng.trim() === 'Engineering')
+  }
 
   // Platform: shared context and the Superagent
   await page.locator('.nav__item', { hasText: 'Platform' }).click()
@@ -222,44 +310,50 @@ const waitFor = async (fn, ms = 4500) => {
   })
   await step(page, 'desktop', 'Opens Platform and watches', 'A brain of tools: the Superagent runs along the connections and the tools light up one by one', brain.lit >= 4 && brain.way > 6, JSON.stringify(brain))
 
-  // Use cases
-  await page.locator('.nav__item', { hasText: 'Use cases' }).click()
-  await sleep(1300)
-  await page.getByRole('tab', { name: 'Investor Update' }).click()
-  await sleep(3200)
-  const uc = await page.evaluate(() => {
-    const s = document.querySelector('.slide[data-state="active"]')
-    return {
-      n: s.querySelector('.cu__el-n')?.textContent,
-      nodes: s.querySelectorAll('.fl-n').length,
-      human: s.querySelectorAll('.fl-n--human').length,
-      llm: s.querySelectorAll('.fl-n--llm').length,
-    }
-  })
-  await step(page, 'desktop', 'Picks the “Investor Update” example', 'Element 102 is drawn as a node graph — system, LLM and a human approval — with data running through it', uc.n === '102' && uc.nodes === 7 && uc.human === 1 && uc.llm >= 2, JSON.stringify(uc))
+  if (has('custom')) {
+    // Use cases
+    await page.locator('.nav__item', { hasText: 'Use cases' }).click()
+    await sleep(1300)
+    await page.getByRole('tab', { name: 'Investor Update' }).click()
+    await sleep(3200)
+    const uc = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      return {
+        n: s.querySelector('.cu__el-n')?.textContent,
+        nodes: s.querySelectorAll('.fl-n').length,
+        human: s.querySelectorAll('.fl-n--human').length,
+        llm: s.querySelectorAll('.fl-n--llm').length,
+      }
+    })
+    await step(page, 'desktop', 'Picks the “Investor Update” example', 'Element 102 is drawn as a node graph — system, LLM and a human approval — with data running through it', uc.n === '102' && uc.nodes === 7 && uc.human === 1 && uc.llm >= 2, JSON.stringify(uc))
+  }
 
-  // Pricing
-  await page.locator('.nav__item', { hasText: 'Pricing' }).click()
-  await sleep(1300)
-  const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent))
-  await step(page, 'desktop', 'Opens Pricing', 'Three plans; no invented prices', prices.length === 3 && prices.every((p) => p === 'Price on request'))
-  await page.locator('.pr-plan.is-featured').getByRole('button', { name: /Get Early Access/ }).click()
-  await sleep(1500)
-  await step(page, 'desktop', 'Clicks “Get Early Access” on the Company plan', 'Goes to the final block with the idea input', (await idx(page)) === at('start'))
+  if (has('pricing')) {
+    // Pricing
+    await page.locator('.nav__item', { hasText: 'Pricing' }).click()
+    await sleep(1300)
+    const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent))
+    await step(page, 'desktop', 'Opens Pricing', 'Three plans; no invented prices', prices.length === 3 && prices.every((p) => p === 'Price on request'))
+    await page.locator('.pr-plan.is-featured').getByRole('button', { name: /Get Early Access/ }).click()
+    await sleep(1500)
+    await step(page, 'desktop', 'Clicks “Get Early Access” on the Company plan', 'Goes to the final block with the idea input', (await idx(page)) === at('start'))
+  }
 
-  // FAQ
-  await page.locator('.nav__item', { hasText: 'FAQ' }).click()
-  await sleep(1300)
-  await page.getByRole('button', { name: /Is it available today/ }).click()
-  await sleep(700)
-  const faqA = await page.evaluate(() => ({
-    open: document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]').length,
-    text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
-  }))
-  await page.keyboard.press('ArrowDown')
-  await sleep(300)
-  const nextQ = await page.evaluate(() => document.activeElement?.textContent)
-  await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.text.slice(0, 70))
+  if (has('faq')) {
+    // FAQ
+    await page.locator('.nav__item', { hasText: 'FAQ' }).click()
+    await sleep(1300)
+    await page.getByRole('button', { name: /Is it available today/ }).click()
+    await sleep(700)
+    const faqA = await page.evaluate(() => ({
+      open: document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]').length,
+      text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
+    }))
+    await page.keyboard.press('ArrowDown')
+    await sleep(300)
+    const nextQ = await page.evaluate(() => document.activeElement?.textContent)
+    await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.text.slice(0, 70))
+  }
 
   // Final: idea
   await page.locator('.nav__cta').click()
@@ -274,9 +368,14 @@ const waitFor = async (fn, ms = 4500) => {
   await sleep(500)
   const sent = await page.locator('#fin-status').innerText()
   await step(page, 'desktop', 'Types an idea and presses Enter', 'A pre-filled email to the team opens (no fake “sent”)', /email app should open/i.test(sent))
-  await fin.getByRole('button', { name: /Explore AI Employees/ }).click()
-  await sleep(1500)
-  await step(page, 'desktop', 'Clicks “Explore AI Employees”', 'Back on the periodic table', (await idx(page)) === at('employees'))
+  if (has('employees')) {
+    await fin.getByRole('button', { name: /Explore AI Employees/ }).click()
+    await sleep(1500)
+    await step(page, 'desktop', 'Clicks “Explore AI Employees”', 'Back on the periodic table', (await idx(page)) === at('employees'))
+  } else {
+    const link = await fin.getByRole('button', { name: /Explore AI Employees/ }).count()
+    await step(page, 'desktop', 'Looks for a way to the AI employees table', 'There is none while the table is closed — no dead link', link === 0)
+  }
   await ctx.close()
 }
 
@@ -314,29 +413,48 @@ const waitFor = async (fn, ms = 4500) => {
     })
     await step(page, 'phone', `Swipes up to block ${i + 1}`, `${SLIDES[i].label} within 3 swipes, no sideways scroll`, now === i && fit.docX <= 0 && tries <= 3, `${tries} swipe(s), inner overflow ${fit.over}px`)
   }
-  await page.getByRole('button', { name: 'Open menu' }).tap()
-  await sleep(500)
-  await page.locator('.nav__sheet-dept', { hasText: 'Sales' }).tap()
-  await sleep(1500)
-  await step(page, 'phone', 'Opens the menu and taps Sales', 'The sheet closes and the Sales block opens', (await idx(page)) === at('sales') && (await page.locator('#nav-sheet').count()) === 0)
-  await page.locator('.slide[data-state="active"] #tab-44').tap()
-  await sleep(600)
-  const ph = await page.evaluate(() => {
-    const s = document.querySelector('.slide[data-state="active"]')
-    const vis = [...s.querySelectorAll('.dept__slot')].filter((x) => Number(getComputedStyle(x).opacity) > 0.5)
-    return { cap: s.querySelector('.dept__cap-name')?.textContent, visible: vis.length, hot: !!vis[0]?.querySelector('.hot.is-hot') }
-  })
-  await step(page, 'phone', 'Taps element 44 (Sq)', 'One interface piece at a time: Personalized Sequences, its part lit', /Personalized Sequences/.test(ph.cap) && ph.visible === 1 && ph.hot, JSON.stringify(ph))
-  await page.evaluate(() => (location.hash = '#employees'))
-  await sleep(1400)
-  const noCard = (await page.locator('.emp__card').count()) === 0
-  await page.locator('.pt__cell[data-n="76"]').tap()
-  await sleep(400)
-  const card = await page.locator('.emp__card').innerText()
-  await step(page, 'phone', 'Taps element 76', 'The table is clear until a tap; then a card with User Experience', noCard && card.includes('User Experience'))
-  await page.locator('.emp__card').getByRole('button', { name: /Open Design/ }).tap()
-  await sleep(1500)
-  await step(page, 'phone', 'Taps “Open Design”', 'The Design block opens on User Experience', (await idx(page)) === at('design') && (await selName(page)) === 'User Experience')
+  if (FULL) {
+    await page.getByRole('button', { name: 'Open menu' }).tap()
+    await sleep(500)
+    await page.locator('.nav__sheet-dept', { hasText: 'Sales' }).tap()
+    await sleep(1500)
+    await step(page, 'phone', 'Opens the menu and taps Sales', 'The sheet closes and the Sales block opens', (await idx(page)) === at('sales') && (await page.locator('#nav-sheet').count()) === 0)
+    await page.locator('.slide[data-state="active"] #tab-44').tap()
+    await sleep(600)
+    const ph = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      const vis = [...s.querySelectorAll('.dept__slot')].filter((x) => Number(getComputedStyle(x).opacity) > 0.5)
+      return { cap: s.querySelector('.dept__cap-name')?.textContent, visible: vis.length, hot: !!vis[0]?.querySelector('.hot.is-hot') }
+    })
+    await step(page, 'phone', 'Taps element 44 (Sq)', 'One interface piece at a time: Personalized Sequences, its part lit', /Personalized Sequences/.test(ph.cap) && ph.visible === 1 && ph.hot, JSON.stringify(ph))
+    await page.evaluate(() => (location.hash = '#employees'))
+    await sleep(1400)
+    const noCard = (await page.locator('.emp__card').count()) === 0
+    await page.locator('.pt__cell[data-n="76"]').tap()
+    await sleep(400)
+    const card = await page.locator('.emp__card').innerText()
+    await step(page, 'phone', 'Taps element 76', 'The table is clear until a tap; then a card with User Experience', noCard && card.includes('User Experience'))
+    await page.locator('.emp__card').getByRole('button', { name: /Open Design/ }).tap()
+    await sleep(1500)
+    await step(page, 'phone', 'Taps “Open Design”', 'The Design block opens on User Experience', (await idx(page)) === at('design') && (await selName(page)) === 'User Experience')
+  } else if (OPEN_DEPTS.length) {
+    const d = OPEN_DEPTS[0]
+    const m = d.members[0]
+    await page.getByRole('button', { name: 'Open menu' }).tap()
+    await sleep(500)
+    await page.locator(OPEN_DEPTS.length === 1 ? '.nav__sheet-item' : '.nav__sheet-dept', { hasText: d.name }).tap()
+    await sleep(1500)
+    await step(page, 'phone', `Opens the menu and taps ${d.name}`, `The sheet closes and the ${d.name} block opens`, (await idx(page)) === at(d.id) && (await page.locator('#nav-sheet').count()) === 0)
+    await page.locator(`.slide[data-state="active"] #tab-${m.n}`).tap()
+    await sleep(600)
+    const ph = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      const vis = [...s.querySelectorAll('.dept__slot')].filter((x) => Number(getComputedStyle(x).opacity) > 0.5)
+      const scene = s.querySelector('.mgx')
+      return { cap: s.querySelector('.dept__cap-name')?.textContent, visible: vis.length || (scene ? 1 : 0), hot: !!s.querySelector('.is-hot') }
+    })
+    await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `One interface at a time: ${m.name}, its part lit`, ph.cap === m.name && ph.visible === 1 && ph.hot, JSON.stringify(ph))
+  }
   await page.evaluate(() => (location.hash = '#start'))
   await sleep(1400)
   await page.getByRole('textbox', { name: 'Your idea' }).tap()

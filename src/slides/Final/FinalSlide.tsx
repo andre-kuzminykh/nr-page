@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { isSlideOpen } from '../../data/slides'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
 import { COMPANY_URL, CONTACT_EMAIL, IDEA_ENDPOINT, MEDIA_LABEL_URL, ideaMailto } from '../../config/links'
 import './Final.css'
@@ -101,10 +102,18 @@ export function FinalSlide(_: SlideProps) {
           {message[status]}
         </p>
 
-        <button type="button" className="text-link fin__explore rv rv--fade" style={d(640)} onClick={() => goTo('employees')}>
-          Explore AI Employees
-          <ArrowRight size={13} strokeWidth={1.8} aria-hidden="true" />
-        </button>
+        {/* the table opens later; until then the link has nowhere to go */}
+        {isSlideOpen('employees') && (
+          <button
+            type="button"
+            className="text-link fin__explore rv rv--fade"
+            style={d(640)}
+            onClick={() => goTo('employees')}
+          >
+            Explore AI Employees
+            <ArrowRight size={13} strokeWidth={1.8} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
       <footer className="fin__foot rv rv--fade" style={d(800)}>

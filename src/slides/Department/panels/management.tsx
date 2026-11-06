@@ -2,6 +2,7 @@ import {
   CalendarDays,
   ChartGantt,
   Check,
+  FileText,
   HardDrive,
   Inbox,
   ListChecks,
@@ -81,6 +82,52 @@ const TASKS: Task[] = [
 
 const pct = (v: number) => `${v.toFixed(2)}%`
 
+/** Knowledge Management answers from what the company already has — one question after another. */
+const QA: {
+  q: string
+  a: string
+  src: [LucideIcon, string][]
+  found: [LucideIcon, string, string, string][]
+}[] = [
+  {
+    q: 'What did we agree on pilot pricing?',
+    a: 'The pilot price stays fixed for three months — decided at the review on Oct 12.',
+    src: [
+      [HardDrive, 'Drive · Pricing notes'],
+      [Video, 'Meet · Oct 12'],
+    ],
+    found: [
+      [HardDrive, 'Pricing notes', '“…we keep the pilot price fixed for the first three months…”', 'Drive'],
+      [Video, 'Weekly review · transcript', '“…agreed: no price change until the pilot ends…”', '14:32'],
+    ],
+  },
+  {
+    q: 'Who owns the landing page?',
+    a: 'The design lead owns it: the copy is due on Nov 14, the release is on Nov 20.',
+    src: [
+      [FileText, 'Docs · Launch plan'],
+      [CalendarDays, 'Calendar · Release'],
+    ],
+    found: [
+      [FileText, 'Launch plan', '“…landing page — owner: design lead, copy due Nov 14…”', 'Docs'],
+      [CalendarDays, 'Release · Mobile App', '“…Nov 20, 10:00 — release to the pilot group…”', 'Calendar'],
+    ],
+  },
+  {
+    q: 'What do customers ask about most?',
+    a: 'Sending reports to their clients as a PDF or a link — it comes up in support emails and in customer calls.',
+    src: [
+      [Mail, 'Gmail · Support'],
+      [Video, 'Meet · Customer calls'],
+    ],
+    found: [
+      [Mail, 'Support threads', '“…can I send the report to my client as a PDF?…”', 'Gmail'],
+      [Video, 'Customer call · transcript', '“…our clients want a link, not a file…”', '09:12'],
+    ],
+  },
+]
+const QA_MS = 6500
+
 /** Where each task sits in each view (percent of the window body). */
 function place(view: View, i: number, step: number): { x: number; y: number; w: number; h: number; on: boolean } {
   const task = TASKS[i]
@@ -133,6 +180,16 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
     }
   }, [view, live])
 
+  // while Knowledge stays on screen, it answers one question after another
+  const [qa, setQa] = useState(0)
+  useEffect(() => {
+    setQa(0)
+    if (view !== 'knowledge' || !live) return
+    const t = window.setInterval(() => setQa((x) => (x + 1) % QA.length), QA_MS)
+    return () => window.clearInterval(t)
+  }, [view, live])
+  const ask = QA[qa]
+
   const counts = COLS.map((_, c) => TASKS.filter((t) => t.k[step] === c).length)
   const on = (v: View) => (view === v ? 'true' : 'false')
   const hot = (v: View) => `mgx-v mgx-v--${v} ${view === v ? 'is-hot' : ''}`
@@ -142,48 +199,44 @@ function ManagementScene({ sel, live }: PanelRenderProps) {
       <div className="pn__head mgx__head" key={view}>
         <Icon size={14} strokeWidth={1.7} aria-hidden="true" />
         <span className="pn__title">{head.title}</span>
-        <span className="pn__meta">{head.meta}</span>
+        {/* Knowledge names the tools the current answer came from */}
+        <span className="pn__meta">{view === 'knowledge' ? ask.src.map(([, t]) => t.split(' · ')[0]).join(' · ') : head.meta}</span>
       </div>
       <div className="pn__body mgx__body">
         <div className="mgx__stage">
           {/* ---------- 1 Knowledge ---------- */}
           <section className={hot('knowledge')} data-on={on('knowledge')} aria-hidden={view !== 'knowledge'}>
-            <div className="mgx-search">
-              <Search size={15} strokeWidth={1.8} aria-hidden="true" />
-              <Type text="What did we agree on pilot pricing?" play={live && view === 'knowledge'} speed={28} delay={200} />
-            </div>
-            <div className="mgx-answer">
-              <Sym n={1} />
-              <div>
-                <p>The pilot price stays fixed for three months — decided at the review on Oct 12.</p>
-                <p className="mgx-src">
-                  <span>
-                    <HardDrive size={11} strokeWidth={1.8} aria-hidden="true" /> Drive · Pricing notes
-                  </span>
-                  <span>
-                    <Video size={11} strokeWidth={1.8} aria-hidden="true" /> Meet · Oct 12
-                  </span>
-                </p>
+            <div className="mgx-qa" key={qa}>
+              <div className="mgx-search">
+                <Search size={15} strokeWidth={1.8} aria-hidden="true" />
+                <Type text={ask.q} play={live && view === 'knowledge'} speed={28} delay={200} />
               </div>
-            </div>
-            <p className="mgx-label mgx-late" style={{ '--k': 0 } as CSSProperties}>
-              Found in
-            </p>
-            <div className="mgx-doc mgx-late" style={{ '--k': 1 } as CSSProperties}>
-              <HardDrive size={14} strokeWidth={1.7} aria-hidden="true" />
-              <div>
-                <p>Pricing notes</p>
-                <p className="mgx-quote">“…we keep the pilot price fixed for the first three months…”</p>
+              <div className="mgx-answer">
+                <Sym n={1} />
+                <div>
+                  <p>{ask.a}</p>
+                  <p className="mgx-src">
+                    {ask.src.map(([I, t]) => (
+                      <span key={t}>
+                        <I size={11} strokeWidth={1.8} aria-hidden="true" /> {t}
+                      </span>
+                    ))}
+                  </p>
+                </div>
               </div>
-              <span className="k-mono k-muted">Drive</span>
-            </div>
-            <div className="mgx-doc mgx-late" style={{ '--k': 2 } as CSSProperties}>
-              <Video size={14} strokeWidth={1.7} aria-hidden="true" />
-              <div>
-                <p>Weekly review · transcript</p>
-                <p className="mgx-quote">“…agreed: no price change until the pilot ends…”</p>
-              </div>
-              <span className="k-mono k-muted">14:32</span>
+              <p className="mgx-label mgx-late" style={{ '--k': 0 } as CSSProperties}>
+                Found in
+              </p>
+              {ask.found.map(([I, title, quote, tag], k) => (
+                <div key={title} className="mgx-doc mgx-late" style={{ '--k': k + 1 } as CSSProperties}>
+                  <I size={14} strokeWidth={1.7} aria-hidden="true" />
+                  <div>
+                    <p>{title}</p>
+                    <p className="mgx-quote">{quote}</p>
+                  </div>
+                  <span className="k-mono k-muted">{tag}</span>
+                </div>
+              ))}
             </div>
           </section>
 

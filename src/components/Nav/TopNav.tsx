@@ -1,20 +1,31 @@
 import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { DEPARTMENTS } from '../../data/departments'
-import { SLIDES, type NavGroup } from '../../data/slides'
+import { SLIDES, isSlideOpen, type NavGroup } from '../../data/slides'
 import { FAMILY } from '../Element/Element'
 import { useDeck } from '../SlideController/DeckContext'
 import { DEPARTMENT_ICON } from '../ui/icons'
 import './Nav.css'
 
-const ITEMS: { key: NavGroup; label: string; target: string }[] = [
+/** Departments that are open on the site; with one, the menu links to it directly. */
+const OPEN_DEPTS = DEPARTMENTS.filter((d) => isSlideOpen(d.id))
+
+const ALL_ITEMS: { key: NavGroup; label: string; target: string }[] = [
   { key: 'platform', label: 'Platform', target: 'context' },
   { key: 'employees', label: 'AI Employees', target: 'employees' },
-  { key: 'departments', label: 'Departments', target: 'management' },
+  {
+    key: 'departments',
+    label: OPEN_DEPTS.length === 1 ? OPEN_DEPTS[0].name : 'Departments',
+    target: OPEN_DEPTS[0]?.id ?? 'management',
+  },
   { key: 'custom', label: 'Use cases', target: 'custom' },
   { key: 'pricing', label: 'Pricing', target: 'pricing' },
   { key: 'faq', label: 'FAQ', target: 'faq' },
 ]
+
+/** Only the sections that are open. */
+const ITEMS = ALL_ITEMS.filter((it) => (it.key === 'departments' ? OPEN_DEPTS.length > 0 : isSlideOpen(it.target)))
+const DROPDOWN = OPEN_DEPTS.length > 1
 
 /**
  * Transparent top menu. The current section is marked by a gliding line; the
@@ -112,7 +123,7 @@ export function TopNav() {
 
       <div className="nav__menu" ref={menuRef} role="navigation" aria-label="Main">
         {ITEMS.map((item) =>
-          item.key === 'departments' ? (
+          item.key === 'departments' && DROPDOWN ? (
             <div key={item.key} className="nav__dd" ref={ddRef}>
               <button
                 type="button"
@@ -127,8 +138,9 @@ export function TopNav() {
               </button>
               {ddOpen && (
                 <div className="nav__panel" role="menu" aria-label="Departments">
-                  {DEPARTMENTS.map((d, k) => {
+                  {OPEN_DEPTS.map((d) => {
                     const Icon = DEPARTMENT_ICON[d.id]
+                    const k = DEPARTMENTS.indexOf(d)
                     return (
                       <button
                         key={d.id}
@@ -186,7 +198,7 @@ export function TopNav() {
       {sheetOpen && (
         <div id="nav-sheet" className="nav__sheet" role="dialog" aria-modal="true" aria-label="Menu">
           <nav className="nav__sheet-main" aria-label="Main">
-            {ITEMS.filter((it) => it.key !== 'departments').map((item, k) => (
+            {ITEMS.filter((it) => it.key !== 'departments' || !DROPDOWN).map((item, k) => (
               <button
                 key={item.key}
                 type="button"
@@ -198,10 +210,11 @@ export function TopNav() {
               </button>
             ))}
           </nav>
-          <p className="nav__sheet-label">Departments</p>
-          <div className="nav__sheet-depts">
-            {DEPARTMENTS.map((d, k) => {
+          {DROPDOWN && <p className="nav__sheet-label">Departments</p>}
+          <div className="nav__sheet-depts" hidden={!DROPDOWN}>
+            {OPEN_DEPTS.map((d) => {
               const Icon = DEPARTMENT_ICON[d.id]
+              const k = DEPARTMENTS.indexOf(d)
               return (
                 <button
                   key={d.id}

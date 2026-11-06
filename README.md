@@ -1,10 +1,14 @@
 # Neuronium — Run AI Business with AI Operating System.
 
 Interactive landing for **Neuronium**, the AI Operating System by Andre AI Technologies (a Dataist AI label).
-Seventeen full-screen blocks, one gesture per block, over one continuous WebGL light field.
+Full-screen blocks, one gesture per block, over one continuous WebGL light field.
 100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
-![Desktop, all 17 blocks](docs/screenshots/sheets/1440x900.jpg)
+The site opens step by step. **Open now:** the hero, Platform (shared context and the Superagent),
+Management with its first AI employee (**1 · Km**, Knowledge Management) and the final block.
+The other 13 blocks are built and stay hidden until they are opened — see [Staged release](#staged-release).
+
+![Desktop, the open blocks](docs/screenshots/sheets/1440x900.jpg)
 
 ## Run it
 
@@ -28,30 +32,61 @@ There is no registration backend in this project, so nothing pretends to submit:
 
 Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
 
+## Staged release
+
+What is open is set in one file, [`src/data/release.ts`](src/data/release.ts):
+
+| Setting | Opens | Now |
+|---|---|---|
+| `OPEN_EMPLOYEES` | AI employees by number (1–100). A department block opens as soon as one of its AI employees is open and shows only its open elements. | `[1]` — Management with 1 · Km |
+| `OPEN_BLOCKS.employees` | The periodic table of 100 AI employees | `false` |
+| `OPEN_BLOCKS.custom` | Use cases | `false` |
+| `OPEN_BLOCKS.pricing` | Pricing | `false` |
+| `OPEN_BLOCKS.faq` | FAQ | `false` |
+
+The hero, Platform and the final block are always open. A closed block is not rendered at all:
+it is not in the menu, scrolling skips it, and a link to it (`#sales`) does nothing. Links that would
+lead to a closed block are hidden too — “Explore AI Employees” on the final block, “Open Sales” in the
+table. With one department open, the menu links to it directly; with more, they share the Departments
+dropdown.
+
+To open Note Taking (2) next, and then the table:
+
+```ts
+export const OPEN_EMPLOYEES: readonly number[] = [1, 2]
+export const OPEN_BLOCKS = { employees: true, custom: false, pricing: false, faq: false }
+```
+
+The checks read the same file: they test what is open and check that everything else is absent.
+
 ## Checks
 
 ```bash
 npm run validate:data      # 100 AI employees: names, order, numbering, unique element symbols
-npm run validate:browser   # 17 blocks × 7 viewports + functional checks (menu, table, departments, forms, touch…)
+npm run validate:browser   # every open block × 7 viewports + functional checks (menu, departments, forms, touch…)
 npm run simulate           # simulated visitors: trackpad/desktop, phone with swipes, keyboard only
 ```
 
 The browser scripts need Playwright with Chromium (`npm i -D playwright && npx playwright install chromium`)
 and a running `npm run preview` (override the URL with `BASE_URL=…`). Output goes to `validation/`.
 
-Latest results (production build, headless Chromium with software WebGL):
+Latest results for the staged release (production build, headless Chromium with software WebGL):
 
 - **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
-- **Browser**: **41 / 41 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
-  - Every block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
-  - The functional checks also cover the brain, department picking and hover details, every AI employee in every department, the Management story, the use-case graph and the FAQ accordion. [Report](docs/validation/browser-report.md)
-- **Simulated users**: **66 / 66 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+- **Browser**: **29 / 29 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
+  - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
+  - Only the open blocks are on the page; the menu shows Platform · Management; links to closed blocks do nothing.
+  - Knowledge Management answers one question after another, each with its sources and the documents it was found in. [Report](docs/validation/browser-report.md)
+- **Simulated users**: **24 / 24 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+- With everything opened in `release.ts`, the same scripts run the full tour of all 17 blocks (last run: 66 / 66 walkthrough steps).
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
 contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screenshots/sheets), and
 [reduced motion](docs/screenshots/reduced-motion-management.jpg).
 
 ## The 17 blocks
+
+Built and in the code; open now: 01, 02, 04 (1 · Km only) and 17.
 
 | # | Block | What it shows |
 |---|---|---|
@@ -81,7 +116,7 @@ contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screens
 
 - **AI employee data** (`src/data/departments.ts`) carries an `availability` per AI employee:
   `available`, `in-development`, `planned` or `scope`. Everything is `scope` (“Product scope”) until
-  confirmed — the table says that availability varies by release. Mark confirmed items there.
+  confirmed. Mark confirmed items there. What is shown on the site is set separately, in `src/data/release.ts`.
 - **Illustrative** (labelled “Interface preview · sample data” on screen, not connected to production): every
   piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
   (Northwind Studio, Brightline) are fictional samples.
@@ -113,6 +148,7 @@ src/
     architecture.ts               OS, AI Governance, AI Agents · AI Workflows · AI Skills
     pricing.ts, faq.ts            plans and questions
     slides.ts                     block order, menu groups and light composition per block
+    release.ts                    what is open on the site right now (staged release)
   config/links.ts                 CTA destinations and the idea endpoint
 scripts/                          validate-data, validate-browser, simulate-user
 ```

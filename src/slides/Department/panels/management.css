@@ -76,7 +76,23 @@
   }
 }
 
+/* for pieces that wait hidden (opacity 0) until their moment, and then stay */
+@keyframes mgx-show {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* knowledge */
+.mgx-qa {
+  display: contents;
+}
+
 .mgx-search {
   display: flex;
   align-items: center;
@@ -163,7 +179,7 @@
 }
 
 .mgx-v[data-on='true'] .mgx-late {
-  animation: mgx-in 500ms var(--ease-out) forwards;
+  animation: mgx-show 500ms var(--ease-out) forwards;
   animation-delay: calc(2300ms + var(--k) * 350ms);
 }
 
@@ -336,7 +352,7 @@
 }
 
 .mgx-v[data-on='true'] .mgx-make {
-  animation: mgx-in 500ms var(--ease-out) 2600ms forwards;
+  animation: mgx-show 500ms var(--ease-out) 2600ms forwards;
 }
 
 /* list header */
@@ -780,6 +796,13 @@
   .mgx-msg,
   .mgx-person {
     font-size: 12px;
+  }
+}
+
+/* a phone window has room for one of the documents an answer was found in */
+@media (max-width: 860px) and (max-height: 920px) {
+  .mgx-qa > .mgx-doc ~ .mgx-doc {
+    display: none;
   }
 }
 
