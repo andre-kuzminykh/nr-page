@@ -309,26 +309,41 @@ async function functionalPass(browser) {
   const up = await activeIndex(page)
   check('Keyboard: End / Home / ArrowDown / ArrowUp', end === SLIDES.length - 1 && home === 0 && down === 1 && up === 0, `${end},${home},${down},${up}`)
 
-  // Shared context: a brain of tools, one Superagent running through it
+  // The AI Superagent in the business context: commands below the brain, each with its own way
   await go('context')
-  await sleep(4200)
-  const cx = await page.evaluate(() => {
+  const cx = await page.evaluate(async () => {
     const s = document.querySelector('.slide[data-state="active"]')
     const nodes = [...s.querySelectorAll('.cb-n')]
+    // watch the commands go by: which tools light up for each one
+    const ways = {}
+    let maxWay = 0
+    const t0 = performance.now()
+    while (performance.now() - t0 < 48000) {
+      const cmd = s.querySelector('.prompt__q .sr-only')?.textContent.trim()
+      if (cmd) {
+        ways[cmd] ??= new Set()
+        for (const n of s.querySelectorAll('.cb-n.is-on:not(.cb-n--core) .cb-lab')) ways[cmd].add(n.textContent)
+      }
+      maxWay = Math.max(maxWay, s.querySelectorAll('.cb line[display="inline"]').length)
+      if (Object.keys(ways).length === 3 && [...Object.values(ways)].every((w) => w.size === 4)) break
+      await new Promise((r) => setTimeout(r, 200))
+    }
     return {
       nodes: nodes.length,
       labels: nodes.map((n) => n.querySelector('.cb-lab')?.textContent).join('|'),
-      lit: nodes.filter((n) => Number(n.children[3]?.getAttribute('opacity') ?? 0) > 0.5).length,
-      way: s.querySelectorAll('.cb line[display="inline"]').length,
+      ways: Object.fromEntries(Object.entries(ways).map(([k, v]) => [k, [...v]])),
+      maxWay,
       text: s.querySelector('.slide__frame').innerText.replace(/\s+/g, ' ').trim(),
     }
   })
+  const ways = Object.values(cx.ways)
+  const reached = new Set(ways.flat())
   check(
-    'Shared context: a brain of 12 tools around the AI Superagent; the agent runs along the connections and the tools light up',
-    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && cx.lit >= 3 && cx.way > 4,
-    `${cx.lit} lit, ${cx.way} connections on the way`,
+    'AI Superagent: a brain of 12 tools; three commands are typed below it, each sends the agent its own way, and together they reach every tool',
+    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4,
+    Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · '),
   )
-  check('Shared context: no extra copy — just the title and the brain', /^Shared context\. One Superagent\./.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
+  check('AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy', /^AI Superagent works in the context of your business/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
 
   // Periodic table of 100 AI employees
   if (has('employees')) {
@@ -495,7 +510,7 @@ async function functionalPass(browser) {
     }
     const km = await page.evaluate(async (alone) => {
       const s = document.querySelector('.slide[data-state="active"]')
-      const ask = () => s.querySelector(alone ? '.kq-q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
+      const ask = () => s.querySelector(alone ? '.kq .prompt__q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
       const shown = (el) => getComputedStyle(el).visibility !== 'hidden' && Number(getComputedStyle(el).opacity) > 0.9
       // wait for the next question, then let its answer and sources arrive
       const seen = []
@@ -628,8 +643,8 @@ async function functionalPass(browser) {
   await sleep(300)
   const sentMsg = await page.locator('#fin-status').innerText()
   check(
-    'Final: “Turn your Idea into Reality.”, “Run AI Business with Neuronium.”, idea input with no hint text; empty input is caught; submit hands off honestly',
-    fin.title === 'Turn your Idea into Reality.' && !fin.centerMark && fin.sub === 'Run AI Business with Neuronium.' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
+    'Final: “Run Your AI Business”, “with Neuronium” smaller below, idea input with no hint text; empty input is caught; submit hands off honestly',
+    fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
     sentMsg,
   )
   const deep = has('employees') ? 'employees' : OPEN_DEPTS[0]?.id ?? 'context'

@@ -1,6 +1,7 @@
-import { ArrowUp, ArrowUpRight, CalendarDays, FileText, HardDrive, Hash, Mail, Search, Sheet, Video, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, FileText, HardDrive, Hash, Mail, Sheet, Video, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
-import { Sym, Type } from '../../../components/Kit/Kit'
+import { Sym } from '../../../components/Kit/Kit'
+import { Prompt } from '../../../components/Prompt/Prompt'
 import type { SoloRenderProps } from '../types'
 import './knowledge.css'
 
@@ -58,9 +59,9 @@ export const ANSWER_MS = 8000
 export const answerText = (a: Answer['a']) => a.filter((x): x is string => typeof x === 'string').join(' ')
 
 /**
- * Knowledge Management on its own: no window, just the search. A question is typed into the bar,
- * and once its last letter is in it is sent: the search runs, the answer streams in with numbered
- * references to three sources. `round` counts the questions (it ticks every ANSWER_MS); each round
+ * Knowledge Management on its own: no window, just the search. A question is typed into the bar at
+ * the bottom, and once its last letter is in it is sent: the search runs, and above the bar the
+ * answer streams in with numbered references to three sources. `round` counts the questions (it ticks every ANSWER_MS); each round
  * mounts afresh and plays the next one.
  */
 export function KnowledgeSearch({ live, round }: SoloRenderProps) {
@@ -92,17 +93,6 @@ export function KnowledgeSearch({ live, round }: SoloRenderProps) {
 
   return (
     <div className={`kq ${live ? 'is-live' : 'is-still'} ${live && sent ? 'is-sent' : ''}`}>
-      <div className="kq-bar">
-        <Search size={18} strokeWidth={1.8} aria-hidden="true" />
-        <span className="kq-q">
-          <Type text={ans.q} play={live} speed={30} delay={260} onDone={() => setSent(true)} />
-        </span>
-        <span className="kq-go" aria-hidden="true">
-          <ArrowUp size={17} strokeWidth={2} />
-        </span>
-        <i className="kq-scan" aria-hidden="true" />
-      </div>
-
       <div className="kq-answer">
         <Sym n={1} className="kq-km" />
         <p className="kq-text">{words}</p>
@@ -125,6 +115,8 @@ export function KnowledgeSearch({ live, round }: SoloRenderProps) {
           )
         })}
       </ol>
+
+      <Prompt text={ans.q} live={live} sent={sent} onSent={() => setSent(true)} />
     </div>
   )
 }

@@ -73,18 +73,23 @@ const TOOLS: ToolNode[] = [
 ]
 const NODES = [CORE, ...TOOLS]
 /** Two ways at once from the core (node indices into NODES). */
-const BRANCHES = [
-  [0, 1, 2, 3, 4, 5, 6],
-  [0, 7, 8, 9, 10, 11, 12],
+/**
+ * Commands to the AI Superagent. Each one takes its own way from the core through the tools it
+ * needs; together the three reach every tool of the context.
+ */
+export const COMMANDS: { text: string; way: string[] }[] = [
+  { text: 'Find new leads and book demos', way: ['Apollo', 'Sheets', 'Gmail', 'Calendar'] },
+  { text: 'Sum up today’s calls for the team', way: ['Meet', 'Docs', 'Slack', 'Telegram'] },
+  { text: 'Collect feedback and ship the fix', way: ['WhatsApp', 'Drive', 'Code', 'APIs'] },
 ]
 
-const POP = 600
-const GAP = 420
-const SPEED = 0.24 // px per ms along the connections
+const POP = 200
+const GAP = 260
+const SPEED = 0.38 // px per ms along the connections
 const WAVE = 3.4
 const FADE = 3
-const HOLD = 900
-const LEAD = 1050
+const HOLD = 700
+const LEAD = 250
 
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
@@ -159,11 +164,13 @@ interface Leg {
   du: number
 }
 
-function plan() {
-  const arr: number[] = new Array(NODES.length).fill(0)
+/** The way of one command: the arrival time at each tool (Infinity: not on this way), its legs and timeline. */
+function plan(cmd: number) {
+  const way = [0, ...COMMANDS[cmd].way.map((label) => NODES.findIndex((n) => n.label === label))]
+  const arr: number[] = new Array(NODES.length).fill(Infinity)
   arr[0] = POP
   const legs: Leg[] = []
-  for (const br of BRANCHES) {
+  for (const br of [way]) {
     for (let k = 1; k < br.length; k++) {
       const a = br[k - 1]
       const b = br[k]
@@ -200,7 +207,7 @@ function plan() {
       if (k < L.pts.length - 1) mids.push({ p: b, l: acc, leg: li, t: legT(L, acc) })
     }
   })
-  const last = Math.max(...arr)
+  const last = Math.max(...arr.filter(Number.isFinite))
   const run = last - arr[0]
   const W0 = last + 450
   const D0 = W0 + run / WAVE + HOLD
@@ -233,8 +240,26 @@ function set(el: Element | null | undefined, k: string, v: string) {
   }
 }
 
-export function Brain({ active, shown, still }: { active: boolean; shown: boolean; still: boolean }) {
-  const P = useMemo(plan, [])
+export function Brain({
+  active,
+  shown,
+  still,
+  cmd,
+  go,
+  onDone,
+}: {
+  active: boolean
+  shown: boolean
+  still: boolean
+  /** The command whose way is shown. */
+  cmd: number
+  /** The command is sent: the agent runs its way once, then `onDone`. */
+  go: boolean
+  onDone: () => void
+}) {
+  const P = useMemo(() => plan(cmd), [cmd])
+  const done = useRef(onDone)
+  done.current = onDone
   const [phone, setPhone] = useState(() => window.matchMedia?.('(max-width: 767px)').matches ?? false)
   useEffect(() => {
     const mq = window.matchMedia?.('(max-width: 767px)')
@@ -263,7 +288,6 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
     const draw = (T: number, fixed: boolean) => {
       let c = fixed ? T : T - LEAD
       if (c < 0) c = -1
-      else if (!fixed) c %= P.CL
       const wc = !fixed && c > P.W0 ? P.arr[0] + (c - P.W0) * WAVE : -1e9
       const dc = !fixed && c > P.D0 ? P.arr[0] + (c - P.D0) * FADE : -1e9
 
@@ -308,38 +332,32 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
         set(vh.current[i], 'r', f1((6 + 9 * s + 6 * w) * K))
         set(vh.current[i], 'opacity', (0.22 + 0.55 * s + 0.4 * w).toFixed(2))
       })
-      // tools swell as the agent arrives: a ripple, the icon; the name shows and fades, the icon stays
-      NODES.forEach((n, i) => {
+      // tools: at rest they wait, dimmed — the whole context is always there. The ones on this way
+      // swell as the agent arrives (a ripple, the icon, the name for a moment) and settle back as
+      // the way fades out.
+      NODES.forEach((_, i) => {
         const g = nodes.current[i]
         if (!g) return
         const [ripple, halo, base, icon] = Array.from(g.children) as SVGElement[]
         const isCore = i === 0
         const k = c - P.arr[i]
-        let z = dc > -1e8 ? clamp((dc - P.arr[i]) / (420 * FADE), 0, 1) : 0
-        if (isCore) z = 0
-        if (k < 0 || z >= 1) {
-          set(base, 'r', '0')
-          set(halo, 'r', '0')
-          set(ripple, 'r', '0')
-          set(icon, 'opacity', '0')
-          g.classList.remove('is-named')
-          return
-        }
-        const w = Math.exp(-(((wc - P.arr[i]) / 420) ** 2))
-        z *= z
-        const s = backOut(clamp(k / 560, 0, 1)) * (1 + 0.18 * w) * (1 - z)
-        const r0 = V[n.v][2]
-        set(base, 'r', f1(Math.max(r0, (isCore ? R * 1.08 : R) * s)))
-        set(base, 'opacity', (1 - z * 0.6).toFixed(2))
-        const rp = clamp(k / 950, 0, 1)
+        const on = k >= 0
+        const z = on && dc > -1e8 ? clamp((dc - P.arr[i]) / (420 * FADE), 0, 1) ** 2 : 0
+        const w = on ? Math.exp(-(((wc - P.arr[i]) / 420) ** 2)) : 0
+        const lit = on ? backOut(clamp(k / 560, 0, 1)) * (1 - z) : 0
+        const rest = isCore ? 0.92 : 0.72
+        const s = rest + (1 - rest) * lit + 0.16 * w
+        set(base, 'r', f1((isCore ? R * 1.08 : R) * s))
+        set(base, 'opacity', (isCore ? 1 : 0.7 + 0.3 * lit).toFixed(2))
+        const rp = on ? clamp(k / 950, 0, 1) : 1
         set(ripple, 'r', rp < 1 ? f1(R + 26 * out3(rp)) : '0')
         set(ripple, 'opacity', (0.9 * (1 - rp)).toFixed(2))
-        set(halo, 'r', f1((R + 6) * Math.min(1, s) + 4 * w))
-        set(halo, 'opacity', ((0.16 + 0.05 * Math.sin(T / 650 + i) + 0.3 * w) * (1 - z)).toFixed(2))
-        const si = backOut(clamp((k - 150) / 440, 0, 1))
-        set(icon, 'opacity', (clamp((k - 150) / 220, 0, 1) * (1 - z)).toFixed(2))
-        set(icon, 'transform', `scale(${Math.max(0.001, si * (1 + 0.12 * w) * (1 - z)).toFixed(3)})`)
-        g.classList.toggle('is-named', !fixed && k > 80 && k < (isCore ? 2600 : 2000))
+        set(halo, 'r', f1((R + 6) * s + 4 * w))
+        set(halo, 'opacity', (0.05 + (0.12 + 0.05 * Math.sin(T / 650 + i)) * lit + 0.3 * w).toFixed(2))
+        set(icon, 'opacity', (isCore ? 0.75 + 0.25 * lit : 0.4 + 0.6 * lit).toFixed(2))
+        set(icon, 'transform', `scale(${(0.8 + 0.2 * lit + 0.1 * w).toFixed(3)})`)
+        g.classList.toggle('is-on', lit > 0.5)
+        g.classList.toggle('is-named', !fixed && on && k > 80 && k < (isCore ? 1800 : 2000))
       })
       // the agent: one bright point on each way, and the spark of the wave
       P.legs.forEach((L, i) => {
@@ -365,30 +383,49 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
     }
 
     if (still) {
-      root.classList.add('is-still')
       draw(P.W0 - 1, true)
       return
     }
-    if (!shown) {
-      root.classList.remove('is-run')
+    if (!shown || !active || !go) {
       draw(-1, true)
       return
     }
-    if (!active) return
-    root.classList.remove('is-run')
-    void root.getBoundingClientRect()
-    root.classList.add('is-run')
+    // the command is sent: its way runs once
     const t0 = performance.now()
     const frame = (now: number) => {
-      draw(now - t0, false)
+      const T = now - t0
+      draw(T, false)
+      if (T - LEAD >= P.CL) {
+        done.current()
+        return
+      }
       raf = requestAnimationFrame(frame)
     }
     raf = requestAnimationFrame(frame)
     return () => cancelAnimationFrame(raf)
-  }, [P, active, shown, still, R, K])
+  }, [P, go, active, shown, still, R, K])
+
+  // the brain itself arrives once each time the block is shown
+  useEffect(() => {
+    const root = svg.current
+    if (!root) return
+    root.classList.toggle('is-still', still)
+    if (still) return
+    if (!shown) root.classList.remove('is-run')
+    else if (active && !root.classList.contains('is-run')) {
+      void root.getBoundingClientRect()
+      root.classList.add('is-run')
+    }
+  }, [active, shown, still])
 
   return (
-    <svg ref={svg} className="cb" viewBox="26 22 562 362" role="img" aria-label={`Shared context: ${TOOLS.map((t) => t.label).join(', ')} — the AI Superagent runs through all of them`}>
+    <svg
+      ref={svg}
+      className="cb"
+      viewBox="26 22 562 362"
+      role="img"
+      aria-label={`Your business context: ${TOOLS.map((t) => t.label).join(', ')}. For “${COMMANDS[cmd].text}” the AI Superagent goes through ${COMMANDS[cmd].way.join(', ')}.`}
+    >
       <defs>
         {/* the connections and the way follow the same colours as the points */}
         <linearGradient id="cbL" gradientUnits="userSpaceOnUse" x1={X0} y1="0" x2={X1} y2="0">
@@ -436,7 +473,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
       <g fill="none" strokeLinecap="round" stroke="url(#cbP)">
         {P.segs.map((e, i) => (
           <line
-            key={`g${i}`}
+            key={`g${cmd}-${i}`}
             ref={(el) => {
               rg.current[i] = el
             }}
@@ -449,7 +486,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
         ))}
         {P.segs.map((e, i) => (
           <line
-            key={`c${i}`}
+            key={`c${cmd}-${i}`}
             ref={(el) => {
               rc.current[i] = el
             }}
@@ -465,7 +502,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
         {P.mids.map((m, k) => {
           const p = V[m.p]
           return (
-            <g key={k}>
+            <g key={`${cmd}-${k}`}>
               <circle
                 ref={(el) => {
                   vh.current[k] = el
@@ -501,7 +538,10 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
             ref={(el) => {
               nodes.current[i] = el
             }}
-            className={`cb-n ${i === 0 ? 'cb-n--core' : ''}`} transform={`translate(${x} ${y})`}>
+            className={`cb-n ${i === 0 ? 'cb-n--core' : ''}`}
+            transform={`translate(${x} ${y})`}
+            style={{ '--d': `${(0.5 + ((x - 40) / 535) * 0.9).toFixed(2)}s` } as CSSProperties}
+          >
             <circle r={0} fill="none" stroke={hue(x)} strokeWidth={1.4} />
             <circle r={0} fill={hue(x)} />
             <circle r={0} fill="#130d1f" stroke={hue(x, true)} strokeWidth={1.6} />
@@ -518,7 +558,7 @@ export function Brain({ active, shown, still }: { active: boolean; shown: boolea
       {/* the agent */}
       {P.legs.map((_, i) => (
         <g
-          key={i}
+          key={`${cmd}-${i}`}
           ref={(el) => {
             heads.current[i] = el
           }}

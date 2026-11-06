@@ -6,15 +6,28 @@
 }
 
 .ctx__title {
-  font-size: clamp(30px, min(4.2vw, 6.6vh), 66px);
+  font-size: clamp(28px, min(3.7vw, 6.2vh), 60px);
 }
 
 .ctx__title .mask {
   white-space: nowrap;
 }
 
+.ctx__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.6vh, 28px);
+  min-width: 0;
+}
+
 .ctx__brain {
   min-width: 0;
+}
+
+/* commands are typed below the brain */
+.ctx__prompt {
+  width: min(100%, 580px);
+  margin-inline: auto;
 }
 
 /* ---------- the brain ---------- */
@@ -22,7 +35,7 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: min(70vh, 640px);
+  max-height: min(58vh, 560px);
   overflow: visible;
 }
 
@@ -35,6 +48,19 @@
 
 .cb-v {
   opacity: 0;
+}
+
+/* the tools appear once the brain has arrived, and wait */
+.cb-n {
+  opacity: 0;
+}
+
+.cb.is-run .cb-n {
+  animation: cb-in 0.6s ease var(--d) both;
+}
+
+.cb.is-still .cb-n {
+  opacity: 1;
 }
 
 .cb.is-run .cb-e {

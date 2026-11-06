@@ -4,7 +4,7 @@ Interactive landing for **Neuronium**, the AI Operating System by Andre AI Techn
 Full-screen blocks, one gesture per block, over one continuous WebGL light field.
 100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
-The site opens step by step. **Open now:** the hero, Platform (shared context and the Superagent),
+The site opens step by step. **Open now:** the hero, Platform (the AI Superagent in your business context),
 Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ and the final
 block. Pricing and FAQ describe what is ready today. The other 11 blocks are built and stay hidden
 until they are opened — see [Staged release](#staged-release).
@@ -29,7 +29,7 @@ There is no registration backend in this project, so nothing pretends to submit:
 | Variable | Used by | Default |
 |---|---|---|
 | `VITE_EARLY_ACCESS_URL` | “Get Early Access” buttons | `mailto:admin@andre.technology` (published on andre.technology) |
-| `VITE_IDEA_ENDPOINT` | “Turn your Idea into Reality” input on the last block | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
+| `VITE_IDEA_ENDPOINT` | The idea input on the last block (“Run Your AI Business”) | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
 
 Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
 
@@ -59,8 +59,8 @@ Until all 100 AI employees are open, Pricing and FAQ describe what is ready:
 A department with only one open AI employee is led by it. Now that is Management with 1 · Km:
 - On the left: the title “Knowledge Management”, then “Answers from a search across your knowledge base”, then its
   element. The line under the element fills up until the next answer.
-- On the right, no window — just a search bar. A question is typed into it and sent, and the answer streams in with
-  numbered references to three sources (`src/slides/Department/panels/knowledge.tsx`).
+- On the right, no window — just a search bar at the bottom. A question is typed into it and sent, and above it the
+  answer streams in with numbered references to three sources (`src/slides/Department/panels/knowledge.tsx`).
 - Once a second AI employee of the department opens, the department's headline, its elements and its turning
   interface come back.
 
@@ -112,13 +112,13 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15 and 16 (for
 | # | Block | What it shows |
 |---|---|---|
 | 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System.” |
-| 02 | Shared context · Superagent | A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. The AI Superagent starts in the middle and runs along the connections, two ways at once: the connections light up, each tool swells and shows its icon, its name appears and fades. The brain is violet through most of its width and turns orange near its right side. |
+| 02 | AI Superagent works in the context of your business | A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs; at rest they wait, dimmed. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — they light up and show their names, then settle back. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools. The brain is violet through most of its width and turns orange near its right side. |
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. Until all 100 are open: one subscription for what is ready. |
 | 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
-| 17 | Turn your Idea into Reality | The idea goes straight into the input → “Get Early Access”; “Explore AI Employees”. |
+| 17 | Run Your AI Business | “Run Your AI Business”, “with Neuronium” smaller below; the idea goes straight into the input → “Get Early Access”; “Explore AI Employees” once the table is open. |
 
 | Department | Headline | Interface pieces |
 |---|---|---|
@@ -157,11 +157,12 @@ src/
     ProgressBar/                  bottom violet→orange progress rule
     Nav/                          transparent top menu: Nr logo, sections, Departments dropdown, phone sheet
     Kit/                          interface-piece kit: Panel, Hot (lit section), Sym (mini element), Type, charts
+    Prompt/                       the bar a question or a command is typed into and sent
     Element/                      element tile and department colours
     Chrome/                       Nr mark (used as Neuronium's avatar in the FAQ)
   slides/
     Hero/ Context/ Employees/ Custom/ Pricing/ Faq/ Final/
-      Context/Brain.tsx           the brain of tools and the Superagent's run through it (SVG + rAF)
+      Context/Brain.tsx           the brain of tools, the commands and the Superagent's way for each (SVG + rAF)
     Department/                   one template for all ten departments
       panels/                     the interfaces of each department; management.tsx is one turning scene
   data/

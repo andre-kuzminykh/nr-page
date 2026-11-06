@@ -20,11 +20,12 @@
 }
 
 .fin__sub {
-  margin-top: clamp(14px, 2.6vh, 26px);
-  font-size: clamp(16px, min(1.6vw, 2.6vh), 22px);
-  letter-spacing: -0.015em;
+  margin-top: clamp(10px, 2vh, 20px);
+  font-size: clamp(22px, min(2.8vw, 4.4vh), 44px);
+  font-weight: 460;
+  letter-spacing: -0.035em;
   color: var(--fg);
-  opacity: 0.86;
+  opacity: 0.78;
   text-wrap: balance;
 }
 

@@ -39,7 +39,7 @@ const dept = (id: DepartmentId, label: string, x: number, y: number): SlideMeta 
 
 export const ALL_SLIDES: SlideMeta[] = [
   { id: 'hero', label: 'Neuronium', light: { x: 0.7, y: 0.42, radius: 0.56, energy: 1.05, spread: 1.0 } },
-  { id: 'context', label: 'Shared context and Superagent', nav: 'platform', light: { x: 0.12, y: 0.56, radius: 0.46, energy: 0.8, spread: 1.0 } },
+  { id: 'context', label: 'AI Superagent in your business', nav: 'platform', light: { x: 0.12, y: 0.56, radius: 0.46, energy: 0.8, spread: 1.0 } },
   { id: 'employees', label: '100 AI employees', nav: 'employees', light: { x: 0.5, y: 0.62, radius: 0.55, energy: 0.8, spread: 1.15 } },
   dept('management', 'Management', 0.82, 0.42),
   dept('hr', 'HR', 0.78, 0.66),
@@ -54,7 +54,7 @@ export const ALL_SLIDES: SlideMeta[] = [
   { id: 'custom', label: 'Custom use cases', nav: 'custom', light: { x: 0.76, y: 0.52, radius: 0.5, energy: 0.85, spread: 1.05 } },
   { id: 'pricing', label: 'Pricing', nav: 'pricing', light: { x: 0.5, y: 1.08, radius: 0.55, energy: 0.85, spread: 1.15 } },
   { id: 'faq', label: 'FAQ', nav: 'faq', light: { x: 0.14, y: 0.92, radius: 0.48, energy: 0.72, spread: 1.05 } },
-  { id: 'start', label: 'Turn your idea into reality', nav: 'start', light: { x: 0.5, y: 0.56, radius: 0.62, energy: 1.25, spread: 0.78 } },
+  { id: 'start', label: 'Run your AI business', nav: 'start', light: { x: 0.5, y: 0.56, radius: 0.62, energy: 1.25, spread: 0.78 } },
 ]
 
 const ALWAYS_OPEN = new Set(['hero', 'context', 'start'])

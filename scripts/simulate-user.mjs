@@ -267,7 +267,7 @@ const waitFor = async (fn, ms = 4500) => {
         }
         const km = await page.evaluate(async (alone) => {
           const s = document.querySelector('.slide[data-state="active"]')
-          const ask = () => s.querySelector(alone ? '.kq-q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
+          const ask = () => s.querySelector(alone ? '.kq .prompt__q .sr-only' : '.mgx-search .sr-only')?.textContent.trim()
           const seen = []
           const t0 = performance.now()
           while (performance.now() - t0 < 12000 && seen.length < 2) {
@@ -317,15 +317,19 @@ const waitFor = async (fn, ms = 4500) => {
 
   // Platform: shared context and the Superagent
   await page.locator('.nav__item', { hasText: 'Platform' }).click()
-  await sleep(5600)
+  // a command is typed below the brain and sent; the agent sets off
+  await page.waitForFunction(() => document.querySelectorAll('.slide[data-state="active"] .cb-n.is-on:not(.cb-n--core)').length >= 2, null, { timeout: 15000 }).catch(() => {})
   const brain = await page.evaluate(() => {
-    const nodes = [...document.querySelectorAll('.slide[data-state="active"] .cb-n')]
+    const s = document.querySelector('.slide[data-state="active"]')
     return {
-      lit: nodes.filter((n) => Number(n.children[3]?.getAttribute('opacity') ?? 0) > 0.5).length,
-      way: document.querySelectorAll('.slide[data-state="active"] .cb line[display="inline"]').length,
+      cmd: s.querySelector('.prompt__q .sr-only')?.textContent.trim(),
+      sent: !!s.querySelector('.prompt.is-sent'),
+      on: [...s.querySelectorAll('.cb-n.is-on:not(.cb-n--core) .cb-lab')].map((x) => x.textContent),
+      rest: s.querySelectorAll('.cb-n:not(.is-on)').length,
+      way: s.querySelectorAll('.cb line[display="inline"]').length,
     }
   })
-  await step(page, 'desktop', 'Opens Platform and watches', 'A brain of tools: the Superagent runs along the connections and the tools light up one by one', brain.lit >= 4 && brain.way > 6, JSON.stringify(brain))
+  await step(page, 'desktop', 'Opens Platform and watches', 'A command is typed below the brain and sent; the Superagent runs its way, the tools it needs light up and the rest wait', brain.sent && brain.on.length >= 2 && brain.rest >= 6 && brain.way > 4, JSON.stringify(brain))
 
   if (has('custom')) {
     // Use cases
@@ -483,7 +487,7 @@ const waitFor = async (fn, ms = 4500) => {
         title: [...s.querySelectorAll('.dept__title .mask')].map((x) => x.textContent.trim()).join(' '),
         visible: vis.length || (scene ? 1 : 0) || s.querySelectorAll('.dept__solo > *').length,
         hot: !!s.querySelector('.is-hot'),
-        search: !!s.querySelector('.kq-bar'),
+        search: !!s.querySelector('.kq .prompt'),
         over: f.scrollHeight - f.clientHeight,
       }
     })

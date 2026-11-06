@@ -57,14 +57,14 @@ export function FinalSlide(_: SlideProps) {
       <div className="fin__center">
         <h2 className="fin__title">
           <span className="mask" style={d(80)}>
-            <span>Turn your Idea</span>
+            <span>Run Your</span>
           </span>
           <span className="mask" style={d(170)}>
-            <span>into Reality.</span>
+            <span>AI Business</span>
           </span>
         </h2>
         <p className="fin__sub rv rv--blur" style={d(360)}>
-          Run AI Business with Neuronium.
+          with Neuronium
         </p>
 
         <form className={`fin__form rv fin__form--${status}`} style={d(480)} onSubmit={submit}>

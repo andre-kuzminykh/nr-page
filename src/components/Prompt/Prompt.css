@@ -1,0 +1,161 @@
+/* A floating bar with a gradient edge: the text types itself, then it is sent. */
+.prompt {
+  --c1: #a071ff;
+  --c2: #e06ad8;
+  --c3: #ff8a33;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: clamp(56px, 7.6vh, 68px);
+  padding: 0 10px 0 22px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgb(17 13 26 / 0.86), rgb(17 13 26 / 0.86)) padding-box,
+    linear-gradient(100deg, rgb(160 113 255 / 0.95), rgb(224 106 216 / 0.7) 55%, rgb(255 138 51 / 0.85)) border-box;
+  box-shadow:
+    0 30px 80px -34px rgb(160 113 255 / 0.75),
+    0 0 0 7px rgb(160 113 255 / 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: clamp(15px, 1.3vw, 19px);
+  letter-spacing: -0.01em;
+}
+
+.prompt > svg {
+  flex-shrink: 0;
+  color: var(--c1);
+}
+
+.prompt__q {
+  --fam: var(--c1);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--fg);
+}
+
+.prompt__go {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: clamp(38px, 5.2vh, 46px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.07);
+  color: rgb(255 255 255 / 0.45);
+  overflow: hidden;
+}
+
+.prompt__go::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--grad);
+  opacity: 0;
+}
+
+.prompt__go svg {
+  position: relative;
+}
+
+/* sent: the button lights and is pressed */
+.prompt.is-still .prompt__go,
+.prompt.is-sent .prompt__go {
+  color: #fff;
+}
+
+.prompt.is-still .prompt__go::before {
+  opacity: 1;
+}
+
+.prompt.is-sent .prompt__go {
+  animation: prompt-press 520ms var(--ease-out) both;
+}
+
+.prompt.is-sent .prompt__go::before {
+  animation: prompt-on 360ms ease both;
+}
+
+@keyframes prompt-press {
+  0% {
+    color: rgb(255 255 255 / 0.45);
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.84);
+  }
+  100% {
+    color: #fff;
+    transform: scale(1);
+  }
+}
+
+@keyframes prompt-on {
+  to {
+    opacity: 1;
+  }
+}
+
+/* the request runs along the lower edge */
+.prompt__scan {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--c1), var(--c2), var(--c3), transparent) no-repeat;
+  background-size: 45% 100%;
+  opacity: 0;
+}
+
+.prompt.is-sent .prompt__scan {
+  animation: prompt-scan 760ms ease-in-out 80ms both;
+}
+
+@keyframes prompt-scan {
+  0% {
+    opacity: 0;
+    background-position: -60% 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 160% 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .prompt {
+    height: 50px;
+    gap: 11px;
+    padding-left: 17px;
+    padding-right: 6px;
+    font-size: 14.5px;
+  }
+  .prompt__go {
+    width: 38px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .prompt {
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt,
+  .prompt * {
+    animation: none !important;
+  }
+}
