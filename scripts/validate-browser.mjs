@@ -594,25 +594,26 @@ async function functionalPass(browser) {
           line: x.querySelector('.pr-plan__line')?.textContent.trim(),
           cta: x.querySelector('.pr-plan__cta')?.textContent.trim(),
           href: x.querySelector('.pr-plan__cta')?.getAttribute('href') ?? '',
-          extra: x.querySelectorAll('ul, li, .pr-grid, .pr-plan__tag').length,
+          includes: [...x.querySelectorAll('.pr-plan__list li')].map((li) => li.textContent.replace(/\s+/g, ' ').trim()).join('|'),
+          extra: x.querySelectorAll('.pr-grid, .pr-plan__tag, .pr-plan__note').length,
         })),
         title: s.querySelector('.pr__title')?.textContent.trim(),
         copy: s.querySelectorAll('.pr__copy, .pr__note').length,
       }
     })
     const want = [
-      ['Standard', '$ 59 / month', 'Bring your own LLM key', 'Start Free Trial'],
-      ['Solo', '$ 190 / month', 'For a solo builder', 'Start Free Trial'],
-      ['Business', '$ 890 / month', 'Up to 10 people', 'Start Free Trial'],
-      ['Enterprise', 'Custom', 'More than 10 people', 'Contact sales'],
+      ['Standard', '$ 59 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Your AI Costs'],
+      ['Solo', '$ 190 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|1 000 AI Work Hours'],
+      ['Business', '$ 890 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|10 000 AI Work Hours'],
+      ['Enterprise', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Custom AI Work Hours'],
     ]
-    const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c], k) => {
+    const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c, inc], k) => {
       const x = pr.plans[k]
       // the spaces around the price are margins, not text
-      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.extra === 0
+      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.includes === inc && x.extra === 0
     })
     check(
-      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise with Contact sales — a name, a price, one line and a button each, no other copy',
+      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise “Contact us” with Contact sales — a name, a price, one line, what it includes and a button, no other copy',
       asWanted && pr.title === 'Pricing' && pr.copy === 0,
       pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta}`).join(' | '),
     )

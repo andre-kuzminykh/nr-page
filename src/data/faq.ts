@@ -51,7 +51,7 @@ export const FAQ: Question[] = [
   },
   {
     q: 'How much does it cost?',
-    a: 'Standard is $59 a month with your own LLM key, Solo $190 for a solo builder, and Business $890 for up to 10 people — each starts with a free trial. Enterprise is priced with sales.',
+    a: 'Standard is $59 a month with your own provider key, Solo $190 for a solo builder, and Business $890 for up to 10 people — each starts with a free trial. Enterprise is priced with sales.',
   },
 ]
 

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Check } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
@@ -7,7 +7,7 @@ import './Pricing.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 
-/** Four plans: a name, a price, who it is for and one button. */
+/** Four plans: a name, a price, who it is for, what it includes and one button. */
 export function PricingSlide(_: SlideProps) {
   return (
     <div className="slide__frame pr">
@@ -23,7 +23,7 @@ export function PricingSlide(_: SlideProps) {
             <h3 className="pr-plan__name">{p.name}</h3>
             <p className="pr-plan__price">
               {p.price === null ? (
-                <span className="pr-plan__num">Custom</span>
+                <span className="pr-plan__num pr-plan__num--word">Contact us</span>
               ) : (
                 <>
                   <span className="pr-plan__cur">$</span>
@@ -33,6 +33,16 @@ export function PricingSlide(_: SlideProps) {
               )}
             </p>
             <p className="pr-plan__line">{p.line}</p>
+            {p.includes.length > 0 && (
+              <ul className="pr-plan__list">
+                {p.includes.map((item) => (
+                  <li key={item}>
+                    <Check size={14} strokeWidth={2.2} aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            )}
             <a
               className={`btn ${p.featured ? 'btn--primary' : 'btn--ghost'} pr-plan__cta`}
               href={p.cta === 'trial' ? trialHref(p.name) : SALES_URL}

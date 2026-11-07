@@ -366,8 +366,8 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Opens Pricing',
-      'Standard $59, Solo $190, Business $890 and Enterprise — prices per month, nothing else around them',
-      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Enterprise' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Custom',
+      'Standard $59, Solo $190, Business $890 per month and Enterprise (Contact us), each with what it includes',
+      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Enterprise' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Contact us',
       plans.map((p) => `${p.name} ${p.price}`).join(' | '),
     )
     const trial = plans.filter((p) => p.cta === 'Start Free Trial')
