@@ -80,7 +80,7 @@ const NAV_LABELS = [
   ['Use cases', 'custom'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
-  ['Contacts', 'contacts'],
+  ['Contacts', 'start'],
 ]
   .filter(([, id]) => id && has(id))
   .map(([l]) => l)

@@ -115,6 +115,32 @@
   margin-top: clamp(10px, 2vh, 20px);
 }
 
+.fin__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  opacity: 0.72;
+}
+
+.fin__foot a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--fg-30);
+}
+
+.fin__foot a:hover {
+  border-bottom-color: var(--fg);
+}
+
+.fin__sep {
+  color: var(--fg-60);
+}
+
+
 @media (max-width: 600px) {
   .fin__form {
     flex-direction: column;
@@ -135,4 +161,14 @@
   .fin__status {
     font-size: 9.5px;
   }
+  .fin__foot {
+    font-size: 9.5px;
+  }
+  .fin__foot .fin__sep {
+    display: none;
+  }
+  .fin__foot > span {
+    flex-basis: 100%;
+  }
 }
+

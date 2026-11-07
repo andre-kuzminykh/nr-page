@@ -7,7 +7,6 @@ import { Slide } from './components/SlideController/Slide'
 import { TRANSITION_MS, useSlideController } from './components/SlideController/useSlideController'
 import { SLIDES, slideIndex } from './data/slides'
 import { useReducedMotion } from './hooks/useReducedMotion'
-import { ContactsSlide } from './slides/Contacts/ContactsSlide'
 import { ContextSlide } from './slides/Context/ContextSlide'
 import { CustomSlide } from './slides/Custom/CustomSlide'
 import { DepartmentSlide } from './slides/Department/DepartmentSlide'
@@ -25,7 +24,6 @@ const COMPONENTS: Record<string, ComponentType<SlideProps>> = {
   pricing: PricingSlide,
   faq: FaqSlide,
   start: FinalSlide,
-  contacts: ContactsSlide,
 }
 
 const fromHash = () => {

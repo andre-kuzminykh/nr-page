@@ -2,7 +2,7 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { isSlideOpen } from '../../data/slides'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
-import { CONTACT_EMAIL, IDEA_ENDPOINT, ideaMailto } from '../../config/links'
+import { COMPANY_URL, CONTACT_EMAIL, IDEA_ENDPOINT, MEDIA_LABEL_URL, ideaMailto } from '../../config/links'
 import './Final.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
@@ -113,6 +113,25 @@ export function FinalSlide(_: SlideProps) {
         )}
       </div>
 
+
+      <footer className="fin__foot rv rv--fade" style={d(800)}>
+        <span>Neuronium</span>
+        <span className="fin__sep" aria-hidden="true">·</span>
+        <span>
+          A{' '}
+          <a href={MEDIA_LABEL_URL} target="_blank" rel="noreferrer">
+            Dataist AI
+          </a>{' '}
+          label
+        </span>
+        <span className="fin__sep" aria-hidden="true">·</span>
+        <span>
+          Technology by{' '}
+          <a href={COMPANY_URL} target="_blank" rel="noreferrer">
+            Andre AI Technologies
+          </a>
+        </span>
+      </footer>
     </div>
   )
 }

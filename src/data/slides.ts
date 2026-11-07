@@ -19,7 +19,7 @@ export interface LightPreset {
   spread: number
 }
 
-export type NavGroup = 'platform' | 'employees' | 'departments' | 'custom' | 'pricing' | 'faq' | 'start' | 'contacts'
+export type NavGroup = 'platform' | 'employees' | 'departments' | 'custom' | 'pricing' | 'faq' | 'start'
 
 export interface SlideMeta {
   id: string
@@ -55,10 +55,9 @@ export const ALL_SLIDES: SlideMeta[] = [
   { id: 'pricing', label: 'Pricing', nav: 'pricing', light: { x: 0.5, y: 1.08, radius: 0.55, energy: 0.85, spread: 1.15 } },
   { id: 'faq', label: 'FAQ', nav: 'faq', light: { x: 0.14, y: 0.92, radius: 0.48, energy: 0.72, spread: 1.05 } },
   { id: 'start', label: 'Run your AI business', nav: 'start', light: { x: 0.5, y: 0.56, radius: 0.62, energy: 1.25, spread: 0.78 } },
-  { id: 'contacts', label: 'Contacts', nav: 'contacts', light: { x: 0.8, y: 0.74, radius: 0.5, energy: 0.85, spread: 1.0 } },
 ]
 
-const ALWAYS_OPEN = new Set(['hero', 'context', 'start', 'contacts'])
+const ALWAYS_OPEN = new Set(['hero', 'context', 'start'])
 
 function isOpen(s: SlideMeta): boolean {
   if (ALWAYS_OPEN.has(s.id)) return true

@@ -29,7 +29,7 @@ const NAV = [
   ['Use cases', 'custom'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
-  ['Contacts', 'contacts'],
+  ['Contacts', 'start'],
 ].filter(([, id]) => id && has(id))
 let chromium
 try {
@@ -701,30 +701,23 @@ async function functionalPass(browser) {
     fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
     sentMsg,
   )
-  // Contacts: the last block — the address and who stands behind Neuronium
-  await go('contacts')
-  // let the address finish arriving before measuring it
-  await sleep(900)
+  // Contacts: the menu's last item leads to the final block, which ends with who stands behind Neuronium
+  await go('hero')
+  await page.locator('.nav__item', { hasText: 'Contacts' }).click()
+  await sleep(1300)
   const ct = await page.evaluate(() => {
     const s = document.querySelector('.slide[data-state="active"]')
-    const mail = s.querySelector('.ct__mail')
-    const text = s.querySelector('.ct__mail-text')
-    const col = s.querySelector('.ct__main')?.getBoundingClientRect()
-    const range = document.createRange()
-    if (text) range.selectNodeContents(text)
-    const tr = range.getBoundingClientRect()
     return {
-      title: s.querySelector('.ct__title')?.textContent.trim(),
-      href: mail?.getAttribute('href'),
-      oneLine: text ? text.getBoundingClientRect().height < parseFloat(getComputedStyle(text).fontSize) * 1.6 : false,
-      fits: !!text && !!col && tr.left >= col.left - 1 && tr.right <= col.right + 1,
-      links: [...s.querySelectorAll('.ct__foot a')].map((a) => a.getAttribute('href')),
       last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
+      title: s.querySelector('.fin__title')?.textContent.trim(),
+      links: [...s.querySelectorAll('.fin__foot a')].map((a) => a.getAttribute('href')),
+      active: document.querySelector('.nav__item.is-active')?.textContent.trim(),
+      blocks: document.querySelectorAll('.slide').length,
     }
   })
   check(
-    'Contacts: the last block, in the menu after FAQ — the address on one line as a mailto link, and links to Dataist AI and Andre AI Technologies',
-    ct.title === 'Contacts' && ct.href === 'mailto:admin@andre.technology' && ct.oneLine && ct.fits && ct.links.some((h) => /dataist\.ai/.test(h)) && ct.links.some((h) => /andre\.technology/.test(h)) && ct.last && NAV.at(-1)[0] === 'Contacts',
+    'Contacts: last in the menu, after FAQ — it opens the final block (“Run Your AI Business”), which ends with Neuronium · Dataist AI · Andre AI Technologies; no separate contacts block',
+    NAV.at(-1)[0] === 'Contacts' && ct.last && ct.title === 'Run Your AI Business' && ct.active === 'Contacts' && ct.links.some((h) => /dataist\.ai/.test(h)) && ct.links.some((h) => /andre\.technology/.test(h)) && ct.blocks === SLIDES.length,
     JSON.stringify(ct),
   )
   await go('start')

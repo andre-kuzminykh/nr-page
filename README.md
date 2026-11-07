@@ -5,8 +5,8 @@ Full-screen blocks, one gesture per block, over one continuous WebGL light field
 100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
 The site opens step by step. **Open now:** the hero, Platform (the AI Superagent in your business context),
-Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ, the final
-block and Contacts. The FAQ answers for what is ready today. The other 11 blocks are built and stay hidden
+Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ and the final
+block, which “Contacts” in the menu leads to. The FAQ answers for what is ready today. The other 11 blocks are built and stay hidden
 until they are opened — see [Staged release](#staged-release).
 
 ![Desktop, the open blocks](docs/screenshots/sheets/1440x900.jpg)
@@ -61,7 +61,7 @@ A department with only one open AI employee is led by it. Now that is Management
 - Once a second AI employee of the department opens, the department's headline, its elements and its turning
   interface come back.
 
-The hero, Platform, the final block and Contacts are always open. A closed block is not rendered at all:
+The hero, Platform and the final block are always open. A closed block is not rendered at all:
 it is not in the menu, scrolling skips it, and a link to it (`#sales`) does nothing. Links that would
 lead to a closed block are hidden too — “Explore AI Employees” on the final block, “Open Sales” in the
 table. With one department open, the menu links to it directly; with more, they share the Departments
@@ -96,15 +96,15 @@ Latest results for the staged release (production build, headless Chromium with 
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
   - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Enterprise (Contact us) with Contact sales, each with what it includes; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
 - **Simulated users**: **33 / 33 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
-- With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run, before the Contacts block: 66 / 66 walkthrough steps).
+- With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
 contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screenshots/sheets), and
 [reduced motion](docs/screenshots/reduced-motion-management.jpg).
 
-## The 18 blocks
+## The 17 blocks
 
-Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for what is ready), 17 and 18.
+Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for what is ready) and 17.
 
 | # | Block | What it shows |
 |---|---|---|
@@ -115,8 +115,7 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for wh
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Pricing | **Standard** $59 / month, bring your own Provider Key — AI Superagent, AI Management, your AI costs · **Solo** $190 / month, for a solo builder — AI Superagent, AI Management, 1 000 AI Work Hours · **Business** $890 / month, up to 10 people — AI Superagent, AI Management, 10 000 AI Work Hours; each with “Start Free Trial” · **Enterprise**, Contact us, more than 10 people — AI Superagent, AI Management, custom AI Work Hours; “Contact sales”. |
 | 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
-| 17 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below; the business task goes straight into the input (“Describe your business task”) → “Get Early Access”; “Explore AI Employees” once the table is open. |
-| 18 | Contacts | The address, admin@andre.technology, large and on one line as a mailto link; Neuronium · a Dataist AI label · technology by Andre AI Technologies. Last in the menu, after FAQ. |
+| 17 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below; the business task goes straight into the input (“Describe your business task”) → “Get Early Access”; Neuronium · a Dataist AI label · technology by Andre AI Technologies at the foot. “Contacts”, last in the menu, leads here. |
 
 | Department | Headline | Interface pieces |
 |---|---|---|
