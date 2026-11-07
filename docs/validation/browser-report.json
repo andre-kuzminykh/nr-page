@@ -116,9 +116,9 @@
       "detail": "{\"platform\":{\"text\":\"Open Platform\",\"href\":\"https://platform.neuronium.ai/\",\"seen\":true},\"km\":{\"text\":\"Open Knowledge Management\",\"href\":\"https://management.neuronium.ai/km\",\"seen\":true}}"
     },
     {
-      "name": "Cases: after Management in the menu, three articles — a lead story and two beside it, each with a living cover; until an article is out its card says “Soon” and links nowhere",
+      "name": "Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases” opens every case with a search (empty state, the block holds still, Escape closes)",
       "ok": true,
-      "detail": "One question, the whole business context (Soon) · From today’s calls to the team’s tasks (Soon) · New leads to booked demos (Soon)"
+      "detail": "{\"flows\":true,\"held\":[[-201,-4128],[-201,-4078]],\"cases\":3,\"index\":3,\"search\":\"today’s → 1\"}"
     },
     {
       "name": "Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task",
@@ -738,7 +738,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-07T21:09:30.286Z",
+  "startedAt": "2026-11-07T22:53:42.684Z",
   "base": "http://127.0.0.1:4173/",
   "fps": 46
 }
