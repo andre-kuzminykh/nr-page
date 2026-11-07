@@ -1,132 +1,187 @@
 /* =========================================================
-   Cases: pictures and titles in a row. One case is open wide;
-   the others wait as narrow panels with their titles on edge.
-   Pointing opens another; left alone, they take turns.
+   Cases: two rows flow by, one each way — a picture and a
+   title per case. Pointing holds a row. “All cases” opens
+   every case with a search.
    ========================================================= */
 .cs {
-  --gap: clamp(10px, 1vw, 16px);
-  --wide: 3.4;
-  --ease-cs: cubic-bezier(0.76, 0, 0.24, 1);
+  --card: clamp(250px, 24vw, 380px);
+  --row-gap: clamp(12px, 2vh, 22px);
   display: grid;
-  /* the row of cases grows to 660px and the two sit centred when the window is taller */
-  grid-template-rows: auto minmax(0, 660px);
+  /* the column never takes the width of a row's long track */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
   align-content: center;
   align-content: safe center;
-  gap: clamp(18px, 3.4vh, 34px);
+  gap: clamp(18px, 3.6vh, 38px);
+}
+
+.cs__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .cs__title {
   font-size: clamp(34px, min(4.4vw, 7.4vh), 72px);
 }
 
-.cs__row {
+.cs-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 16px 0 18px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 999px;
+  background: rgb(11 10 15 / 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg);
+  transition:
+    border-color 300ms,
+    background-color 300ms;
+}
+
+.cs-all:hover,
+.cs-all:focus-visible {
+  border-color: rgb(255 255 255 / 0.42);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.cs-all__n {
+  color: rgb(255 255 255 / 0.5);
+  letter-spacing: 0.06em;
+}
+
+/* ---------- the rows ---------- */
+.cs__rows {
+  min-width: 0;
   display: flex;
-  gap: var(--gap);
-  min-height: 0;
-  height: 100%;
-  container-type: inline-size;
+  flex-direction: column;
+  gap: var(--row-gap);
+}
+
+.cs-row {
+  overflow: hidden;
+  /* the cards come out of the dark and go back into it */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.cs-track {
+  display: flex;
+  gap: clamp(12px, 1.2vw, 18px);
+  width: max-content;
+  padding: 6px 0;
+}
+
+/* one copy of the row follows the other: moving by half the track loops without a seam */
+.cs.is-live .cs-track {
+  animation: cs-flow calc(var(--items) * 6.5s) linear infinite;
+}
+
+.cs.is-live .cs-row.is-back .cs-track {
+  animation-direction: reverse;
+}
+
+/* pointing at a row (or reaching a case with Tab) holds it */
+.cs-row:hover .cs-track,
+.cs-row:focus-within .cs-track {
+  animation-play-state: paused;
+}
+
+@keyframes cs-flow {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 /* ---------- a case ---------- */
-.cs-card {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  border-radius: 26px;
-  background: #0b0a10;
+.cs-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: var(--card);
+  flex-shrink: 0;
   color: var(--fg);
   text-decoration: none;
-  overflow: hidden;
-  isolation: isolate;
   outline: none;
   cursor: pointer;
+  transition: opacity 400ms ease;
+}
+
+.cs-item.is-soon {
+  cursor: default;
+}
+
+/* the others step back while one is looked at */
+@media (hover: hover) {
+  .cs-row:hover .cs-item:not(:hover),
+  .cx__grid:hover .cs-item:not(:hover) {
+    opacity: 0.55;
+  }
+}
+
+.cs-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0b0a10;
   transition:
-    flex-grow 950ms var(--ease-cs),
-    border-color 500ms ease;
+    border-color 400ms ease,
+    box-shadow 600ms var(--ease-out),
+    transform 600ms var(--ease-out);
 }
 
-.cs-card.is-open {
-  flex-grow: var(--wide);
-  border-color: rgb(255 255 255 / 0.16);
+.cs-item:hover .cs-pic,
+.cs-item:focus-visible .cs-pic {
+  border-color: rgb(255 255 255 / 0.22);
+  box-shadow: 0 30px 70px -34px rgb(214 60 245 / 0.75);
+  transform: translateY(-4px);
 }
 
-.cs-card:focus-visible {
+.cs-item:focus-visible .cs-pic {
   box-shadow:
     0 0 0 2px var(--bg),
     0 0 0 4px #fff;
 }
 
-/* each arrives from below, unveiled */
-[data-shown] .cs-card {
-  animation: cs-rise 1200ms var(--ease-out) calc(220ms + var(--k) * 120ms) backwards;
-}
-
-[data-shown] .cs-pic {
-  animation: cs-settle 1800ms var(--ease-out) calc(220ms + var(--k) * 120ms) backwards;
-}
-
-@keyframes cs-rise {
-  from {
-    clip-path: inset(100% 0 0 0 round 26px);
-    transform: translateY(40px);
-  }
-  to {
-    clip-path: inset(0 0 0 0 round 26px);
-  }
-}
-
-@keyframes cs-settle {
-  from {
-    transform: scale(1.25);
-  }
-}
-
-/* ---------- the picture ---------- */
-.cs-pic {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
 .cs-glow {
   position: absolute;
-  inset: -20%;
+  inset: -10%;
+  z-index: -1;
   background: var(--tone);
-  animation: cs-drift 16s ease-in-out infinite alternate;
-  animation-delay: calc(var(--k) * -5s);
-  animation-play-state: paused;
-}
-
-.cs.is-live .cs-glow {
-  animation-play-state: running;
-}
-
-@keyframes cs-drift {
-  to {
-    transform: translate3d(6%, -5%, 0) scale(1.12) rotate(6deg);
-  }
+  transition: transform 1200ms var(--ease-out);
 }
 
 .cs-pic--violet {
   --tone:
-    radial-gradient(50% 42% at 34% 30%, #8b55f6 0%, rgb(139 85 246 / 0) 100%),
-    radial-gradient(46% 40% at 72% 78%, #4a1fb8 0%, rgb(74 31 184 / 0) 100%),
+    radial-gradient(55% 50% at 32% 30%, #8b55f6 0%, rgb(139 85 246 / 0) 100%),
+    radial-gradient(50% 46% at 74% 78%, #4a1fb8 0%, rgb(74 31 184 / 0) 100%),
     #120b22;
 }
 
 .cs-pic--pink {
   --tone:
-    radial-gradient(50% 42% at 62% 30%, #d63cf5 0%, rgb(214 60 245 / 0) 100%),
-    radial-gradient(46% 40% at 30% 78%, #f2449a 0%, rgb(242 68 154 / 0) 100%),
+    radial-gradient(55% 50% at 64% 30%, #d63cf5 0%, rgb(214 60 245 / 0) 100%),
+    radial-gradient(50% 46% at 28% 78%, #f2449a 0%, rgb(242 68 154 / 0) 100%),
     #1a0a1d;
 }
 
 .cs-pic--orange {
   --tone:
-    radial-gradient(50% 42% at 40% 32%, #f9894b 0%, rgb(249 137 75 / 0) 100%),
-    radial-gradient(46% 40% at 74% 76%, #f2449a 0%, rgb(242 68 154 / 0) 100%),
+    radial-gradient(55% 50% at 40% 32%, #f9894b 0%, rgb(249 137 75 / 0) 100%),
+    radial-gradient(50% 46% at 76% 76%, #f2449a 0%, rgb(242 68 154 / 0) 100%),
     #1d0e0b;
 }
 
@@ -136,108 +191,37 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.3;
-  transform: scale(0.9);
-  transition:
-    opacity 900ms ease,
-    transform 1200ms var(--ease-cs);
+  transition: transform 1200ms var(--ease-out);
 }
 
 .cs-img {
   object-fit: cover;
-  opacity: 0.55;
 }
 
-.cs-card.is-open .ca,
-.cs-card.is-open .cs-img {
-  opacity: 1;
-  transform: none;
+.cs-item:hover .ca,
+.cs-item:hover .cs-img,
+.cs-item:hover .cs-glow {
+  transform: scale(1.06);
 }
 
-@media (hover: hover) {
-  .cs-card.is-open:hover .ca,
-  .cs-card.is-open:hover .cs-img {
-    transform: scale(1.04);
-  }
-}
-
-/* the words always read: a quiet dark fall at the bottom */
-.cs-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgb(5 4 8 / 0.35) 0%, rgb(5 4 8 / 0) 26%, rgb(5 4 8 / 0) 48%, rgb(5 4 8 / 0.82) 100%);
-}
-
-/* ---------- the words ---------- */
-.cs-n {
-  position: absolute;
-  top: 22px;
-  left: 24px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: rgb(255 255 255 / 0.72);
-}
-
-/* a closed case: its title runs up its edge */
-.cs-side {
-  position: absolute;
-  left: 22px;
-  bottom: 26px;
-  max-height: calc(100% - 92px);
-  overflow: hidden;
-  writing-mode: vertical-rl;
-  /* letters and punctuation lie on their side as in a line of text (an apostrophe stays one) */
-  text-orientation: sideways;
-  transform: rotate(180deg);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 15px;
-  font-weight: 480;
-  letter-spacing: -0.005em;
-  color: rgb(255 255 255 / 0.86);
-  transition: opacity 450ms ease 350ms;
-}
-
-.cs-card.is-open .cs-side {
-  opacity: 0;
-  transition-delay: 0ms;
-  transition-duration: 200ms;
-}
-
-/* an open case: its title, large, once it has opened (it is laid out at the open width, so it
-   never reflows while the case widens) */
-.cs-foot {
-  position: absolute;
-  left: 28px;
-  bottom: 30px;
+/* ---------- the title under it ---------- */
+.cs-cap {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  width: calc((100cqw - (var(--n) - 1) * var(--gap)) * var(--wide) / (var(--wide) + var(--n) - 1) - 58px);
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 300ms ease,
-    transform 300ms ease;
-  pointer-events: none;
-}
-
-.cs-card.is-open .cs-foot {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 700ms ease 420ms,
-    transform 900ms var(--ease-out) 420ms;
+  gap: 12px;
+  padding: 0 4px;
 }
 
 .cs-title {
-  max-width: 15em;
-  font-size: clamp(24px, 2.5vw, 42px);
-  font-weight: 520;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 480;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
   text-wrap: balance;
 }
 
@@ -245,261 +229,241 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  min-width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  background: var(--fg);
-  color: var(--bg);
-  transition: transform 400ms var(--ease-out);
-}
-
-/* not out yet: a quiet word instead of the arrow */
-article.cs-card .cs-go {
-  min-width: 0;
-  height: 28px;
-  padding: 0 12px;
-  border: 1px solid rgb(255 255 255 / 0.3);
-  background: rgb(255 255 255 / 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: rgb(255 255 255 / 0.82);
+  height: 22px;
+  margin-top: 1px;
+  color: rgb(255 255 255 / 0.55);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 9.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 300ms ease,
+    transform 400ms var(--ease-out);
 }
 
-@media (hover: hover) {
-  a.cs-card.is-open:hover .cs-go {
-    transform: translate(3px, -3px);
-  }
+.cs-item:hover .cs-go,
+.cs-item:focus-visible .cs-go {
+  opacity: 1;
+  transform: none;
 }
 
-/* while the cases take turns, the open one counts down to the next */
-.cs-line {
-  position: absolute;
-  left: 28px;
-  right: 28px;
-  bottom: 14px;
-  height: 2px;
-  border-radius: 2px;
-  background: rgb(255 255 255 / 0.16);
-  overflow: hidden;
-}
-
-.cs-line::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  animation: cs-count var(--turn) linear forwards;
-}
-
-@keyframes cs-count {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* ---------- the open case's picture moves ---------- */
+/* ---------- the open case's pictures: still motifs ---------- */
 .ca-sheet {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  transform: rotate(calc(var(--k) * 9deg));
+  transform: rotate(calc(var(--k) * 11deg));
 }
 
-.ca-tile,
-.ca-core,
-.ca-ring,
-.ca-book {
+.ca-ring {
   transform-box: view-box;
-}
-
-.ca-core,
-.ca-ring {
   transform-origin: 400px 400px;
-}
-
-.ca-book {
-  transform-origin: 610px 400px;
-}
-
-/* still, the rings rest as circles around the point */
-.ca-ring {
-  opacity: 0.2;
   transform: scale(calc(0.3 + var(--k) * 0.17));
+  opacity: 0.32;
 }
 
 .ca-way {
   stroke-dasharray: 14 12;
 }
 
-.cs.is-live .cs-card.is-open .ca-sheet {
-  animation: ca-fan 4.6s ease-in-out infinite alternate;
+/* ---------- All cases ---------- */
+.cx {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  background: rgb(9 8 13 / 0.985);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  animation: cx-in 420ms var(--ease-out);
 }
 
-.cs.is-live .cs-card.is-open .ca-tile {
-  animation: ca-float 5s ease-in-out infinite;
-}
-
-.cs.is-live .cs-card.is-open .ca-ring {
-  animation: ca-ring 5s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-  animation-delay: calc(var(--k) * -1s);
-}
-
-.cs.is-live .cs-card.is-open .ca-core {
-  animation: ca-beat 2.5s ease-in-out infinite;
-}
-
-.cs.is-live .cs-card.is-open .ca-dot {
-  animation: ca-twinkle 3.6s ease-in-out infinite;
-  animation-delay: calc(var(--k) * -0.4s);
-}
-
-.cs.is-live .cs-card.is-open .ca-way {
-  animation: ca-way 1.4s linear infinite;
-}
-
-.cs.is-live .cs-card.is-open .ca-book {
-  animation: ca-beat 2.5s ease-in-out infinite;
-}
-
-@keyframes ca-fan {
-  to {
-    transform: rotate(calc(var(--k) * 16deg)) translateY(-8px);
-  }
-}
-
-@keyframes ca-float {
-  50% {
-    transform: translateY(-12px);
-  }
-}
-
-@keyframes ca-ring {
-  0% {
+@keyframes cx-in {
+  from {
     opacity: 0;
-    transform: scale(0.16);
+    transform: translateY(14px);
   }
-  15% {
-    opacity: 0.8;
-  }
-  100% {
+}
+
+.cx__head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) var(--gutter) 18px;
+}
+
+.cx__title {
+  margin-right: auto;
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 540;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.cx__count {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.4em;
+  letter-spacing: 0.08em;
+  color: rgb(255 255 255 / 0.5);
+  vertical-align: 0.6em;
+}
+
+.cx__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(380px, 42vw);
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.04);
+  color: rgb(255 255 255 / 0.6);
+  transition:
+    border-color 200ms,
+    box-shadow 200ms;
+}
+
+.cx__search:focus-within {
+  border-color: rgb(224 106 216 / 0.7);
+  box-shadow: 0 0 0 4px rgb(214 60 245 / 0.14);
+}
+
+.cx__search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  /* 16px keeps phones from zooming into the field */
+  font-size: 16px;
+  color: var(--fg);
+  caret-color: #e06ad8;
+}
+
+.cx__search input::placeholder {
+  color: rgb(255 255 255 / 0.4);
+}
+
+.cx__x {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 50%;
+  color: var(--fg);
+  transition:
+    border-color 200ms,
+    background-color 200ms;
+}
+
+.cx__x:hover,
+.cx__x:focus-visible {
+  border-color: rgb(255 255 255 / 0.42);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.cx__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cx__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: clamp(22px, 2.4vw, 34px) clamp(14px, 1.4vw, 22px);
+  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 10px var(--gutter) calc(90px + env(safe-area-inset-bottom, 0px));
+}
+
+.cx__grid .cs-item {
+  width: auto;
+  animation: cx-card 600ms var(--ease-out) backwards;
+}
+
+@keyframes cx-card {
+  from {
     opacity: 0;
-    transform: scale(1.12);
+    transform: translateY(16px);
   }
 }
 
-@keyframes ca-beat {
-  50% {
-    transform: scale(1.22);
-  }
+.cx__none {
+  padding: 60px var(--gutter);
+  text-align: center;
+  color: rgb(255 255 255 / 0.6);
 }
 
-@keyframes ca-twinkle {
-  50% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes ca-way {
-  to {
-    stroke-dashoffset: -52;
-  }
-}
-
-/* ---------- smaller windows: the cases stack, one open tall, the others as strips ---------- */
-/* where the gutter is narrower than the “Write to us” button, the row stops above it */
+/* ---------- smaller windows ---------- */
 @media (max-width: 1279px) {
+  /* where the gutter is narrower than the “Write to us” button, the rows stop above it */
   .slide__frame.cs {
     padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-@media (max-width: 1100px) {
-  .cs {
-    --wide: 3;
-  }
-  .cs-foot {
-    left: 22px;
-    bottom: 26px;
-    width: calc((100cqw - (var(--n) - 1) * var(--gap)) * var(--wide) / (var(--wide) + var(--n) - 1) - 46px);
-  }
-  .cs-title {
-    font-size: clamp(22px, 2.6vw, 30px);
-  }
-}
-
 @media (max-width: 860px) {
   .cs {
-    --wide: 3.2;
-    gap: 16px;
+    --card: clamp(210px, 62vw, 300px);
+    gap: 18px;
   }
   .cs__title {
     font-size: clamp(30px, 8vw, 44px);
   }
-  .cs__row {
-    flex-direction: column;
-  }
-  .cs-card {
-    border-radius: 20px;
-  }
-  @keyframes cs-rise {
-    from {
-      clip-path: inset(0 0 100% 0 round 20px);
-      transform: translateY(24px);
-    }
-    to {
-      clip-path: inset(0 0 0 0 round 20px);
-    }
-  }
-  .cs-n {
-    top: 14px;
-    left: 18px;
+  .cs-all {
+    height: 38px;
+    padding: 0 13px 0 15px;
     font-size: 10px;
   }
-  /* a closed case: its title across the strip */
-  .cs-side {
-    left: 18px;
-    right: 18px;
-    bottom: 14px;
-    max-height: none;
-    writing-mode: horizontal-tb;
-    transform: none;
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    font-size: 15px;
-    line-height: 1.25;
+  .cs-pic {
+    border-radius: 16px;
   }
-  .cs-foot {
-    left: 18px;
-    right: 18px;
-    bottom: 22px;
-    width: auto;
-    gap: 14px;
+  .cs-item {
+    gap: 9px;
   }
   .cs-title {
-    font-size: clamp(21px, 6vw, 28px);
+    font-size: 14px;
   }
-  .cs-go {
-    min-width: 44px;
-    height: 44px;
+  .cx__head {
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .cs-line {
-    left: 18px;
-    right: 18px;
-    bottom: 10px;
+  .cx__search {
+    order: 3;
+    width: 100%;
+  }
+  .cx__grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    gap: 20px 12px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .cs {
+    --card: clamp(190px, 56vw, 250px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cs *,
-  .cs-card {
+  .cx,
+  .cx * {
     animation: none !important;
     transition: none !important;
+  }
+  /* still rows: each can be scrolled through by hand */
+  .cs-row {
+    overflow-x: auto;
   }
 }

@@ -1,96 +1,68 @@
 import { ArrowUpRight } from 'lucide-react'
-import { useEffect, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
-import { CASES } from '../../data/cases'
-import { useInterval } from '../../hooks/useInterval'
-import { Art } from './Art'
+import { CASES, type CaseStudy } from '../../data/cases'
+import { CaseCard } from './CaseCard'
+import { CasesIndex } from './CasesIndex'
 import './Cases.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-/** Without a visitor's hand on them, the cases open one after another, this long each. */
-const TURN_MS = 5200
+const ROWS = 2
+/** A row holds at least this many cards before it loops, so it always runs past the window. */
+const MIN_RUN = 8
 
 /**
- * Cases: pictures and titles in a row. One case is open wide at a time; the pointer (or focus)
- * opens another, and left alone they take turns. An open case with a link leads to it.
+ * The cases of each flowing row. With many cases the rows share them out; with few, each row
+ * shows them all, starting from a different one. Then the run repeats until it is long enough.
+ * `own` counts the cards of a row that are its own (the rest repeat): only those take focus, so
+ * every case is reached once by Tab.
  */
-export function CasesSlide({ active, shown }: SlideProps) {
+function rows(list: CaseStudy[]): { run: CaseStudy[]; own: number }[] {
+  const split = list.length >= 12
+  return Array.from({ length: ROWS }, (_, r) => {
+    let run = split ? list.filter((_, i) => i % ROWS === r) : list.map((_, i) => list[(i + r * Math.ceil(list.length / 2)) % list.length])
+    const own = split || r === 0 ? run.length : 0
+    while (run.length < MIN_RUN) run = run.concat(run)
+    return { run, own }
+  })
+}
+
+const RUNS = rows(CASES)
+
+/**
+ * Cases: they flow by in two rows, one each way — a picture and a title each. Pointing at a row
+ * holds it; a case with a link opens it. “All cases” opens every case with a search.
+ */
+export function CasesSlide({ active }: SlideProps) {
   const { reducedMotion } = useDeck()
-  const live = active && !reducedMotion
-  const [on, setOn] = useState(0)
-  const [hand, setHand] = useState(false)
-
-  useEffect(() => {
-    if (!shown) {
-      setOn(0)
-      setHand(false)
-    }
-  }, [shown])
-  useInterval(() => setOn((k) => (k + 1) % CASES.length), live && !hand ? TURN_MS : null)
-
-  const enter = (k: number) => (e: PointerEvent) => {
-    // a mouse opens a case by pointing; a finger opens it with the first tap
-    if (e.pointerType !== 'mouse') return
-    setOn(k)
-    setHand(true)
-  }
-  const tap = (k: number) => (e: MouseEvent) => {
-    if (k === on) return
-    e.preventDefault()
-    setOn(k)
-    setHand(true)
-  }
+  const [all, setAll] = useState(false)
 
   return (
-    <div className={`slide__frame cs ${live ? 'is-live' : ''}`} style={{ '--turn': `${TURN_MS}ms`, '--n': CASES.length } as CSSProperties}>
-      <h2 className="h2 cs__title">
-        <span className="mask" style={d(40)}>
-          <span>Cases</span>
-        </span>
-      </h2>
-
-      <div className={`cs__row ${hand ? 'is-held' : ''}`} onPointerLeave={() => setHand(false)}>
-        {CASES.map((c, k) => {
-          const open = k === on
-          const inner = (
-            <>
-              <span className={`cs-pic cs-pic--${c.tone}`}>
-                <span className="cs-glow" />
-                {c.image ? <img className="cs-img" src={c.image} alt="" loading="lazy" /> : <Art art={c.art} />}
-                <span className="cs-shade" />
-              </span>
-              <span className="cs-n">{String(k + 1).padStart(2, '0')}</span>
-              <span className="cs-side" aria-hidden="true">
-                {c.title}
-              </span>
-              <span className="cs-foot">
-                <span className="cs-title">{c.title}</span>
-                <span className="cs-go">{c.href ? <ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" /> : 'Soon'}</span>
-              </span>
-              {open && live && !hand && <i key={on} className="cs-line" aria-hidden="true" />}
-            </>
-          )
-          const props = {
-            className: `cs-card ${open ? 'is-open' : ''}`,
-            style: { '--k': k } as CSSProperties,
-            onPointerEnter: enter(k),
-            onFocus: () => {
-              setOn(k)
-              setHand(true)
-            },
-            onBlur: () => setHand(false),
-          }
-          return c.href ? (
-            <a key={c.id} {...props} href={c.href} onClick={tap(k)}>
-              {inner}
-            </a>
-          ) : (
-            <article key={c.id} {...props} tabIndex={0} aria-label={`${c.title} — soon`} onClick={tap(k)}>
-              {inner}
-            </article>
-          )
-        })}
+    <div className={`slide__frame cs ${active && !reducedMotion ? 'is-live' : ''}`}>
+      <div className="cs__head">
+        <h2 className="h2 cs__title">
+          <span className="mask" style={d(40)}>
+            <span>Cases</span>
+          </span>
+        </h2>
+        <button type="button" className="cs-all rv" style={d(260)} onClick={() => setAll(true)}>
+          All cases
+          <span className="cs-all__n">{CASES.length}</span>
+          <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
+        </button>
       </div>
+
+      <div className="cs__rows">
+        {RUNS.map(({ run, own }, r) => (
+          <div key={r} className={`cs-row rv ${r % 2 ? 'is-back' : ''}`} style={{ '--d': 300 + r * 140, '--items': run.length } as CSSProperties}>
+            <div className="cs-track">
+              {[0, 1].map((copy) => run.map((c, i) => <CaseCard key={`${copy}-${i}-${c.id}`} c={c} hidden={copy === 1 || i >= own} />))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {all && <CasesIndex onClose={() => setAll(false)} />}
     </div>
   )
 }

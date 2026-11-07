@@ -413,18 +413,24 @@ const waitFor = async (fn, ms = 4500) => {
   if (has('cases')) {
     await page.locator('.nav__item', { hasText: 'Cases' }).click()
     await sleep(1600)
-    const cards = await page.$$eval('.slide[data-state="active"] .cs-card', (els) => els.map((c) => c.querySelector('.cs-title')?.textContent.trim()))
-    await step(page, 'desktop', 'Opens Cases from the menu', 'Pictures with titles in a row; the first case is open wide', (await idx(page)) === at('cases') && cards.length >= 3 && cards.every(Boolean), cards.join(' | '))
-    const last = page.locator('.slide[data-state="active"] .cs-card').last()
-    await last.hover()
-    await sleep(1500)
-    const opened = await page.evaluate(() => {
-      const cards = [...document.querySelectorAll('.slide[data-state="active"] .cs-card')]
-      const open = cards.findIndex((c) => c.classList.contains('is-open'))
-      const t = cards[open]?.querySelector('.cs-foot')
-      return { open, last: cards.length - 1, title: t && getComputedStyle(t).opacity === '1' ? t.querySelector('.cs-title')?.textContent.trim() : null }
+    const titles = await page.$$eval('.slide[data-state="active"] .cs-item:not([aria-hidden="true"]) .cs-title', (t) => t.map((e) => e.textContent.trim()))
+    await step(page, 'desktop', 'Opens Cases from the menu', 'Two rows of pictures with titles flow by, one each way', (await idx(page)) === at('cases') && titles.length >= 3 && (await page.locator('.slide[data-state="active"] .cs-row').count()) === 2, titles.join(' | '))
+    const card = page.locator('.slide[data-state="active"] .cs-row').first().locator('.cs-item:not([aria-hidden="true"])').first()
+    await card.hover()
+    await sleep(500)
+    const look = await page.evaluate(() => {
+      const row = document.querySelector('.slide[data-state="active"] .cs-row')
+      return { held: getComputedStyle(row.querySelector('.cs-track')).animationPlayState, go: row.querySelector('.cs-item:hover .cs-go')?.textContent.trim() }
     })
-    await step(page, 'desktop', 'Points at the last case', 'It opens wide and shows its title', opened.open === opened.last && !!opened.title, JSON.stringify(opened))
+    await step(page, 'desktop', 'Points at a case', 'Its row holds still, the case lifts and says “Soon” (no article yet)', look.held === 'paused' && look.go === 'Soon', JSON.stringify(look))
+    await page.locator('.slide[data-state="active"] .cs-all').click()
+    await sleep(600)
+    await page.keyboard.type('leads')
+    await sleep(300)
+    const found = await page.$$eval('.cx .cs-title', (t) => t.map((e) => e.textContent.trim()))
+    await step(page, 'desktop', 'Opens “All cases” and searches “leads”', 'Every case on one page; the search keeps the matching ones', found.length >= 1 && found.every((t) => /leads/i.test(t)), found.join(' | '))
+    await page.keyboard.press('Escape')
+    await sleep(300)
     await page.mouse.move(8, 450)
   }
 

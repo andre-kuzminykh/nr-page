@@ -812,49 +812,65 @@ async function functionalPass(browser) {
     outs.platform?.text === 'Open Platform' && outs.platform.href === PLATFORM && outs.platform.seen && (outs.km === undefined || (outs.km?.text === 'Open Knowledge Management' && outs.km.href === KM && outs.km.seen)),
     JSON.stringify(outs),
   )
-  // Cases: pictures and titles; one open wide at a time — pointing opens another, left alone they take turns
+  // Cases: rows of pictures and titles flow by, one each way; pointing holds a row; All cases opens every case with a search
   if (has('cases')) {
     await go('cases')
     await sleep(1600)
-    const state = () =>
-      page.evaluate(() => {
-        const cards = [...document.querySelectorAll('.slide[data-state="active"] .cs-card')]
-        return {
-          open: cards.findIndex((c) => c.classList.contains('is-open')),
-          widths: cards.map((c) => Math.round(c.getBoundingClientRect().width)),
-        }
-      })
+    const shift = () => page.$$eval('.slide[data-state="active"] .cs-track', (t) => t.map((e) => new DOMMatrix(getComputedStyle(e).transform).m41))
+    const x0 = await shift()
+    await sleep(900)
+    const x1 = await shift()
+    const row = await page.locator('.slide[data-state="active"] .cs-row').first().boundingBox()
+    await page.mouse.move(row.x + row.width / 2, row.y + row.height / 2)
+    await sleep(300)
+    const h0 = await shift()
+    await sleep(900)
+    const h1 = await shift()
+    await page.mouse.move(8, 450)
     const cs = await page.evaluate(() => {
       const s = document.querySelector('.slide[data-state="active"]')
+      const own = [...s.querySelectorAll('.cs-item')].filter((c) => c.tabIndex >= 0 && c.getAttribute('aria-hidden') !== 'true')
       return {
         title: s.querySelector('.cs__title')?.textContent.trim(),
-        cards: [...s.querySelectorAll('.cs-card')].map((c) => ({
+        rows: s.querySelectorAll('.cs-row').length,
+        own: own.map((c) => ({
           title: c.querySelector('.cs-title')?.textContent.trim(),
-          n: c.querySelector('.cs-n')?.textContent.trim(),
           picture: c.querySelectorAll('.cs-pic svg.ca *, .cs-pic img').length,
           go: c.querySelector('.cs-go')?.textContent.trim(),
           link: c.tagName === 'A' ? c.getAttribute('href') : null,
-          extra: c.querySelectorAll('.cs-kind, .cs-tools, .cs-meta').length,
         })),
+        all: s.querySelector('.cs-all')?.textContent.replace(/\s+/g, ' ').trim(),
       }
     })
-    const s0 = await state()
-    const third = await page.locator('.slide[data-state="active"] .cs-card').nth(2).boundingBox()
-    await page.mouse.move(third.x + third.width / 2, third.y + third.height / 2)
-    await sleep(1500)
-    const s1 = await state()
-    await sleep(6000)
-    const s2 = await state()
-    await page.mouse.move(8, 450)
-    await sleep(7000)
-    const s3 = await state()
-    const wide = (st) => st.open >= 0 && st.widths.every((w, k) => k === st.open || st.widths[st.open] > 2 * w)
+    await page.locator('.slide[data-state="active"] .cs-all').click()
+    await sleep(600)
+    const ix = await page.evaluate(() => ({
+      dialog: !!document.querySelector('.cx[role="dialog"][aria-modal="true"]'),
+      cards: document.querySelectorAll('.cx .cs-item').length,
+      focus: document.activeElement?.getAttribute('type'),
+    }))
+    const word = cs.own[1]?.title.split(' ').find((w) => w.length > 4) ?? 'calls'
+    await page.keyboard.type(word)
+    await sleep(300)
+    const hits = await page.$$eval('.cx .cs-title', (t) => t.map((e) => e.textContent))
+    await page.locator('.cx__search input').fill('zzzz')
+    const none = await page.locator('.cx__none').innerText().catch(() => '')
+    const at0 = await activeIndex(page)
+    await page.mouse.move(700, 500)
+    await page.mouse.wheel(0, 700)
+    await sleep(1100)
+    const held = (await activeIndex(page)) === at0
+    await page.keyboard.press('Escape')
+    await sleep(300)
+    const closed = (await page.locator('.cx').count()) === 0 && (await page.evaluate(() => document.activeElement?.classList.contains('cs-all')))
+    const flows = x0.every((v, k) => Math.abs(v - x1[k]) > 4) && Math.sign(x1[0] - x0[0]) !== Math.sign(x1[1] - x0[1])
     check(
-      'Cases: after Management in the menu, pictures with titles — one case open wide at a time; pointing opens another and holds it; left alone they take turns; a case with no article yet says “Soon” and links nowhere',
-      cs.title === 'Cases' && cs.cards.length >= 3 && cs.cards.every((c, k) => c.title && c.n === String(k + 1).padStart(2, '0') && c.picture > 5 && c.extra === 0 && (c.link ? c.go === '' : c.go === 'Soon')) &&
-        wide(s0) && s1.open === 2 && wide(s1) && s2.open === 2 && s3.open !== 2 &&
+      'Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases” opens every case with a search (empty state, the block holds still, Escape closes)',
+      cs.title === 'Cases' && cs.rows === 2 && flows && Math.abs(h0[0] - h1[0]) < 1 && Math.abs(h0[1] - h1[1]) > 4 &&
+        cs.own.length === ix.cards && cs.own.every((c) => c.title && c.picture > 5 && (c.link ? c.go === '' : c.go === 'Soon')) && /All cases/.test(cs.all) &&
+        ix.dialog && ix.focus === 'search' && hits.length >= 1 && hits.every((t) => t.toLowerCase().includes(word.toLowerCase())) && /Nothing matches/.test(none) && held && closed &&
         NAV.findIndex(([, id]) => id === 'cases') === NAV.findIndex(([, id]) => id === 'pricing') - 1,
-      `${cs.cards.map((c) => c.title).join(' · ')} · open ${s0.open} → pointed ${s1.open} → held ${s2.open} → turned ${s3.open}`,
+      JSON.stringify({ flows, held: [h0, h1].map((h) => h.map(Math.round)), cases: cs.own.length, index: ix.cards, search: `${word} → ${hits.length}` }),
     )
   }
 
