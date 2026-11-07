@@ -95,7 +95,7 @@ Latest results for the staged release (production build, headless Chromium with 
   - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ; links to closed blocks do nothing.
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
   - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Enterprise (Contact us) with Contact sales, each with what it includes; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
-- **Simulated users**: **33 / 33 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+- **Simulated users**: **31 / 31 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
