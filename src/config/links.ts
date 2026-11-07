@@ -12,6 +12,14 @@ export const PLATFORM_URL: string = env.VITE_PLATFORM_URL || 'https://platform.n
 export const KM_URL: string = env.VITE_KM_URL || 'https://management.neuronium.ai/km'
 
 export const SUPPORT_EMAIL = 'support@neuronium.ai'
+/** The contact widget posts here ({ email, subject, message }); api/contact.js sends it to support by email. */
+export const CONTACT_ENDPOINT: string = env.VITE_CONTACT_ENDPOINT || '/api/contact'
+/** A question asked on the landing opens Knowledge Management with it (`?q=`); empty → just KM. */
+export const kmHref = (q: string) => {
+  const t = q.trim()
+  if (!t) return KM_URL
+  return `${KM_URL}${KM_URL.includes('?') ? '&' : '?'}q=${encodeURIComponent(t)}`
+}
 
 /** The final block: the business task travels to the platform as ?task=… */
 export const taskHref = (task: string) => {
@@ -20,12 +28,13 @@ export const taskHref = (task: string) => {
   return `${PLATFORM_URL}${PLATFORM_URL.includes('?') ? '&' : '?'}task=${encodeURIComponent(t)}`
 }
 
-/** “Contact sales” on Enterprise. */
-export const SALES_URL: string =
-  env.VITE_SALES_URL || `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Neuronium Enterprise')}`
+/** “Contact sales” on the Scale plan: a sales page if there is one; empty → the contact widget opens. */
+export const SALES_URL: string = env.VITE_SALES_URL || ''
 
 /** Created by Andre AI Technologies; its terms and privacy policy cover the site. */
 export const COMPANY_URL = 'https://andre.technology/'
+/** Neuronium is open source: the top menu says so, next to Open Platform. */
+export const GITHUB_URL = 'https://github.com/andre-kuzminykh'
 export const TERMS_URL: string = env.VITE_TERMS_URL || 'https://andre.technology/terms/'
 export const PRIVACY_URL: string = env.VITE_PRIVACY_URL || 'https://andre.technology/privacy/'
 
@@ -36,5 +45,5 @@ export const SOCIAL: { brand: 'linkedin' | 'x' | 'instagram' | 'tiktok' | 'youtu
   { brand: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/andre_dataist' },
   { brand: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@andre_dataist' },
   { brand: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@andre_dataist' },
-  { brand: 'github', label: 'GitHub — open source', href: 'https://github.com/andre-kuzminykh' },
+  { brand: 'github', label: 'GitHub', href: GITHUB_URL },
 ]

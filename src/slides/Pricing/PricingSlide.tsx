@@ -2,6 +2,7 @@ import { Check, MessageCircle, Sparkles } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { PLATFORM_URL, SALES_URL } from '../../config/links'
+import { openContact } from '../../lib/events'
 import { PLANS } from '../../data/pricing'
 import './Pricing.css'
 
@@ -43,14 +44,23 @@ export function PricingSlide(_: SlideProps) {
                 ))}
               </ul>
             )}
-            <a className="btn pr-plan__cta" href={p.cta === 'trial' ? PLATFORM_URL : SALES_URL}>
-              {p.cta === 'trial' ? (
+            {p.cta === 'trial' ? (
+              <a className="btn pr-plan__cta" href={PLATFORM_URL}>
                 <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
-              ) : (
+                <span>Start Free Trial</span>
+              </a>
+            ) : SALES_URL ? (
+              <a className="btn pr-plan__cta" href={SALES_URL}>
                 <MessageCircle size={16} strokeWidth={1.8} aria-hidden="true" />
-              )}
-              <span>{p.cta === 'trial' ? 'Start Free Trial' : 'Contact sales'}</span>
-            </a>
+                <span>Contact sales</span>
+              </a>
+            ) : (
+              // no sales page: the widget in the corner opens, already about this plan
+              <button type="button" className="btn pr-plan__cta" onClick={() => openContact(`${p.name} plan`)}>
+                <MessageCircle size={16} strokeWidth={1.8} aria-hidden="true" />
+                <span>Contact sales</span>
+              </button>
+            )}
           </article>
         ))}
       </div>

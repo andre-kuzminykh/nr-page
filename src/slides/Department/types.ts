@@ -11,6 +11,8 @@ export interface PanelRenderProps {
 export interface SoloRenderProps extends PanelRenderProps {
   /** Counts the rounds of a solo AI employee's show; it ticks every `ms` while the block is live. */
   round: number
+  /** The show pauses its rounds while the visitor uses it (e.g. types into its bar). */
+  hold: (on: boolean) => void
 }
 
 export interface PanelDef {

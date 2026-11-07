@@ -20,6 +20,8 @@ export const OPEN_BLOCKS = {
   employees: false,
   /** custom use cases */
   custom: false,
+  /** case articles (the block lists them; each opens once it is written) */
+  cases: true,
   pricing: true,
   faq: true,
 }

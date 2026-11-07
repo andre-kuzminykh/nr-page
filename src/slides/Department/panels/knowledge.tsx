@@ -2,6 +2,7 @@ import { CalendarDays, FilePlay, FileSpreadsheet, FileText, Mail, MessageSquareT
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Sym } from '../../../components/Kit/Kit'
 import { Prompt } from '../../../components/Prompt/Prompt'
+import { kmHref } from '../../../config/links'
 import type { SoloRenderProps } from '../types'
 import './knowledge.css'
 
@@ -59,19 +60,27 @@ export const ANSWER_MS = 8000
  * Knowledge Management on its own: no window, just the search. A question is typed into the bar at
  * the bottom, and once its last letter is in it is sent: above the bar the answer streams in, and
  * the three things it was found in arrive — each just its icon and its name. `round` counts the
- * questions (it ticks every ANSWER_MS); each round mounts afresh and plays the next one.
+ * rounds (it ticks every ANSWER_MS); each round mounts afresh and plays the next question, and after
+ * the last one comes a round of “Try it yourself”. The visitor can click into the bar at any time:
+ * the rounds wait, and a question sent from there opens Knowledge Management with it.
  */
-export function KnowledgeSearch({ live, round }: SoloRenderProps) {
-  const ans = ANSWERS[round % ANSWERS.length]
+export function KnowledgeSearch({ live, round, hold }: SoloRenderProps) {
+  const k = round % (ANSWERS.length + 1)
+  const inviting = k === ANSWERS.length
+  // the try round keeps the last answer's room, so the bar does not move
+  const ans = ANSWERS[Math.min(k, ANSWERS.length - 1)]
   const [sent, setSent] = useState(false)
+  const [own, setOwn] = useState(false)
+  const [left, setLeft] = useState(false)
   // leaving the block mid-question starts it over next time
   useEffect(() => {
     if (!live) setSent(false)
   }, [live])
+  const quiet = inviting || own || left
 
   return (
-    <div className={`kq ${live ? 'is-live' : 'is-still'} ${live && sent ? 'is-sent' : ''}`}>
-      <div className="kq-answer">
+    <div className={`kq ${live ? 'is-live' : 'is-still'} ${live && sent && !quiet ? 'is-sent' : ''} ${quiet ? 'is-quiet' : ''}`}>
+      <div className="kq-answer" aria-hidden={quiet || undefined}>
         <Sym n={1} className="kq-km" />
         <div className="kq-body">
           <p className="kq-text">
@@ -98,7 +107,27 @@ export function KnowledgeSearch({ live, round }: SoloRenderProps) {
         </div>
       </div>
 
-      <Prompt text={ans.q} live={live} sent={sent} onSent={() => setSent(true)} />
+      <Prompt
+        label="Ask Knowledge Management"
+        placeholder="Ask anything about your business"
+        href={kmHref}
+        text={ans.q}
+        live={live}
+        sent={sent}
+        onSent={() => setSent(true)}
+        tryIt={inviting || left}
+        onTake={() => {
+          setOwn(true)
+          setSent(false)
+          hold(true)
+        }}
+        onLeave={() => {
+          setOwn(false)
+          // the visitor looked and left: “Try it yourself” until the next round
+          setLeft(true)
+          hold(false)
+        }}
+      />
     </div>
   )
 }

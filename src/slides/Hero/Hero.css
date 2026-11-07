@@ -91,7 +91,7 @@
 }
 
 .hero__line {
-  /* One line: “Run AI Business with AI Operating System.” — it scales down to fit on phones. */
+  /* One line: “Run AI Business with AI Operating System” — it scales down to fit on phones. */
   display: flex;
   align-items: baseline;
   gap: 0.27em;
@@ -111,13 +111,10 @@
   color: rgb(var(--fg-rgb) / 0.66);
 }
 
-.hero__dot {
-  background: var(--grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  background-size: 400% 100%;
-  background-position: 100% 0;
+/* the bar to give it a business task: the examples type themselves, then “Try it yourself” */
+.hero__bar {
+  width: min(640px, 100%);
+  margin-top: clamp(22px, 4.4vh, 44px);
 }
 
 @media (prefers-reduced-motion: reduce) {

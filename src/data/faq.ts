@@ -11,6 +11,8 @@ interface Question {
   now?: string | ((ready: AIEmployee[]) => string)
   /** asked only once this block is open */
   needs?: string
+  /** asked only once the whole product is on the site */
+  full?: boolean
 }
 
 /** Questions and answers for the FAQ block. Answers stay within confirmed product scope. */
@@ -18,12 +20,17 @@ export const FAQ: Question[] = [
   {
     q: 'What is Neuronium?',
     a: 'An AI Operating System for creating and running AI businesses. It brings one shared business context, an AI Superagent and 100 AI employees across ten departments into a single system.',
-    now: 'An AI Operating System for creating and running AI businesses: one shared business context, an AI Superagent and AI employees, each for one job. They are added one by one — the first is Knowledge Management.',
+    now: (ready) =>
+      `An AI Operating System for running a business with AI: one shared business context, the AI Superagent, and AI employees, each for one job. They are added one by one — ready today: ${readyList(ready)}.`,
+  },
+  {
+    q: 'What does the AI Superagent do?',
+    a: 'You give it a task in plain words, and it carries the task through the tools it needs, inside your business context. AI employees take on the specialised jobs; the Superagent brings them together.',
   },
   {
     q: 'What is an AI employee?',
     a: 'A ready AI specialist for one job — for example Lead Qualification or Code Review. Each one works with AI Agents, AI Workflows and AI Skills, inside your business context.',
-    now: 'A ready AI specialist for one job, working inside your business context. The first one, Knowledge Management, answers from a search across your knowledge base, including Google Drive — and live, during a Google Meet call.',
+    now: 'A ready AI specialist for one job, working inside your business context. The first, Knowledge Management, answers from a search across your knowledge base — including Google Drive, and live during a Google Meet call — and shows where each answer was found.',
   },
   {
     q: 'Who stays in control?',
@@ -32,6 +39,7 @@ export const FAQ: Question[] = [
   {
     q: 'AI-First or AI-Native?',
     a: 'AI-First: AI does the core operational work of a business while people manage decisions and results. AI-Native: an autonomous AI product where people oversee exceptions and key decisions. Neuronium is built for both.',
+    full: true,
   },
   {
     q: 'Which tools does it connect to?',
@@ -44,19 +52,27 @@ export const FAQ: Question[] = [
     needs: 'custom',
   },
   {
+    q: 'Is it open source?',
+    a: 'Yes. The code is open on GitHub — the link is at the top of the page.',
+  },
+  {
     q: 'Is it available today?',
     a: 'Neuronium is in early access. The 100 AI employees describe the intended product scope; what is available can vary by release and integration.',
     now: (ready) =>
-      `Neuronium is in early access. Ready today: ${readyList(ready)}. New AI employees are added one by one.`,
+      `Yes, in early access. Ready today: ${readyList(ready)}; new AI employees are added one by one. Every plan starts with a free trial on the platform.`,
   },
   {
     q: 'How much does it cost?',
-    a: 'Standard is $59 a month with your own provider key, Solo $190 for a solo builder, and Business $890 for up to 10 people — each starts with a free trial. Enterprise is priced with sales.',
+    a: 'Standard is $59 a month with your own Provider Key. Solo is $190 with 1 000 AI Work Hours, and Business $890 for up to 10 people with 10 000 AI Work Hours. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
+  },
+  {
+    q: 'What does “Bring your own Provider Key” mean?',
+    a: 'On Standard you connect your own AI provider’s key, and the AI usage is billed to you by that provider — your AI costs, at their price. Solo, Business and Scale include AI Work Hours instead.',
   },
 ]
 
 /** The questions asked on the site right now, with the answers for this stage. */
-export const QUESTIONS: { q: string; a: string }[] = FAQ.filter((f) => !f.needs || isSlideOpen(f.needs)).map((f) => ({
+export const QUESTIONS: { q: string; a: string }[] = FAQ.filter((f) => (!f.needs || isSlideOpen(f.needs)) && (!f.full || ALL_EMPLOYEES_OPEN)).map((f) => ({
   q: f.q,
   a: ALL_EMPLOYEES_OPEN || f.now === undefined ? f.a : typeof f.now === 'function' ? f.now(READY) : f.now,
 }))

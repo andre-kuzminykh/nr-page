@@ -16,9 +16,11 @@
   margin-inline: auto;
 }
 
-/* nothing is answered before the question is sent */
+/* nothing is answered before the question is sent — nor while it is the visitor's turn */
 .kq.is-live:not(.is-sent) .kq-answer,
-.kq.is-live:not(.is-sent) .kq-sources {
+.kq.is-live:not(.is-sent) .kq-sources,
+.kq.is-quiet .kq-answer,
+.kq.is-quiet .kq-sources {
   visibility: hidden;
 }
 
@@ -121,8 +123,10 @@
   }
 }
 
-/* ---------- the round ends: everything steps back for the next question ---------- */
-.kq.is-live {
+/* ---------- the round ends: the answer and the question step back for the next one;
+   the bar itself stays, so it can be clicked at any moment ---------- */
+.kq.is-live:not(.is-quiet) .kq-answer,
+.kq.is-live:not(.is-quiet) .prompt__q {
   animation: kq-out 420ms ease 7560ms forwards;
 }
 

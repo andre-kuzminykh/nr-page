@@ -1,12 +1,20 @@
 import { useLayoutEffect, useRef, type CSSProperties } from 'react'
-import type { SlideProps } from '../../components/SlideController/DeckContext'
+import { Prompt } from '../../components/Prompt/Prompt'
+import { useDemo } from '../../components/Prompt/useDemo'
+import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
+import { taskHref } from '../../config/links'
 import './Hero.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 const WORD = 'NEURONIUM'
+/** Business tasks the bar types by itself before it says “Try it yourself”. */
+const TASKS = ['Plan the launch of our new product', 'Turn today’s calls into tasks', 'Answer customers on every channel']
 
-/** Main block: the name, very large — then what it is and what it does. */
-export function HeroSlide(_: SlideProps) {
+/** Main block: the name, very large — then what it is, and the bar to give it a business task. */
+export function HeroSlide({ active, shown }: SlideProps) {
+  const { reducedMotion } = useDeck()
+  const live = active && !reducedMotion
+  const demo = useDemo(TASKS.length, { live, shown, after: 1400 })
   const word = useRef<HTMLHeadingElement>(null)
   const line = useRef<HTMLParagraphElement>(null)
 
@@ -57,9 +65,20 @@ export function HeroSlide(_: SlideProps) {
             Run AI Business
           </span>
           <span className="hero__os rv rv--blur" style={d(800)}>
-            with AI Operating System<span className="hero__dot">.</span>
+            with AI Operating System
           </span>
         </p>
+        <div className="hero__bar rv" style={d(980)}>
+          <Prompt
+            {...demo.bar}
+            label="Your business task"
+            placeholder="Describe your business task"
+            href={taskHref}
+            text={TASKS[demo.k]}
+            live={live}
+            delay={demo.k === 0 ? 1900 : 500}
+          />
+        </div>
       </div>
     </div>
   )

@@ -1,8 +1,9 @@
 import { ArrowUpRight } from 'lucide-react'
-import { useEffect, useState, type CSSProperties } from 'react'
+import type { CSSProperties } from 'react'
 import { Prompt } from '../../components/Prompt/Prompt'
+import { useDemo } from '../../components/Prompt/useDemo'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
-import { PLATFORM_URL } from '../../config/links'
+import { PLATFORM_URL, taskHref } from '../../config/links'
 import { Brain, COMMANDS } from './Brain'
 import './Context.css'
 
@@ -12,23 +13,13 @@ const TITLE = ['AI Superagent works', 'in your business context']
 /**
  * The tools of the business are one context — a brain. Commands are typed into the bar below it;
  * each one sends the AI Superagent its own way through the tools it needs, then the next comes.
+ * After the last one the bar says “Try it yourself”: a task typed there goes to the platform.
  */
 export function ContextSlide({ active, shown }: SlideProps) {
   const { reducedMotion } = useDeck()
   const live = active && !reducedMotion
-  const [cmd, setCmd] = useState(0)
-  const [sent, setSent] = useState(false)
-
-  useEffect(() => {
-    if (!shown) {
-      setCmd(0)
-      setSent(false)
-    }
-  }, [shown])
-  // leaving the block mid-command starts it over next time
-  useEffect(() => {
-    if (!live) setSent(false)
-  }, [live])
+  // the commands play one after another; then “Try it yourself”, and the visitor's task goes to the platform
+  const demo = useDemo(COMMANDS.length, { live, shown })
 
   return (
     <div className="slide__frame ctx">
@@ -47,26 +38,17 @@ export function ContextSlide({ active, shown }: SlideProps) {
       </div>
       <div className="ctx__main">
         <div className="ctx__brain">
-          <Brain
-            active={active}
-            shown={shown}
-            still={reducedMotion}
-            cmd={cmd}
-            go={live && sent}
-            onDone={() => {
-              setSent(false)
-              setCmd((k) => (k + 1) % COMMANDS.length)
-            }}
-          />
+          <Brain active={active} shown={shown} still={reducedMotion} cmd={demo.k} go={live && demo.go} onDone={demo.next} />
         </div>
         <div className="ctx__prompt rv" style={d(700)}>
           <Prompt
-            key={cmd}
-            text={COMMANDS[cmd].text}
+            {...demo.bar}
+            label="A task for the AI Superagent"
+            placeholder="Give the AI Superagent a task"
+            href={taskHref}
+            text={COMMANDS[demo.k].text}
             live={live}
-            sent={sent}
-            onSent={() => setSent(true)}
-            delay={cmd === 0 ? 1500 : 450}
+            delay={demo.k === 0 ? 1500 : 450}
           />
         </div>
       </div>

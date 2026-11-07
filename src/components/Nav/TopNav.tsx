@@ -1,6 +1,7 @@
 import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import { PLATFORM_URL } from '../../config/links'
+import { GITHUB_URL, PLATFORM_URL } from '../../config/links'
+import { BrandIcon } from '../Brand/BrandIcon'
 import { DEPARTMENTS } from '../../data/departments'
 import { SLIDES, isSlideOpen, type NavGroup } from '../../data/slides'
 import { FAMILY } from '../Element/Element'
@@ -20,6 +21,7 @@ const ALL_ITEMS: { key: NavGroup; label: string; target: string }[] = [
     target: OPEN_DEPTS[0]?.id ?? 'management',
   },
   { key: 'custom', label: 'Use cases', target: 'custom' },
+  { key: 'cases', label: 'Cases', target: 'cases' },
   { key: 'pricing', label: 'Pricing', target: 'pricing' },
   { key: 'faq', label: 'FAQ', target: 'faq' },
   // the last block: the business task, and who stands behind Neuronium
@@ -182,8 +184,12 @@ export function TopNav() {
         />
       </div>
 
+      <a className="nav__oss" href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="Open source on GitHub">
+        <BrandIcon brand="github" size={15} />
+        <span>Open source</span>
+      </a>
       <a className="nav__cta" href={PLATFORM_URL}>
-        Get Early Access
+        Open Platform
         <ArrowUpRight size={14} strokeWidth={1.8} aria-hidden="true" />
       </a>
 
@@ -233,7 +239,7 @@ export function TopNav() {
             })}
           </div>
           <a className="btn btn--primary nav__sheet-cta" href={PLATFORM_URL}>
-            Get Early Access
+            Open Platform
             <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
           </a>
         </div>

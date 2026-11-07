@@ -52,6 +52,8 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   const [sel, setSel] = useState(order[0])
   const [auto, setAuto] = useState(true)
   const [round, setRound] = useState(0)
+  // the visitor is using the solo show (typing into its bar): its rounds wait
+  const [held, setHeld] = useState(false)
   const tabs = useRef<(HTMLButtonElement | null)[]>([])
   const stageRef = useParallax<HTMLDivElement>(active && !reducedMotion)
 
@@ -60,6 +62,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
       setSel(order[0])
       setAuto(true)
       setRound(0)
+      setHeld(false)
     }
   }, [shown, order])
 
@@ -80,7 +83,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
     live && auto && !solo ? CYCLE_MS : null,
   )
   // the solo show: the line under the element fills up, and the next round starts
-  useInterval(() => setRound((r) => r + 1), show && live ? show.ms : null)
+  useInterval(() => setRound((r) => r + 1), show && live && !held ? show.ms : null)
 
   const pick = (n: number) => {
     setSel(n)
@@ -107,7 +110,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
 
   const strip = (
     <div
-      className={`dept__strip ${auto && live && !solo ? 'is-auto' : ''} ${show && live ? 'is-live' : ''}`}
+      className={`dept__strip ${auto && live && !solo ? 'is-auto' : ''} ${show && live && !held ? 'is-live' : ''}`}
       role="tablist"
       aria-label={`${dept.name} AI employees`}
       onKeyDown={onStripKey}
@@ -195,7 +198,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
         className={`dept__stage ${show ? 'dept__stage--solo' : ''}`}
       >
         {show ? (
-          <div className="dept__solo">{show.render({ sel, live, round })}</div>
+          <div className="dept__solo">{show.render({ sel, live, round, hold: setHeld })}</div>
         ) : stage.scene ? (
           <div className="dept__slot is-focus">
             <div className="dept__scale">{stage.scene({ sel, live })}</div>

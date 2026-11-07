@@ -1,13 +1,21 @@
-# Neuronium — Run AI Business with AI Operating System.
+# Neuronium — Run AI Business with AI Operating System
 
 Interactive landing for **Neuronium**, the AI Operating System by Andre AI Technologies (a Dataist AI label).
 Full-screen blocks, one gesture per block, over one continuous WebGL light field.
 100 ready AI employees are shown as elements of a periodic table; Neuronium is element 0 (**Nr**).
 
 The site opens step by step. **Open now:** the hero, Platform (the AI Superagent in your business context),
-Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ and the final
+Management with its first AI employee (**1 · Km**, Knowledge Management), Cases, Pricing, FAQ and the final
 block, which “Contacts” in the menu leads to. The FAQ answers for what is ready today. The other 11 blocks are built and stay hidden
 until they are opened — see [Staged release](#staged-release).
+
+**One input bar, on every block that does something.** The hero, the AI Superagent, Knowledge Management and the
+last block share the same bar (`src/components/Prompt`). On a block it first shows what it does — example tasks,
+commands or questions type themselves and are sent — then says **“Try it yourself”**. The visitor can click into it at
+any moment (the demo waits), and what they send opens the product with it. On the last block it is just the input.
+
+**Write to us** is a small button in the bottom-right corner of every block: email, subject and an optional message;
+the team replies by email. See [Write to us](#write-to-us).
 
 ![Desktop, the open blocks](docs/screenshots/sheets/1440x900.jpg)
 
@@ -28,20 +36,23 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 
 | Button | Leads to | Variable |
 |---|---|---|
-| “Get Early Access” in the top menu (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open Platform” in the top menu (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open source”, next to it | `https://github.com/andre-kuzminykh` | `GITHUB_URL` in `links.ts` |
+| The bar on the hero and on the AI Superagent block, and the bar on the last block | `https://platform.neuronium.ai/?task=<the task>`; empty on the last block → the platform | `VITE_PLATFORM_URL` |
 | “Open Platform” on the AI Superagent block | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| The bar in Knowledge Management | `https://management.neuronium.ai/km?q=<the question>` | `VITE_KM_URL` |
 | “Open Knowledge Management” beside the Km element | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
 | “Start Free Trial” on Standard, Solo and Business | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
-| “Contact sales” on Enterprise | an email to support@neuronium.ai | `VITE_SALES_URL` |
-| The task input on the last block (“Describe your business task” → Get Early Access) | `https://platform.neuronium.ai/?task=<the task>`; empty → the platform | `VITE_PLATFORM_URL` |
+| “Contact sales” on Scale | the “Write to us” widget, about the Scale plan (or a sales page, if set) | `VITE_SALES_URL` |
 | Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
 
-The platform can read `?task=` to start with the visitor's task already typed in; without it, the parameter is simply ignored.
+The platform can read `?task=` (and Knowledge Management `?q=`) to start with what the visitor wrote already typed in;
+without that, the parameter is simply ignored.
 The defaults are in [`src/config/links.ts`](src/config/links.ts); copy `.env.example` to `.env` (or set the variables
 in the host's build settings) to point the buttons elsewhere, e.g. at a staging platform.
 
-The foot of the last block (“Contacts” in the menu) holds: Created by with the orange AIT logo (→ andre.technology),
-LinkedIn, X, Instagram, TikTok, YouTube, GitHub marked “Open source”, support@neuronium.ai, Terms of Use and Privacy Policy.
+The foot of the last block (“Contacts” in the menu) holds the orange AIT logo (→ andre.technology), LinkedIn, X,
+Instagram, TikTok, YouTube, GitHub, Terms of Use and Privacy Policy. Writing to the team is the widget in the corner.
 The social links are the ones published on andre.technology; they are listed once, in `SOCIAL` in `src/config/links.ts`.
 
 ## Hosting on neuronium.ai
@@ -67,6 +78,9 @@ nothing moves away from GoDaddy, and existing records (such as mail for support@
    (usually `cname.vercel-dns.com`).
 4. Leave the `MX`, `TXT` and `NS` records alone: mail and verification depend on them.
 
+The `api/` folder (the “Write to us” function) is deployed with the site; set its key as described in
+[Write to us](#write-to-us).
+
 Most changes are live within an hour (up to 48 hours). Vercel issues the HTTPS certificate on its own once the
 records match, and the domains turn green on its Domains page. From then on every push to `main` deploys, and
 every other branch and pull request gets a preview address.
@@ -80,6 +94,27 @@ Pages project's Custom domains, and redirect `www` to the apex with a Redirect R
 **The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. In the same
 GoDaddy DNS add `CNAME platform` and `CNAME management`, each pointing to wherever that app is hosted (its host
 shows the value); nothing in this project serves them.
+
+## Write to us
+
+The button in the bottom-right corner opens a small card: **your email**, **subject**, and an optional **message**
+(`src/components/Contact`). “Contact sales” on the Scale plan opens it too, with the subject “Scale plan”.
+It posts `{ email, subject, message }` to `/api/contact`, and the visitor sees “Sent. We’ll reply to …”.
+If sending fails, it says so and offers a plain email to support@neuronium.ai with the subject filled in.
+A hidden field catches bots; while the card is open, scrolling does not turn the block, and Escape closes it.
+
+`/api/contact` is [`api/contact.js`](api/contact.js), a Vercel Function that Vercel deploys on its own along with the site.
+It sends the message to support@neuronium.ai through [Resend](https://resend.com), with the visitor's address as
+Reply-To, so replying to the email answers them. To turn it on:
+
+1. Create a Resend account, add the domain `neuronium.ai`, and add the DNS records Resend shows (SPF and DKIM
+   `TXT` records, an `MX` record for its bounce subdomain) in **GoDaddy → DNS**, next to the existing ones.
+2. Create an API key in Resend.
+3. In Vercel → the project → Settings → Environment Variables, add `RESEND_API_KEY` (and, if needed, `CONTACT_TO`,
+   `CONTACT_FROM`; the defaults are support@neuronium.ai and `Neuronium <hello@neuronium.ai>`). Redeploy.
+
+Until the key is set, the function answers 503 and the widget offers the plain email. Another backend can be used
+by pointing `VITE_CONTACT_ENDPOINT` at it. `npm run validate:api` checks the function with stand-ins (nothing is sent).
 
 ## Staged release
 
@@ -127,6 +162,7 @@ The checks read the same file: they test what is open and check that everything 
 
 ```bash
 npm run validate:data      # 100 AI employees: names, order, numbering, unique element symbols
+npm run validate:api       # the contact function, with stand-ins for Vercel and the email provider
 npm run validate:browser   # every open block × 7 viewports + functional checks (menu, departments, forms, touch…)
 npm run simulate           # simulated visitors: trackpad/desktop, phone with swipes, keyboard only
 ```
@@ -141,7 +177,7 @@ Latest results for the staged release (production build, headless Chromium with 
   - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
   - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ · Contacts; links to closed blocks do nothing.
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
-  - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Enterprise (Contact us) with Contact sales, each with what it includes; the FAQ names what is ready today.
+  - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Scale (Contact us) with Contact sales, each with what it includes, every button white; the FAQ names what is ready today.
   - Every way out leads where [the table above](#where-the-buttons-lead) says; the last block's task reaches the platform as `?task=`; the foot has the AIT logo, the six socials, support, Terms and Privacy. The platform and Knowledge Management are stand-in pages during the checks, so nothing leaves the machine. [Report](docs/validation/browser-report.md)
 - **Simulated users**: **35 / 35 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. The desktop visitor clicks through to the platform and Knowledge Management and comes back. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
@@ -150,20 +186,21 @@ Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screensh
 contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screenshots/sheets), and
 [reduced motion](docs/screenshots/reduced-motion-management.jpg).
 
-## The 17 blocks
+## The 18 blocks
 
-Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for what is ready) and 17.
+Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (for what is ready) and 18.
 
 | # | Block | What it shows |
 |---|---|---|
-| 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System.” |
-| 02 | AI Superagent works in your business context | “Open Platform” under the title. A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools. The brain is violet through most of its width and turns orange near its right side. |
+| 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System”, and the input bar: example tasks type themselves, then “Try it yourself”. |
+| 02 | AI Superagent works in your business context | “Open Platform” under the title. A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools; then the bar says “Try it yourself”, and a task written there goes to the platform. The brain is violet through most of its width and turns orange near its right side. |
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
-| 15 | Pricing | **Standard** $59 / month, bring your own Provider Key — AI Superagent, AI Management, your AI costs · **Solo** $190 / month, for a solo builder — AI Superagent, AI Management, 1 000 AI Work Hours · **Business** $890 / month, up to 10 people — AI Superagent, AI Management, 10 000 AI Work Hours; each with “Start Free Trial” · **Enterprise**, Contact us, more than 10 people — AI Superagent, AI Management, custom AI Work Hours; “Contact sales”. |
-| 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
-| 17 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below; the business task goes straight into the input (“Describe your business task”) → “Get Early Access” opens the platform with it. At the foot: Created by with the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support@neuronium.ai, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
+| 15 | Cases | Articles on how work runs with Neuronium: a lead story and two beside it, each with a living cover (Knowledge Management; the AI Superagent from calls to tasks; from leads to booked demos). Until an article is out its card says “Soon”; the articles are listed in `src/data/cases.ts`. |
+| 16 | Pricing | **Standard** $59 / month, bring your own Provider Key — AI Superagent, AI Management, your AI costs · **Solo** $190 / month, for a solo builder — AI Superagent, AI Management, 1 000 AI Work Hours · **Business** $890 / month, up to 10 people — AI Superagent, AI Management, 10 000 AI Work Hours; each with “Start Free Trial” · **Scale**, Contact us, more than 10 people — AI Superagent, AI Management, custom AI Work Hours; “Contact sales”. Every button is white. |
+| 17 | FAQ | Questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
+| 18 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below, then just the input bar (“Describe your business task”): sending it opens the platform with the task. At the foot: the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
 
 | Department | Headline | Interface pieces |
 |---|---|---|
@@ -187,8 +224,10 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for wh
   piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
   (Northwind Studio, Brightline) are fictional samples.
 - **Pricing** (`src/data/pricing.ts`): Standard $59, Solo $190 and Business $890 per month, each with a free
-  trial; Enterprise is priced with sales. Sign-up happens on the platform: “Start Free Trial” leads to
-  platform.neuronium.ai, and “Contact sales” writes to support@neuronium.ai.
+  trial; Scale (more than 10 people) is priced with sales. Sign-up happens on the platform: “Start Free Trial” leads to
+  platform.neuronium.ai, and “Contact sales” opens the “Write to us” widget.
+- **Cases** (`src/data/cases.ts`): the articles are being written. Their titles and covers are on the site; each
+  card says “Soon” and links nowhere until its article has an `href`. No customer stories are invented.
 - No invented customers, testimonials or metrics. The tools in the context brain are examples of what can be
   connected.
 
@@ -203,23 +242,27 @@ src/
     ProgressBar/                  bottom violet→orange progress rule
     Nav/                          transparent top menu: Nr logo, sections, Departments dropdown, phone sheet
     Kit/                          interface-piece kit: Panel, Hot (lit section), Sym (mini element), Type, charts
-    Prompt/                       the bar a question or a command is typed into and sent
+    Prompt/                       the one input bar: its demo (useDemo), “Try it yourself”, the visitor's own text
+    Contact/                      “Write to us”, the widget in the bottom-right corner
+    Brand/                        brand marks for the social links (Simple Icons, CC0)
     Element/                      element tile and department colours
     Chrome/                       Nr mark (used as Neuronium's avatar in the FAQ)
   slides/
-    Hero/ Context/ Employees/ Custom/ Pricing/ Faq/ Final/
+    Hero/ Context/ Employees/ Custom/ Cases/ Pricing/ Faq/ Final/
+      Cases/Covers.tsx            the living covers of the case articles (SVG)
       Context/Brain.tsx           the brain of tools, the commands and the Superagent's way for each (SVG + rAF)
     Department/                   one template for all ten departments
       panels/                     the interfaces of each department; management.tsx is one turning scene
   data/
     departments.ts                10 departments × 10 AI employees: symbols, descriptions, headlines, availability
     architecture.ts               OS, AI Governance, AI Agents · AI Workflows · AI Skills
-    pricing.ts, faq.ts            plans and questions
+    pricing.ts, faq.ts, cases.ts  plans, questions and case articles
     slides.ts                     block order, menu groups and light composition per block
     release.ts                    what is open on the site right now (staged release)
     ready.ts                      the open AI employees, for the FAQ
-  config/links.ts                 CTA destinations and the idea endpoint
-scripts/                          validate-data, validate-browser, simulate-user
+  config/links.ts                 where the buttons and bars lead, the social links, the contact endpoint
+api/contact.js                    the widget's messages → support@neuronium.ai (Vercel Function, Resend)
+scripts/                          validate-data, validate-api, validate-browser, simulate-user
 ```
 
 ## Design notes

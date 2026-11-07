@@ -127,49 +127,35 @@
   margin-bottom: clamp(22px, 4vh, 40px);
 }
 
+/* every plan's button is white, the highlighted plan's too: one clear action per card */
 .pr-plan__cta {
   width: 100%;
   height: 50px;
   margin-top: auto;
   gap: 10px;
   padding: 0 18px;
-  border: 1px solid rgb(255 255 255 / 0.14);
-  background: rgb(255 255 255 / 0.06);
-  color: var(--fg);
+  border: 0;
+  background: var(--fg);
+  color: var(--bg);
+  cursor: pointer;
   transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
+    box-shadow 0.3s ease,
     transform 0.2s ease;
 }
 
 .pr-plan__cta svg {
   flex-shrink: 0;
-  color: #c084fc;
 }
 
 .pr-plan__cta:hover {
-  border-color: rgb(255 255 255 / 0.28);
-  background: rgb(255 255 255 / 0.1);
-}
-
-/* the highlighted plan: a gradient button. The gradient spans the border box and does not repeat,
-   so no sliver of its other end shows through the transparent border at the edges. */
-.pr-plan.is-featured .pr-plan__cta {
-  border-color: transparent;
-  background: var(--grad) border-box no-repeat;
-  color: #fff;
-  box-shadow: 0 18px 44px -18px rgb(214 60 245 / 0.85);
-}
-
-.pr-plan.is-featured .pr-plan__cta svg {
-  color: #fff;
-}
-
-.pr-plan.is-featured .pr-plan__cta:hover {
   box-shadow:
-    -14px 12px 44px -14px rgb(139 85 246 / 0.9),
-    14px 12px 44px -14px rgb(249 137 75 / 0.85);
+    -14px 12px 44px -16px rgb(139 85 246 / 0.85),
+    14px 12px 44px -16px rgb(249 137 75 / 0.8);
+}
+
+.pr-plan__cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 
 /* four narrow columns: the buttons' words get tighter */

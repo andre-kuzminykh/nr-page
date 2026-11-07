@@ -85,7 +85,7 @@ export function useSlideController(count: number, initial: number) {
     let lastInner = 0
     let gesture = { consumed: false, acc: 0, inner: false }
 
-    const navOpen = () => document.documentElement.dataset.navOpen === 'true'
+    const navOpen = () => document.documentElement.dataset.navOpen === 'true' || document.documentElement.dataset.contactOpen === 'true'
 
     const onWheel = (e: WheelEvent) => {
       if (e.ctrlKey || navOpen()) return // pinch-zoom, or a menu is open

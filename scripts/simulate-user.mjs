@@ -37,6 +37,14 @@ const standIn = (ctx) =>
       ),
     ),
   )
+/** The widget's endpoint, stood in for: it answers `contactStatus` and keeps what was sent. */
+const contactSent = []
+let contactStatus = 200
+const contactStandIn = (ctx) =>
+  ctx.route('**/api/contact', (r) => {
+    contactSent.push(r.request().postDataJSON())
+    return r.fulfill({ status: contactStatus, contentType: 'application/json', body: '{}' })
+  })
 /** Clicks a way out, waits for the page it leads to, and comes back to the block. Returns where it landed. */
 async function leave(page, click, want, back) {
   let url = ''
@@ -105,6 +113,7 @@ const NAV_LABELS = [
   ['AI Employees', 'employees'],
   [OPEN_DEPTS.length === 1 ? OPEN_DEPTS[0].name : 'Departments', OPEN_DEPTS[0]?.id],
   ['Use cases', 'custom'],
+  ['Cases', 'cases'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
   ['Contacts', 'start'],
@@ -137,6 +146,7 @@ const waitFor = async (fn, ms = 4500) => {
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
   await standIn(ctx)
+  await contactStandIn(ctx)
   const page = await ctx.newPage()
   watch(page, 'desktop')
   await page.goto(BASE, { waitUntil: 'networkidle' })
@@ -149,15 +159,26 @@ const waitFor = async (fn, ms = 4500) => {
       line: spans.map((s) => s.textContent.trim()).join(' '),
       oneLine: Math.max(...tops) - Math.min(...tops) < 6,
       logo: document.querySelector('.nav__brand')?.textContent.trim(),
+      bar: !!document.querySelector('.hero__bar .prompt__input'),
     }
   })
   await step(
     page,
     'desktop',
     'Opens the site',
-    'NEURONIUM; “Run AI Business with AI Operating System.” on one line; logo is just “Nr”',
-    hero.word === 'NEURONIUM' && hero.line === 'Run AI Business with AI Operating System.' && hero.oneLine && hero.logo === 'Nr',
+    'NEURONIUM; “Run AI Business with AI Operating System” on one line, the input bar under it; logo is just “Nr”',
+    hero.word === 'NEURONIUM' && hero.line === 'Run AI Business with AI Operating System' && hero.oneLine && hero.logo === 'Nr' && hero.bar,
   )
+  {
+    // the bar types its examples, then invites the visitor; their task goes to the platform
+    const invited = await page.waitForSelector('.slide[data-state="active"] .hero__bar .prompt.is-try', { timeout: 25000 }).then(() => true).catch(() => false)
+    await step(page, 'desktop', 'Watches the bar on the first block', 'Example tasks type themselves, then “Try it yourself”', invited)
+    await page.locator('.slide[data-state="active"] .hero__bar .prompt__input').click()
+    await page.keyboard.type('Open a second coffee shop')
+    const out = await leave(page, () => page.keyboard.press('Enter'), PLATFORM, 'hero')
+    await step(page, 'desktop', 'Writes a task there and presses Enter', 'The platform opens with it (?task=…)', out.url.includes('task=Open%20a%20second%20coffee%20shop'), out.url.slice(0, 80))
+    await out.back()
+  }
 
   for (let i = 1; i < SLIDES.length; i++) {
     await flick(page, 1)
@@ -389,6 +410,13 @@ const waitFor = async (fn, ms = 4500) => {
     await step(page, 'desktop', 'Picks the “Investor Update” example', 'Element 102 is drawn as a node graph — system, LLM and a human approval — with data running through it', uc.n === '102' && uc.nodes === 7 && uc.human === 1 && uc.llm >= 2, JSON.stringify(uc))
   }
 
+  if (has('cases')) {
+    await page.locator('.nav__item', { hasText: 'Cases' }).click()
+    await sleep(1400)
+    const cards = await page.$$eval('.slide[data-state="active"] .cs-card', (els) => els.map((c) => `${c.querySelector('.cs-title')?.textContent.trim()} · ${c.querySelector('.cs-soon, .cs-read')?.textContent.trim()}`))
+    await step(page, 'desktop', 'Opens Cases from the menu', 'Three articles with living covers; the ones not out yet say “Soon”', (await idx(page)) === at('cases') && cards.length === 3 && cards.every((c) => /· (Soon|Read)$/.test(c)), cards.join(' | '))
+  }
+
   if (has('pricing')) {
     // Pricing
     await page.locator('.nav__item', { hasText: 'Pricing' }).click()
@@ -399,14 +427,15 @@ const waitFor = async (fn, ms = 4500) => {
         price: x.querySelector('.pr-plan__price')?.textContent.replace(/\s+/g, ' ').trim(),
         cta: x.querySelector('.pr-plan__cta')?.textContent.trim(),
         href: x.querySelector('.pr-plan__cta')?.getAttribute('href') ?? '',
+        tag: x.querySelector('.pr-plan__cta')?.tagName,
       })),
     )
     await step(
       page,
       'desktop',
       'Opens Pricing',
-      'Standard $59, Solo $190, Business $890 per month and Enterprise (Contact us), each with what it includes',
-      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Enterprise' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Contact us',
+      'Standard $59, Solo $190, Business $890 per month and Scale (Contact us), each with what it includes',
+      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Scale' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Contact us',
       plans.map((p) => `${p.name} ${p.price}`).join(' | '),
     )
     const trial = plans.filter((p) => p.cta === 'Start Free Trial')
@@ -415,10 +444,21 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Looks at the buttons',
-      '“Start Free Trial” on Standard, Solo and Business leads to the platform; “Contact sales” on Enterprise writes to support',
-      trial.length === 3 && sales.length === 1 && trial.every((p) => p.href === PLATFORM) && sales.every((p) => p.href.startsWith(`mailto:${SUPPORT}`)),
-      plans.map((p) => `${p.cta} → ${p.href.slice(0, 48)}`).join(' | '),
+      '“Start Free Trial” on Standard, Solo and Business leads to the platform; “Contact sales” on Scale is a button for writing to us',
+      trial.length === 3 && sales.length === 1 && trial.every((p) => p.href === PLATFORM) && sales.every((p) => p.tag === 'BUTTON'),
+      plans.map((p) => `${p.cta} → ${p.href.slice(0, 48) || p.tag}`).join(' | '),
     )
+    await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
+    await sleep(500)
+    const cw = await page.evaluate(() => ({ open: !!document.querySelector('.cw__card'), subject: document.querySelector('.cw__card input[name="subject"]')?.value }))
+    await step(page, 'desktop', 'Clicks “Contact sales” on Scale', 'The “Write to us” card opens in the corner, already about the Scale plan', cw.open && cw.subject === 'Scale plan', JSON.stringify(cw))
+    await page.locator('.cw__card input[name="email"]').fill('lena@example.com')
+    await page.locator('.cw__card textarea').fill('We are 25 people.')
+    await page.locator('.cw__card').getByRole('button', { name: 'Send' }).click()
+    const done = await page.waitForSelector('.cw__done', { timeout: 4000 }).then(() => page.locator('.cw__done p').innerText()).catch(() => '')
+    await step(page, 'desktop', 'Writes their email and a line, presses Send', '“Sent. We’ll reply to lena@example.com.” — and the message reached the endpoint', /lena@example\.com/.test(done) && contactSent.at(-1)?.subject === 'Scale plan', done)
+    await page.keyboard.press('Escape')
+    await sleep(300)
     const out = await leave(page, () => page.locator('.slide[data-state="active"] .pr-plan.is-featured .pr-plan__cta').click(), PLATFORM, 'pricing')
     await step(page, 'desktop', 'Clicks “Start Free Trial” on Business', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
     await out.back()
@@ -457,8 +497,8 @@ const waitFor = async (fn, ms = 4500) => {
     page,
     'desktop',
     'Clicks “Contacts” in the menu',
-    'The last block, “Run Your AI Business”; at its foot: Created by AIT, LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support, Terms of Use, Privacy Policy',
-    (await idx(page)) === at('start') && /Created by/i.test(foot.by) && foot.logo && foot.social.join('|') === 'LinkedIn|X|Instagram|TikTok|YouTube|GitHub — open source' && foot.legal.join('|') === `${SUPPORT}|Terms of Use|Privacy Policy`,
+    'The last block, “Run Your AI Business”, with just the input bar; at its foot: the AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy',
+    (await idx(page)) === at('start') && foot.by === '' && foot.logo && foot.social.join('|') === 'LinkedIn|X|Instagram|TikTok|YouTube|GitHub' && foot.legal.join('|') === 'Terms of Use|Privacy Policy',
     JSON.stringify(foot),
   )
   const task = 'A marketplace where AI agents negotiate freight for small logistics companies'
@@ -471,7 +511,7 @@ const waitFor = async (fn, ms = 4500) => {
   }
   {
     const out = await leave(page, () => page.locator('.nav__cta').click(), PLATFORM, 'start')
-    await step(page, 'desktop', 'Clicks “Get Early Access” in the top menu', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    await step(page, 'desktop', 'Clicks “Open Platform” in the top menu', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
     await out.back()
   }
   if (has('employees')) {
@@ -574,9 +614,18 @@ const waitFor = async (fn, ms = 4500) => {
   }
   await page.evaluate(() => (location.hash = '#start'))
   await sleep(1400)
-  await page.getByRole('textbox', { name: 'Your business task' }).tap()
+  const bar = page.locator('.slide[data-state="active"]').getByRole('textbox', { name: 'Your business task' })
+  await bar.tap()
   await page.keyboard.type('AI tutor for my language school')
-  await step(page, 'phone', 'Types a business task on the phone', 'Input and button are comfortably reachable', (await page.getByRole('textbox', { name: 'Your business task' }).inputValue()).length > 10)
+  await step(page, 'phone', 'Types a business task on the phone', 'Input and button are comfortably reachable', (await bar.inputValue()).length > 10)
+  await page.locator('.cw__launch').tap()
+  await sleep(500)
+  const card = await page.evaluate(() => {
+    const r = document.querySelector('.cw__card')?.getBoundingClientRect()
+    return r ? { left: Math.round(r.left), top: Math.round(r.top), right: Math.round(r.right), bottom: Math.round(r.bottom), vw: innerWidth, vh: innerHeight } : null
+  })
+  await step(page, 'phone', 'Taps the message button in the corner', 'The “Write to us” card opens above it, inside the screen', !!card && card.left >= 8 && card.right <= card.vw - 8 && card.top >= 60 && card.bottom <= card.vh, JSON.stringify(card))
+  await page.locator('.cw__x').tap()
   await ctx.close()
 }
 

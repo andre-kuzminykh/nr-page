@@ -33,53 +33,10 @@
   text-wrap: balance;
 }
 
-/* idea input */
-.fin__form {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* the same bar as everywhere: here it is the visitor's turn */
+.fin__bar {
   width: min(720px, 100%);
   margin-top: clamp(22px, 4vh, 40px);
-  padding: 8px 8px 8px 24px;
-  border-radius: 34px;
-  border: 1px solid rgb(255 255 255 / 0.22);
-  background: rgb(11 10 15 / 0.55);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.7);
-  transition: border-color 300ms, box-shadow 300ms;
-  text-align: left;
-}
-
-.fin__form:focus-within {
-  border-color: rgb(255 255 255 / 0.5);
-  box-shadow:
-    0 0 0 5px rgb(214 60 245 / 0.16),
-    0 30px 80px -30px rgb(0 0 0 / 0.7);
-}
-
-.fin__form textarea {
-  flex: 1;
-  min-width: 0;
-  height: 26px;
-  max-height: 120px;
-  padding: 0;
-  border: 0;
-  outline: none;
-  resize: none;
-  background: none;
-  font-size: 16px;
-  line-height: 26px;
-  color: var(--fg);
-}
-
-.fin__form textarea::placeholder {
-  color: rgb(255 255 255 / 0.55);
-}
-
-.fin__submit {
-  height: 50px;
-  flex-shrink: 0;
 }
 
 .fin__explore {
@@ -116,8 +73,7 @@
   justify-self: start;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  text-transform: uppercase;
+  padding: 4px 0;
 }
 
 .fin__by img {
@@ -149,14 +105,6 @@
 .fin__icon:hover,
 .fin__icon:focus-visible {
   background: rgb(255 255 255 / 0.07);
-}
-
-/* GitHub says what it is: the code is open */
-.fin__icon--oss {
-  padding: 0 13px 0 11px;
-  border-color: rgb(255 255 255 / 0.14);
-  white-space: nowrap;
-  text-transform: uppercase;
 }
 
 .fin__legal {
@@ -192,22 +140,6 @@
 }
 
 @media (max-width: 600px) {
-  .fin__form {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 14px;
-    border-radius: 22px;
-  }
-  .fin__form textarea {
-    flex: none;
-    height: 48px;
-    font-size: 15px;
-    line-height: 24px;
-  }
-  .fin__submit {
-    height: 48px;
-  }
   .fin__foot {
     gap: 8px;
     font-size: 9.5px;
@@ -223,8 +155,6 @@
     height: 32px;
   }
   .fin__legal {
-    gap: 4px 12px;
-    letter-spacing: 0.04em;
+    gap: 4px 14px;
   }
 }
-

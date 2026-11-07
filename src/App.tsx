@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
+import { ContactWidget } from './components/Contact/ContactWidget'
 import { LightField } from './components/LightField/LightField'
 import { TopNav } from './components/Nav/TopNav'
 import { ProgressBar } from './components/ProgressBar/ProgressBar'
@@ -14,6 +15,7 @@ import { EmployeesSlide } from './slides/Employees/EmployeesSlide'
 import { FaqSlide } from './slides/Faq/FaqSlide'
 import { FinalSlide } from './slides/Final/FinalSlide'
 import { HeroSlide } from './slides/Hero/HeroSlide'
+import { CasesSlide } from './slides/Cases/CasesSlide'
 import { PricingSlide } from './slides/Pricing/PricingSlide'
 
 const COMPONENTS: Record<string, ComponentType<SlideProps>> = {
@@ -21,6 +23,7 @@ const COMPONENTS: Record<string, ComponentType<SlideProps>> = {
   context: ContextSlide,
   employees: EmployeesSlide,
   custom: CustomSlide,
+  cases: CasesSlide,
   pricing: PricingSlide,
   faq: FaqSlide,
   start: FinalSlide,
@@ -143,6 +146,7 @@ export function App() {
         })}
       </main>
       <ProgressBar index={index} count={count} />
+      <ContactWidget />
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {`Slide ${index + 1} of ${count}: ${SLIDES[index].label}`}
       </p>

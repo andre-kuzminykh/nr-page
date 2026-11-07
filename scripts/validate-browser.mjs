@@ -27,6 +27,7 @@ const NAV = [
   ['AI Employees', 'employees'],
   [OPEN_DEPTS.length === 1 ? OPEN_DEPTS[0].name : 'Departments', OPEN_DEPTS[0]?.id],
   ['Use cases', 'custom'],
+  ['Cases', 'cases'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
   ['Contacts', 'start'],
@@ -44,6 +45,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
 const PLATFORM = process.env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
 const KM = process.env.VITE_KM_URL || 'https://management.neuronium.ai/km'
 const SUPPORT = 'support@neuronium.ai'
+const GITHUB = 'https://github.com/andre-kuzminykh'
 const OUT = path.resolve('validation')
 const SHOTS = path.join(OUT, 'screenshots')
 const VIEWPORTS = [
@@ -138,7 +140,17 @@ async function layoutPass(browser) {
           const truncated = [...(slide?.querySelectorAll('.pn__title') ?? [])]
             .filter((t) => t.checkVisibility({ opacityProperty: true, visibilityProperty: true }) && t.scrollWidth > t.clientWidth + 1)
             .map((t) => `title: ${t.textContent.trim()}`)
-          offenders.push(...clipped, ...truncated)
+          // the “Write to us” button in the corner never covers anything that can be clicked
+          const L = document.querySelector('.cw__launch')?.getBoundingClientRect()
+          const under = L
+            ? [...(slide?.querySelectorAll('a, button, input, textarea, [role="tab"]') ?? [])]
+                .filter((e) => {
+                  const r = e.getBoundingClientRect()
+                  return r.width && r.height && r.right > L.left && r.left < L.right && r.bottom > L.top && r.top < L.bottom
+                })
+                .map((e) => `under the widget: ${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}`)
+            : ['no widget']
+          offenders.push(...clipped, ...truncated, ...under)
           return {
             docOverflowX: document.documentElement.scrollWidth - vw,
             frameOverflowY: frame ? frame.scrollHeight - frame.clientHeight : 0,
@@ -154,7 +166,7 @@ async function layoutPass(browser) {
       const rows = results.layout.filter((r) => r.viewport === `${w}x${h}` && r.theme === theme)
       const bad = rows.filter((r) => !r.reached || r.docOverflowX > 0 || r.offenders.length || r.progress !== r.slide)
       const scrolls = rows.filter((r) => r.frameOverflowY > 2).map((r) => r.slide)
-      check(`Layout ${label}: ${SLIDES.length} blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX })) ) : scrolls.length ? `inner scroll used on slide(s) ${scrolls.join(', ')}` : 'all slides fit without inner scroll')
+      check(`Layout ${label}: ${SLIDES.length} blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, nothing under the widget, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX })) ) : scrolls.length ? `inner scroll used on slide(s) ${scrolls.join(', ')}` : 'all slides fit without inner scroll')
     }
   }
 }
@@ -218,8 +230,10 @@ async function functionalPass(browser) {
     word: document.querySelector('.hero__word')?.getAttribute('aria-label'),
     letters: [...document.querySelectorAll('.hero__ch')].map((c) => c.textContent).join(''),
     line: [...document.querySelectorAll('.hero__line > span')].map((s) => s.textContent.trim()).join(' '),
+    bar: !!document.querySelector('.hero__bar form.prompt .prompt__input'),
+    label: document.querySelector('.hero__bar label')?.textContent.trim(),
   }))
-  check('Hero: NEURONIUM, then “Run AI Business with AI Operating System.”', hero.word === 'Neuronium' && hero.letters === 'NEURONIUM' && hero.line === 'Run AI Business with AI Operating System.', hero.line)
+  check('Hero: NEURONIUM, then “Run AI Business with AI Operating System” (no full stop) and the input bar under it', hero.word === 'Neuronium' && hero.letters === 'NEURONIUM' && hero.line === 'Run AI Business with AI Operating System' && hero.bar && hero.label === 'Your business task', hero.line)
   const clipped = await page.evaluate(() =>
     [...document.querySelectorAll('.hero__slot')].some((s) => getComputedStyle(s).overflow === 'hidden'),
   )
@@ -247,12 +261,13 @@ async function functionalPass(browser) {
     items: [...document.querySelectorAll('.nav__menu .nav__item')].map((b) => b.textContent.trim()),
     cta: document.querySelector('.nav__cta')?.textContent.trim(),
     ctaHref: document.querySelector('.nav__cta')?.getAttribute('href'),
+    oss: [document.querySelector('.nav__oss')?.textContent.trim(), document.querySelector('.nav__oss')?.getAttribute('href'), document.querySelector('.nav__oss')?.nextElementSibling?.classList.contains('nav__cta')],
     bg: getComputedStyle(document.querySelector('.nav')).backgroundColor,
     counter: !!document.querySelector('.topbar__counter, .slide-index, .theme-switch'),
   }))
   check(
-    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), Get Early Access to the platform`,
-    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && /Get Early Access/.test(nav.cta) && nav.ctaHref === PLATFORM && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
+    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), “Open source” (GitHub) next to “Open Platform”`,
+    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && nav.cta === 'Open Platform' && nav.ctaHref === PLATFORM && nav.oss[0] === 'Open source' && nav.oss[1] === GITHUB && nav.oss[2] && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
     JSON.stringify(nav),
   )
   if (OPEN_DEPTS.length > 1) {
@@ -634,6 +649,9 @@ async function functionalPass(browser) {
           line: x.querySelector('.pr-plan__line')?.textContent.trim(),
           cta: x.querySelector('.pr-plan__cta')?.textContent.trim(),
           href: x.querySelector('.pr-plan__cta')?.getAttribute('href') ?? '',
+          tag: x.querySelector('.pr-plan__cta')?.tagName,
+          bg: getComputedStyle(x.querySelector('.pr-plan__cta')).backgroundColor,
+          bgImage: getComputedStyle(x.querySelector('.pr-plan__cta')).backgroundImage,
           includes: [...x.querySelectorAll('.pr-plan__list li')].map((li) => li.textContent.replace(/\s+/g, ' ').trim()).join('|'),
           extra: x.querySelectorAll('.pr-grid, .pr-plan__tag, .pr-plan__note').length,
         })),
@@ -645,18 +663,30 @@ async function functionalPass(browser) {
       ['Standard', '$ 59 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Your AI Costs'],
       ['Solo', '$ 190 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|1 000 AI Work Hours'],
       ['Business', '$ 890 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|10 000 AI Work Hours'],
-      ['Enterprise', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Custom AI Work Hours'],
+      ['Scale', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Custom AI Work Hours'],
     ]
     const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c, inc], k) => {
       const x = pr.plans[k]
       // the spaces around the price are margins, not text
-      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && (c === 'Start Free Trial' ? x.href === PLATFORM : x.href.startsWith(`mailto:${SUPPORT}`)) && x.includes === inc && x.extra === 0
+      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && (c === 'Start Free Trial' ? x.href === PLATFORM : x.tag === 'BUTTON') && x.includes === inc && x.extra === 0
     })
+    // every button is white — the highlighted plan's too
+    const white = pr.plans.every((x) => x.bg === pr.plans[0].bg && x.bgImage === 'none' && x.bg.match(/\d+/g).slice(0, 3).every((c) => Number(c) > 235))
     check(
-      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial (to the platform), Enterprise “Contact us” with Contact sales (to support) — a name, a price, one line, what it includes and a button, no other copy',
-      asWanted && pr.title === 'Pricing' && pr.copy === 0,
-      pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta} → ${x.href.slice(0, 40)}`).join(' | '),
+      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial (to the platform), Scale “Contact us” with Contact sales — a name, a price, one line, what it includes and a button, no other copy; every button white',
+      asWanted && white && pr.title === 'Pricing' && pr.copy === 0,
+      pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta} → ${x.href.slice(0, 40) || x.tag} · ${x.bg}`).join(' | '),
     )
+    await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
+    await sleep(500)
+    const sales = await page.evaluate(() => ({
+      open: !!document.querySelector('.cw__card[role="dialog"]'),
+      subject: document.querySelector('.cw__card input[name="subject"]')?.value,
+      focus: document.activeElement?.getAttribute('name'),
+    }))
+    await page.keyboard.press('Escape')
+    await sleep(300)
+    check('Pricing: “Contact sales” on Scale opens the “Write to us” widget, about the Scale plan, with the caret in the email field', sales.open && sales.subject === 'Scale plan' && sales.focus === 'email' && (await page.locator('.cw__card').count()) === 0, JSON.stringify(sales))
   }
 
   // FAQ
@@ -692,7 +722,9 @@ async function functionalPass(browser) {
     centerMark: !!document.querySelector('.fin .brand-mark'),
     sub: document.querySelector('.fin__sub')?.textContent.trim(),
     status: document.querySelectorAll('#fin-status, .fin__status').length,
-    placeholder: document.querySelector('#fin-idea')?.getAttribute('placeholder'),
+    placeholder: document.querySelector('.fin__bar .prompt__input')?.getAttribute('placeholder'),
+    early: /Get Early Access/i.test(document.querySelector('.slide[data-state="active"]').innerText),
+    same: !!document.querySelector('.fin__bar form.prompt .prompt__go'),
   }))
   const hand = await ctx.newPage()
   const landed = []
@@ -703,7 +735,7 @@ async function functionalPass(browser) {
   await hand.goto(`${BASE}#start`)
   await hand.waitForTimeout(1600)
   const handActive = hand.locator('.slide[data-state="active"]')
-  await Promise.all([hand.waitForURL((u) => u.href.startsWith(PLATFORM), { timeout: 5000 }), handActive.getByRole('button', { name: /Get Early Access/ }).click()])
+  await Promise.all([hand.waitForURL((u) => u.href.startsWith(PLATFORM), { timeout: 5000 }), handActive.getByRole('button', { name: 'Send' }).click()])
   await hand.goto(`${BASE}#start`)
   await hand.waitForTimeout(1600)
   const task = 'An AI concierge for boutique hotels'
@@ -712,8 +744,8 @@ async function functionalPass(browser) {
   await hand.close()
   const withTask = landed.find((u) => new URL(u).searchParams.get('task') === task)
   check(
-    'Final: “Run Your AI Business”, “with Neuronium” smaller below, “Describe your business task”; Get Early Access opens the platform, and a written task is carried over to it (?task=)',
-    fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.status === 0 && fin.placeholder === 'Describe your business task' && landed[0] === PLATFORM && !!withTask,
+    'Final: “Run Your AI Business”, “with Neuronium” smaller below, then just the input bar (“Describe your business task”, no Get Early Access); sending opens the platform, with the written task carried over (?task=)',
+    fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.status === 0 && fin.placeholder === 'Describe your business task' && fin.same && !fin.early && landed[0] === PLATFORM && !!withTask,
     landed.join(' · '),
   )
   // Contacts: the menu's last item leads to the final block; its foot holds who made it, the socials, support and the legal pages
@@ -729,10 +761,11 @@ async function functionalPass(browser) {
       last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
       title: s.querySelector('.fin__title')?.textContent.trim(),
       by: foot?.querySelector('.fin__by')?.textContent.trim(),
+      text: foot?.innerText ?? '',
+      mail: foot?.querySelectorAll('a[href^="mailto:"]').length ?? -1,
       byHref: foot?.querySelector('.fin__by')?.getAttribute('href'),
       logo: logo ? { loaded: logo.complete && logo.naturalWidth > 0, h: Math.round(logo.getBoundingClientRect().height) } : null,
       social: [...(foot?.querySelectorAll('.fin__social a') ?? [])].map((x) => [x.getAttribute('aria-label'), x.getAttribute('href'), !!x.querySelector('svg path')]),
-      oss: foot?.querySelector('.fin__icon--oss')?.textContent.trim(),
       legal: [...(foot?.querySelectorAll('.fin__legal a') ?? [])].map((x) => [x.textContent.trim(), x.getAttribute('href')]),
       newTab: a.filter((x) => /^https?:/.test(x.getAttribute('href'))).every((x) => x.target === '_blank' && /noreferrer/.test(x.rel)),
       active: document.querySelector('.nav__item.is-active')?.textContent.trim(),
@@ -745,18 +778,17 @@ async function functionalPass(browser) {
     ['Instagram', /instagram\.com\//],
     ['TikTok', /tiktok\.com\/@/],
     ['YouTube', /youtube\.com\/@/],
-    ['GitHub — open source', /^https:\/\/github\.com\/[^/]+$/],
+    ['GitHub', /^https:\/\/github\.com\/[^/]+$/],
   ]
   const legalWant = [
-    [SUPPORT, `mailto:${SUPPORT}`],
     ['Terms of Use', /^https:\/\/.+\/terms\/?$/],
     ['Privacy Policy', /^https:\/\/.+\/privacy\/?$/],
   ]
   check(
-    'Contacts: last in the menu, after FAQ — it opens the final block, whose foot has “Created by” with the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support@neuronium.ai, Terms of Use and Privacy Policy',
+    'Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget)',
     NAV.at(-1)[0] === 'Contacts' && ct.last && ct.title === 'Run Your AI Business' && ct.active === 'Contacts' && ct.blocks === SLIDES.length &&
-      /Created by/i.test(ct.by) && /andre\.technology/.test(ct.byHref) && ct.logo?.loaded && ct.logo.h >= 14 &&
-      ct.social.length === socialWant.length && socialWant.every(([l, re], k) => ct.social[k][0] === l && re.test(ct.social[k][1]) && ct.social[k][2]) && /open source/i.test(ct.oss) &&
+      ct.by === '' && !/Created by/i.test(ct.text) && ct.mail === 0 && /andre\.technology/.test(ct.byHref) && ct.logo?.loaded && ct.logo.h >= 14 &&
+      ct.social.length === socialWant.length && socialWant.every(([l, re], k) => ct.social[k][0] === l && re.test(ct.social[k][1]) && ct.social[k][2]) &&
       ct.legal.length === legalWant.length && legalWant.every(([l, h], k) => ct.legal[k][0] === l && (typeof h === 'string' ? ct.legal[k][1] === h : h.test(ct.legal[k][1]))) &&
       ct.newTab,
     JSON.stringify({ by: ct.by, logo: ct.logo, social: ct.social.map((x) => x[1]), legal: ct.legal.map((x) => x[1]) }),
@@ -780,6 +812,104 @@ async function functionalPass(browser) {
     outs.platform?.text === 'Open Platform' && outs.platform.href === PLATFORM && outs.platform.seen && (outs.km === undefined || (outs.km?.text === 'Open Knowledge Management' && outs.km.href === KM && outs.km.seen)),
     JSON.stringify(outs),
   )
+  // Cases: the articles, each card honest about whether it is out yet
+  if (has('cases')) {
+    await go('cases')
+    await sleep(600)
+    const cs = await page.evaluate(() => {
+      const s = document.querySelector('.slide[data-state="active"]')
+      const cards = [...s.querySelectorAll('.cs-card')]
+      return {
+        title: s.querySelector('.cs__title')?.textContent.trim(),
+        cards: cards.map((c) => ({
+          kind: c.querySelector('.cs-kind')?.textContent.trim(),
+          title: c.querySelector('.cs-title')?.textContent.trim(),
+          state: c.querySelector('.cs-soon, .cs-read')?.textContent.trim(),
+          link: c.tagName === 'A' ? c.getAttribute('href') : null,
+          cover: c.querySelectorAll('.cs-cover svg *').length,
+        })),
+        moving: [...s.querySelectorAll('.csv-flow')].some((e) => getComputedStyle(e).animationName === 'csv-flow'),
+        lead: cards[0]?.classList.contains('cs-card--lead'),
+      }
+    })
+    check(
+      'Cases: after Management in the menu, three articles — a lead story and two beside it, each with a living cover; until an article is out its card says “Soon” and links nowhere',
+      cs.title === 'Cases' && cs.cards.length === 3 && cs.lead && cs.moving && cs.cards.every((c) => c.kind && c.title && c.cover > 8 && (c.link ? c.state === 'Read' : c.state === 'Soon')) && NAV.findIndex(([, id]) => id === 'cases') === NAV.findIndex(([, id]) => id === 'pricing') - 1,
+      cs.cards.map((c) => `${c.title} (${c.state})`).join(' · '),
+    )
+  }
+
+  // The bar on every block: it shows what it does, then “Try it yourself”; the visitor can take it at any moment
+  await go('hero')
+  const tryHero = await page.waitForSelector('.slide[data-state="active"] .hero__bar .prompt.is-try', { timeout: 25000 }).then(() => true).catch(() => false)
+  const invite = await page.evaluate(() => document.querySelector('.slide[data-state="active"] .prompt__try')?.textContent.trim())
+  await go('context')
+  await sleep(2600)
+  await page.locator('.slide[data-state="active"] .prompt__input').click()
+  await sleep(2500)
+  const taken = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    return {
+      own: s.querySelector('.prompt')?.classList.contains('is-own'),
+      demo: s.querySelectorAll('.prompt__q').length,
+      way: s.querySelectorAll('.cb line[display="inline"]').length,
+      placeholder: s.querySelector('.prompt__input')?.getAttribute('placeholder'),
+    }
+  })
+  await page.keyboard.press('Tab')
+  await sleep(200)
+  check(
+    'Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task',
+    tryHero && invite === 'Try it yourself' && taken.own && taken.demo === 0 && taken.way === 0 && taken.placeholder === 'Give the AI Superagent a task',
+    JSON.stringify({ tryHero, invite, taken }),
+  )
+
+  // Write to us: the widget in the corner
+  {
+    const wp = await ctx.newPage()
+    const posted = []
+    let status = 200
+    await wp.route('**/api/contact', (r) => {
+      posted.push(r.request().postDataJSON())
+      return r.fulfill({ status, contentType: 'application/json', body: '{}' })
+    })
+    await wp.goto(`${BASE}#faq`)
+    await wp.waitForTimeout(1500)
+    const on = (await wp.locator('.cw__launch').count()) === 1
+    await wp.locator('.cw__launch').click()
+    await wp.waitForTimeout(400)
+    const opened = await wp.evaluate(() => ({ dialog: !!document.querySelector('.cw__card[role="dialog"]'), title: document.querySelector('.cw__title')?.textContent.trim(), sub: document.querySelector('.cw__sub')?.textContent.trim(), fields: [...document.querySelectorAll('.cw__field > span')].map((x) => x.textContent.trim()).join('|'), focus: document.activeElement?.getAttribute('name') }))
+    await wp.getByRole('button', { name: 'Send' }).click()
+    const noEmail = await wp.locator('.cw__status').innerText()
+    const before = await activeIndex(wp)
+    await wp.mouse.move(500, 300)
+    await wp.mouse.wheel(0, 700)
+    await wp.waitForTimeout(1200)
+    const stayed = (await activeIndex(wp)) === before
+    await wp.locator('.cw__card input[name="email"]').fill('anna@example.com')
+    await wp.locator('.cw__card input[name="subject"]').fill('A question about Solo')
+    await wp.locator('.cw__card textarea').fill('Can I switch plans later?')
+    await wp.getByRole('button', { name: 'Send' }).click()
+    const sent = await wp.waitForSelector('.cw__done', { timeout: 4000 }).then(() => wp.locator('.cw__done p').innerText()).catch(() => '')
+    status = 503
+    await wp.getByRole('button', { name: 'Write another' }).click()
+    await wp.locator('.cw__card input[name="subject"]').fill('Hello')
+    await wp.getByRole('button', { name: 'Send' }).click()
+    await wp.waitForTimeout(600)
+    const failed = { text: await wp.locator('.cw__status').innerText(), href: await wp.locator('.cw__status a').getAttribute('href').catch(() => null) }
+    await wp.keyboard.press('Escape')
+    await wp.waitForTimeout(300)
+    const closed = (await wp.locator('.cw__card').count()) === 0 && (await wp.evaluate(() => document.activeElement?.classList.contains('cw__launch')))
+    await wp.close()
+    check(
+      'Write to us: a button in the bottom-right corner opens a card (email, subject, optional message; “We reply by email”); it asks for what is missing, holds the block still, sends to /api/contact, says where the reply goes — and offers a plain email if sending fails; Escape closes it',
+      on && opened.dialog && opened.title === 'Write to us' && opened.sub === 'We reply by email.' && opened.fields === 'Your email|Subject|Message optional' && opened.focus === 'email' &&
+        /email/i.test(noEmail) && stayed && posted[0]?.email === 'anna@example.com' && posted[0]?.subject === 'A question about Solo' && posted[0]?.message === 'Can I switch plans later?' &&
+        /anna@example\.com/.test(sent) && /support@neuronium\.ai/.test(failed.text) && failed.href?.startsWith(`mailto:${SUPPORT}?subject=Hello`) && closed,
+      JSON.stringify({ opened, noEmail, stayed, sent, failed: failed.text.slice(0, 50), posted: posted.length }),
+    )
+  }
+
   await go('start')
   const active = page.locator('.slide[data-state="active"]')
   const deep = has('employees') ? 'employees' : OPEN_DEPTS[0]?.id ?? 'context'
