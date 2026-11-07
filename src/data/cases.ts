@@ -1,40 +1,20 @@
 /**
- * Articles for the Cases block. They are being written: until an article has an `href`, its card
- * says “Soon” and leads nowhere. Add the link (and a date) when it is published.
+ * The cases on the Cases block: a picture and a title each. A case opens once it has an `href`;
+ * until then its card shows “Soon” when it is reached. `image` replaces the drawn picture with a
+ * real one (put it in public/cases/ and give its path, e.g. '/cases/knowledge.jpg').
  */
-export interface CaseArticle {
+export interface CaseStudy {
   id: string
-  /** what the article is about: an AI employee or the AI Superagent */
-  kind: string
   title: string
-  /** the tools the work runs through */
-  tools: string[]
-  /** the cover drawing */
-  cover: 'knowledge' | 'calls' | 'leads'
+  /** the drawn picture: its motif and its colour (the row runs violet → pink → orange) */
+  art: 'knowledge' | 'calls' | 'leads'
+  tone: 'violet' | 'pink' | 'orange'
+  image?: string
   href?: string
-  date?: string
 }
 
-export const CASES: CaseArticle[] = [
-  {
-    id: 'knowledge',
-    kind: 'Knowledge Management',
-    title: 'One question, the whole business context',
-    tools: ['Drive', 'Meet', 'Docs'],
-    cover: 'knowledge',
-  },
-  {
-    id: 'calls',
-    kind: 'AI Superagent',
-    title: 'From today’s calls to the team’s tasks',
-    tools: ['Meet', 'Docs', 'Slack', 'Telegram'],
-    cover: 'calls',
-  },
-  {
-    id: 'leads',
-    kind: 'AI Superagent',
-    title: 'New leads to booked demos',
-    tools: ['Apollo', 'Sheets', 'Gmail', 'Calendar'],
-    cover: 'leads',
-  },
+export const CASES: CaseStudy[] = [
+  { id: 'knowledge', title: 'One question, the whole business context', art: 'knowledge', tone: 'violet' },
+  { id: 'calls', title: 'From today’s calls to the team’s tasks', art: 'calls', tone: 'pink' },
+  { id: 'leads', title: 'New leads to booked demos', art: 'leads', tone: 'orange' },
 ]

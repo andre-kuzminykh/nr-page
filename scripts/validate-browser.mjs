@@ -143,7 +143,7 @@ async function layoutPass(browser) {
           // the “Write to us” button in the corner never covers anything that can be clicked
           const L = document.querySelector('.cw__launch')?.getBoundingClientRect()
           const under = L
-            ? [...(slide?.querySelectorAll('a, button, input, textarea, [role="tab"]') ?? [])]
+            ? [...(slide?.querySelectorAll('a, button, input, textarea, [role="tab"], [tabindex="0"]') ?? [])]
                 .filter((e) => {
                   const r = e.getBoundingClientRect()
                   return r.width && r.height && r.right > L.left && r.left < L.right && r.bottom > L.top && r.top < L.bottom
@@ -812,30 +812,49 @@ async function functionalPass(browser) {
     outs.platform?.text === 'Open Platform' && outs.platform.href === PLATFORM && outs.platform.seen && (outs.km === undefined || (outs.km?.text === 'Open Knowledge Management' && outs.km.href === KM && outs.km.seen)),
     JSON.stringify(outs),
   )
-  // Cases: the articles, each card honest about whether it is out yet
+  // Cases: pictures and titles; one open wide at a time — pointing opens another, left alone they take turns
   if (has('cases')) {
     await go('cases')
-    await sleep(600)
+    await sleep(1600)
+    const state = () =>
+      page.evaluate(() => {
+        const cards = [...document.querySelectorAll('.slide[data-state="active"] .cs-card')]
+        return {
+          open: cards.findIndex((c) => c.classList.contains('is-open')),
+          widths: cards.map((c) => Math.round(c.getBoundingClientRect().width)),
+        }
+      })
     const cs = await page.evaluate(() => {
       const s = document.querySelector('.slide[data-state="active"]')
-      const cards = [...s.querySelectorAll('.cs-card')]
       return {
         title: s.querySelector('.cs__title')?.textContent.trim(),
-        cards: cards.map((c) => ({
-          kind: c.querySelector('.cs-kind')?.textContent.trim(),
+        cards: [...s.querySelectorAll('.cs-card')].map((c) => ({
           title: c.querySelector('.cs-title')?.textContent.trim(),
-          state: c.querySelector('.cs-soon, .cs-read')?.textContent.trim(),
+          n: c.querySelector('.cs-n')?.textContent.trim(),
+          picture: c.querySelectorAll('.cs-pic svg.ca *, .cs-pic img').length,
+          go: c.querySelector('.cs-go')?.textContent.trim(),
           link: c.tagName === 'A' ? c.getAttribute('href') : null,
-          cover: c.querySelectorAll('.cs-cover svg *').length,
+          extra: c.querySelectorAll('.cs-kind, .cs-tools, .cs-meta').length,
         })),
-        moving: [...s.querySelectorAll('.csv-flow')].some((e) => getComputedStyle(e).animationName === 'csv-flow'),
-        lead: cards[0]?.classList.contains('cs-card--lead'),
       }
     })
+    const s0 = await state()
+    const third = await page.locator('.slide[data-state="active"] .cs-card').nth(2).boundingBox()
+    await page.mouse.move(third.x + third.width / 2, third.y + third.height / 2)
+    await sleep(1500)
+    const s1 = await state()
+    await sleep(6000)
+    const s2 = await state()
+    await page.mouse.move(8, 450)
+    await sleep(7000)
+    const s3 = await state()
+    const wide = (st) => st.open >= 0 && st.widths.every((w, k) => k === st.open || st.widths[st.open] > 2 * w)
     check(
-      'Cases: after Management in the menu, three articles — a lead story and two beside it, each with a living cover; until an article is out its card says “Soon” and links nowhere',
-      cs.title === 'Cases' && cs.cards.length === 3 && cs.lead && cs.moving && cs.cards.every((c) => c.kind && c.title && c.cover > 8 && (c.link ? c.state === 'Read' : c.state === 'Soon')) && NAV.findIndex(([, id]) => id === 'cases') === NAV.findIndex(([, id]) => id === 'pricing') - 1,
-      cs.cards.map((c) => `${c.title} (${c.state})`).join(' · '),
+      'Cases: after Management in the menu, pictures with titles — one case open wide at a time; pointing opens another and holds it; left alone they take turns; a case with no article yet says “Soon” and links nowhere',
+      cs.title === 'Cases' && cs.cards.length >= 3 && cs.cards.every((c, k) => c.title && c.n === String(k + 1).padStart(2, '0') && c.picture > 5 && c.extra === 0 && (c.link ? c.go === '' : c.go === 'Soon')) &&
+        wide(s0) && s1.open === 2 && wide(s1) && s2.open === 2 && s3.open !== 2 &&
+        NAV.findIndex(([, id]) => id === 'cases') === NAV.findIndex(([, id]) => id === 'pricing') - 1,
+      `${cs.cards.map((c) => c.title).join(' · ')} · open ${s0.open} → pointed ${s1.open} → held ${s2.open} → turned ${s3.open}`,
     )
   }
 

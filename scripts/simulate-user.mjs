@@ -412,9 +412,20 @@ const waitFor = async (fn, ms = 4500) => {
 
   if (has('cases')) {
     await page.locator('.nav__item', { hasText: 'Cases' }).click()
-    await sleep(1400)
-    const cards = await page.$$eval('.slide[data-state="active"] .cs-card', (els) => els.map((c) => `${c.querySelector('.cs-title')?.textContent.trim()} · ${c.querySelector('.cs-soon, .cs-read')?.textContent.trim()}`))
-    await step(page, 'desktop', 'Opens Cases from the menu', 'Three articles with living covers; the ones not out yet say “Soon”', (await idx(page)) === at('cases') && cards.length === 3 && cards.every((c) => /· (Soon|Read)$/.test(c)), cards.join(' | '))
+    await sleep(1600)
+    const cards = await page.$$eval('.slide[data-state="active"] .cs-card', (els) => els.map((c) => c.querySelector('.cs-title')?.textContent.trim()))
+    await step(page, 'desktop', 'Opens Cases from the menu', 'Pictures with titles in a row; the first case is open wide', (await idx(page)) === at('cases') && cards.length >= 3 && cards.every(Boolean), cards.join(' | '))
+    const last = page.locator('.slide[data-state="active"] .cs-card').last()
+    await last.hover()
+    await sleep(1500)
+    const opened = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll('.slide[data-state="active"] .cs-card')]
+      const open = cards.findIndex((c) => c.classList.contains('is-open'))
+      const t = cards[open]?.querySelector('.cs-foot')
+      return { open, last: cards.length - 1, title: t && getComputedStyle(t).opacity === '1' ? t.querySelector('.cs-title')?.textContent.trim() : null }
+    })
+    await step(page, 'desktop', 'Points at the last case', 'It opens wide and shows its title', opened.open === opened.last && !!opened.title, JSON.stringify(opened))
+    await page.mouse.move(8, 450)
   }
 
   if (has('pricing')) {
