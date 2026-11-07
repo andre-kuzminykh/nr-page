@@ -415,9 +415,10 @@ const waitFor = async (fn, ms = 4500) => {
     await sleep(1600)
     const titles = await page.$$eval('.slide[data-state="active"] .cs-item:not([aria-hidden="true"]) .cs-title', (t) => t.map((e) => e.textContent.trim()))
     await step(page, 'desktop', 'Opens Cases from the menu', 'Two rows of pictures with titles flow by, one each way', (await idx(page)) === at('cases') && titles.length >= 3 && (await page.locator('.slide[data-state="active"] .cs-row').count()) === 2, titles.join(' | '))
-    const card = page.locator('.slide[data-state="active"] .cs-row').first().locator('.cs-item:not([aria-hidden="true"])').first()
-    await card.hover()
-    await sleep(500)
+    // the cards keep moving, so the visitor points at a spot on the row, not at a card
+    const row = await page.locator('.slide[data-state="active"] .cs-row').first().boundingBox()
+    await page.mouse.move(row.x + row.width / 2, row.y + row.height * 0.4)
+    await sleep(600)
     const look = await page.evaluate(() => {
       const row = document.querySelector('.slide[data-state="active"] .cs-row')
       return { held: getComputedStyle(row.querySelector('.cs-track')).animationPlayState, go: row.querySelector('.cs-item:hover .cs-go')?.textContent.trim() }
