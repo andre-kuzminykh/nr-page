@@ -181,13 +181,27 @@ async function functionalPass(browser) {
       const cs = getComputedStyle(el)
       if (!cs.backgroundImage.includes('gradient')) continue
       if (!['Top', 'Right', 'Bottom', 'Left'].some((k) => parseFloat(cs[`border${k}Width`]) > 0)) continue
-      const origin = cs.backgroundOrigin.split(',').map((x) => x.trim())
-      const clip = cs.backgroundClip.split(',').map((x) => x.trim())
-      const repeat = cs.backgroundRepeat.split(',').map((x) => x.trim())
-      origin.forEach((o, k) => {
-        const c = clip[k] ?? clip.at(-1)
-        const r = repeat[k] ?? repeat.at(-1)
-        if (o === 'padding-box' && c === 'border-box' && r !== 'no-repeat') bad.push(`${el.className || el.tagName} (layer ${k + 1})`)
+      // the image layers, split at the commas between them (not those inside a gradient)
+      const layers = []
+      let depth = 0
+      let cur = ''
+      for (const ch of cs.backgroundImage) {
+        if (ch === '(') depth++
+        if (ch === ')') depth--
+        if (ch === ',' && depth === 0) {
+          layers.push(cur.trim())
+          cur = ''
+        } else cur += ch
+      }
+      layers.push(cur.trim())
+      const at = (list, k) => {
+        const xs = list.split(',').map((x) => x.trim())
+        return xs[k % xs.length]
+      }
+      layers.forEach((img, k) => {
+        if (!img.includes('gradient')) return
+        if (at(cs.backgroundOrigin, k) === 'padding-box' && at(cs.backgroundClip, k) === 'border-box' && at(cs.backgroundRepeat, k) !== 'no-repeat')
+          bad.push(`${el.className || el.tagName} (layer ${k + 1})`)
       })
     }
     return bad
