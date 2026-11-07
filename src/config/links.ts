@@ -1,35 +1,40 @@
 /**
- * External destinations for calls to action.
+ * Where the calls to action and the links go.
  *
- * No sign-up backend exists in this project, so nothing is faked:
- * - "Get Early Access" links default to the contact address published on andre.technology.
- * - "Start Free Trial" and "Contact sales" on the plans open a pre-filled email unless
- *   VITE_TRIAL_URL / VITE_SALES_URL point to a real page.
- * - The idea form on the last slide opens a pre-filled email to that address, or — when
- *   VITE_IDEA_ENDPOINT is set at build time — POSTs { idea, source } as JSON to that endpoint.
+ * The landing lives on neuronium.ai; the product is on its own subdomains:
+ * - platform.neuronium.ai — the main call to action, the Platform block, every plan and the final block;
+ * - management.neuronium.ai/km — Knowledge Management.
+ * Each can be pointed elsewhere at build time (VITE_… variables, see .env.example).
  */
-export const CONTACT_EMAIL = 'admin@andre.technology'
+const env = import.meta.env
 
-export const EARLY_ACCESS_URL: string =
-  import.meta.env.VITE_EARLY_ACCESS_URL || `mailto:${CONTACT_EMAIL}?subject=Neuronium%20Early%20Access`
+export const PLATFORM_URL: string = env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
+export const KM_URL: string = env.VITE_KM_URL || 'https://management.neuronium.ai/km'
 
-/** “Start Free Trial” on a plan: VITE_TRIAL_URL (with ?plan=…) or a pre-filled email naming the plan. */
-const TRIAL_URL: string | undefined = import.meta.env.VITE_TRIAL_URL || undefined
-export const trialHref = (plan: string) =>
-  TRIAL_URL
-    ? `${TRIAL_URL}${TRIAL_URL.includes('?') ? '&' : '?'}plan=${encodeURIComponent(plan.toLowerCase())}`
-    : `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Neuronium — free trial: ${plan}`)}`
+export const SUPPORT_EMAIL = 'support@neuronium.ai'
 
-/** “Contact sales” for Enterprise: VITE_SALES_URL or an email to the team. */
+/** The final block: the business task travels to the platform as ?task=… */
+export const taskHref = (task: string) => {
+  const t = task.trim()
+  if (!t) return PLATFORM_URL
+  return `${PLATFORM_URL}${PLATFORM_URL.includes('?') ? '&' : '?'}task=${encodeURIComponent(t)}`
+}
+
+/** “Contact sales” on Enterprise. */
 export const SALES_URL: string =
-  import.meta.env.VITE_SALES_URL || `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Neuronium Enterprise')}`
+  env.VITE_SALES_URL || `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Neuronium Enterprise')}`
 
-export const IDEA_ENDPOINT: string | undefined = import.meta.env.VITE_IDEA_ENDPOINT || undefined
-
-export const ideaMailto = (idea: string) =>
-  `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Neuronium — early access: my business task')}&body=${encodeURIComponent(
-    `My business task:\n\n${idea}\n\n— sent from the Neuronium website`,
-  )}`
-
+/** Created by Andre AI Technologies; its terms and privacy policy cover the site. */
 export const COMPANY_URL = 'https://andre.technology/'
-export const MEDIA_LABEL_URL = 'https://dataist.ai/'
+export const TERMS_URL: string = env.VITE_TERMS_URL || 'https://andre.technology/terms/'
+export const PRIVACY_URL: string = env.VITE_PRIVACY_URL || 'https://andre.technology/privacy/'
+
+/** The same profiles as on andre.technology; GitHub is where the code is open. */
+export const SOCIAL: { brand: 'linkedin' | 'x' | 'instagram' | 'tiktok' | 'youtube' | 'github'; label: string; href: string }[] = [
+  { brand: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/andre-kuzminykh/' },
+  { brand: 'x', label: 'X', href: 'https://x.com/andre_dataist' },
+  { brand: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/andre_dataist' },
+  { brand: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@andre_dataist' },
+  { brand: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@andre_dataist' },
+  { brand: 'github', label: 'GitHub — open source', href: 'https://github.com/andre-kuzminykh' },
+]

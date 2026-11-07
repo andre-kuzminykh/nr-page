@@ -1,7 +1,7 @@
 import { Check, MessageCircle, Sparkles } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
-import { SALES_URL, trialHref } from '../../config/links'
+import { PLATFORM_URL, SALES_URL } from '../../config/links'
 import { PLANS } from '../../data/pricing'
 import './Pricing.css'
 
@@ -43,7 +43,7 @@ export function PricingSlide(_: SlideProps) {
                 ))}
               </ul>
             )}
-            <a className="btn pr-plan__cta" href={p.cta === 'trial' ? trialHref(p.name) : SALES_URL}>
+            <a className="btn pr-plan__cta" href={p.cta === 'trial' ? PLATFORM_URL : SALES_URL}>
               {p.cta === 'trial' ? (
                 <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
               ) : (

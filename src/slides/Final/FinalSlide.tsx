@@ -1,55 +1,26 @@
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
-import { useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { ArrowRight, ArrowUpRight, Mail } from 'lucide-react'
+import { useState, type CSSProperties, type FormEvent } from 'react'
+import aitLogo from '../../assets/ait-logo.png'
+import { BrandIcon } from '../../components/Brand/BrandIcon'
 import { isSlideOpen } from '../../data/slides'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
-import { COMPANY_URL, CONTACT_EMAIL, IDEA_ENDPOINT, MEDIA_LABEL_URL, ideaMailto } from '../../config/links'
+import { COMPANY_URL, PRIVACY_URL, SOCIAL, SUPPORT_EMAIL, TERMS_URL, taskHref } from '../../config/links'
 import './Final.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-type Status = 'idle' | 'short' | 'sending' | 'sent' | 'mail' | 'error'
+const ext = { target: '_blank', rel: 'noreferrer' } as const
 
-/** Final CTA — write the business task straight into the input. The light does the rest. */
+/**
+ * Final CTA — write the business task straight into the input and it opens the platform with it.
+ * “Contacts” in the menu leads here: the foot holds the company, the socials, support and the legal pages.
+ */
 export function FinalSlide(_: SlideProps) {
   const { goTo } = useDeck()
   const [idea, setIdea] = useState('')
-  const [status, setStatus] = useState<Status>('idle')
-  const input = useRef<HTMLTextAreaElement>(null)
 
-  const submit = async (e: FormEvent) => {
+  const submit = (e: FormEvent) => {
     e.preventDefault()
-    const text = idea.trim()
-    if (text.length < 3) {
-      setStatus('short')
-      input.current?.focus()
-      return
-    }
-    if (!IDEA_ENDPOINT) {
-      window.location.href = ideaMailto(text)
-      setStatus('mail')
-      return
-    }
-    setStatus('sending')
-    try {
-      const res = await fetch(IDEA_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idea: text, source: 'neuronium-landing' }),
-      })
-      if (!res.ok) throw new Error(String(res.status))
-      setStatus('sent')
-      setIdea('')
-    } catch {
-      setStatus('error')
-    }
-  }
-
-  const message: Record<Status, string> = {
-    idle: '',
-    short: 'Write a few words about your business task first.',
-    sending: 'Sending…',
-    sent: 'Thank you — your task has reached the Neuronium team.',
-    mail: `Your email app should open with your task. If it doesn’t, write to ${CONTACT_EMAIL}.`,
-    error: `Couldn’t send right now. Please write to ${CONTACT_EMAIL}.`,
+    window.location.assign(taskHref(idea))
   }
 
   return (
@@ -64,20 +35,18 @@ export function FinalSlide(_: SlideProps) {
           with Neuronium
         </p>
 
-        <form className={`fin__form rv fin__form--${status}`} style={d(480)} onSubmit={submit}>
+        <form className="fin__form rv" style={d(480)} onSubmit={submit}>
           <label htmlFor="fin-idea" className="sr-only">
             Your business task
           </label>
           <textarea
             id="fin-idea"
-            ref={input}
             rows={1}
             value={idea}
             maxLength={2000}
             placeholder="Describe your business task"
             onChange={(e) => {
               setIdea(e.target.value)
-              if (status !== 'idle' && status !== 'sending') setStatus('idle')
               const el = e.target
               el.style.height = ''
               if (el.scrollHeight > el.clientHeight) el.style.height = `${Math.min(el.scrollHeight, 120)}px`
@@ -88,16 +57,12 @@ export function FinalSlide(_: SlideProps) {
                 e.currentTarget.form?.requestSubmit()
               }
             }}
-            aria-describedby="fin-status"
           />
-          <button type="submit" className="btn btn--primary fin__submit" disabled={status === 'sending'}>
+          <button type="submit" className="btn btn--primary fin__submit">
             Get Early Access
             <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
           </button>
         </form>
-        <p id="fin-status" className={`fin__status rv rv--fade is-${status}`} style={d(560)} aria-live="polite">
-          {message[status]}
-        </p>
 
         {/* the table opens later; until then the link has nowhere to go */}
         {isSlideOpen('employees') && (
@@ -113,24 +78,41 @@ export function FinalSlide(_: SlideProps) {
         )}
       </div>
 
-
       <footer className="fin__foot rv rv--fade" style={d(800)}>
-        <span>Neuronium</span>
-        <span className="fin__sep" aria-hidden="true">·</span>
-        <span>
-          A{' '}
-          <a href={MEDIA_LABEL_URL} target="_blank" rel="noreferrer">
-            Dataist AI
-          </a>{' '}
-          label
-        </span>
-        <span className="fin__sep" aria-hidden="true">·</span>
-        <span>
-          Technology by{' '}
-          <a href={COMPANY_URL} target="_blank" rel="noreferrer">
-            Andre AI Technologies
+        <a className="fin__by" href={COMPANY_URL} {...ext}>
+          <span>Created by</span>
+          <img src={aitLogo} alt="Andre AI Technologies" width={186} height={96} />
+        </a>
+
+        <ul className="fin__social" aria-label="Neuronium elsewhere">
+          {SOCIAL.map((s) => (
+            <li key={s.brand}>
+              <a
+                className={`fin__icon ${s.brand === 'github' ? 'fin__icon--oss' : ''}`}
+                href={s.href}
+                aria-label={s.label}
+                title={s.label}
+                {...ext}
+              >
+                <BrandIcon brand={s.brand} size={s.brand === 'github' ? 16 : 17} />
+                {s.brand === 'github' && <span>Open source</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <nav className="fin__legal" aria-label="Support and legal">
+          <a href={`mailto:${SUPPORT_EMAIL}`}>
+            <Mail size={13} strokeWidth={1.8} aria-hidden="true" />
+            {SUPPORT_EMAIL}
           </a>
-        </span>
+          <a href={TERMS_URL} {...ext}>
+            Terms of Use
+          </a>
+          <a href={PRIVACY_URL} {...ext}>
+            Privacy Policy
+          </a>
+        </nav>
       </footer>
     </div>
   )

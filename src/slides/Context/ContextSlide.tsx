@@ -1,6 +1,8 @@
+import { ArrowUpRight } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Prompt } from '../../components/Prompt/Prompt'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
+import { PLATFORM_URL } from '../../config/links'
 import { Brain, COMMANDS } from './Brain'
 import './Context.css'
 
@@ -30,13 +32,19 @@ export function ContextSlide({ active, shown }: SlideProps) {
 
   return (
     <div className="slide__frame ctx">
-      <h2 className="h2 ctx__title">
-        {TITLE.map((line, k) => (
-          <span key={k} className="mask" style={d(40 + k * 80)}>
-            <span>{line}</span>
-          </span>
-        ))}
-      </h2>
+      <div className="ctx__head">
+        <h2 className="h2 ctx__title">
+          {TITLE.map((line, k) => (
+            <span key={k} className="mask" style={d(40 + k * 80)}>
+              <span>{line}</span>
+            </span>
+          ))}
+        </h2>
+        <a className="btn btn--primary ctx__cta rv" style={d(360)} href={PLATFORM_URL}>
+          Open Platform
+          <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+        </a>
+      </div>
       <div className="ctx__main">
         <div className="ctx__brain">
           <Brain

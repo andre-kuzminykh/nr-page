@@ -22,6 +22,33 @@ try {
 }
 
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
+// where the buttons lead (src/config/links.ts, the build's defaults); both are stood in for, so nothing leaves this machine
+const PLATFORM = process.env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
+const KM = process.env.VITE_KM_URL || 'https://management.neuronium.ai/km'
+const SUPPORT = 'support@neuronium.ai'
+const standIn = (ctx) =>
+  Promise.all(
+    [PLATFORM, KM].map((u) =>
+      ctx.route(`${new URL(u).origin}/**`, (r) =>
+        r.fulfill({
+          contentType: 'text/html',
+          body: `<!doctype html><meta charset="utf-8"><title>Stand-in</title><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0b0a0f;color:#fff;font:15px system-ui">Stand-in for ${new URL(r.request().url()).host}</body>`,
+        }),
+      ),
+    ),
+  )
+/** Clicks a way out, waits for the page it leads to, and comes back to the block. Returns where it landed. */
+async function leave(page, click, want, back) {
+  let url = ''
+  await Promise.all([page.waitForURL((u) => u.href.startsWith(want), { timeout: 6000 }).then(() => (url = page.url())).catch(() => {}), click()])
+  return {
+    url,
+    back: async () => {
+      await page.goto(`${BASE}#${back}`)
+      await sleep(1600)
+    },
+  }
+}
 const OUT = path.resolve('validation/walkthrough')
 fs.rmSync(OUT, { recursive: true, force: true })
 fs.mkdirSync(OUT, { recursive: true })
@@ -109,6 +136,7 @@ const waitFor = async (fn, ms = 4500) => {
 /* ---------------------------------------------------------------- desktop visitor */
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+  await standIn(ctx)
   const page = await ctx.newPage()
   watch(page, 'desktop')
   await page.goto(BASE, { waitUntil: 'networkidle' })
@@ -309,9 +337,14 @@ const waitFor = async (fn, ms = 4500) => {
           load: s.querySelectorAll('.dept__strip.is-live .dept__el-load').length,
         }
       })
-      if (alone)
+      if (alone) {
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.lead?.title ?? first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === (first.lead?.title ?? first.name) && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
-      else
+        if (d.id === 'management' && first.n === 1) {
+          const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__cta').click(), KM, d.id)
+          await step(page, 'desktop', 'Clicks “Open Knowledge Management” beside the element', `Knowledge Management opens (${KM})`, out.url === KM, out.url)
+          await out.back()
+        }
+      } else
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `“${first.n} · ${first.symbol}” above ${first.name}; its part of the interface is lit`, sel.cap === first.name && sel.no === `${first.n} · ${first.symbol}` && sel.hot, JSON.stringify(sel))
     }
   }
@@ -332,6 +365,11 @@ const waitFor = async (fn, ms = 4500) => {
     }
   })
   await step(page, 'desktop', 'Opens Platform and watches', 'A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear', brain.sent && brain.on.length >= 2 && brain.rest >= 6 && brain.icons <= 6 && brain.way > 4, JSON.stringify(brain))
+  {
+    const out = await leave(page, () => page.locator('.slide[data-state="active"] .ctx__cta').click(), PLATFORM, 'context')
+    await step(page, 'desktop', 'Clicks “Open Platform” under the title', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    await out.back()
+  }
 
   if (has('custom')) {
     // Use cases
@@ -377,10 +415,13 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Looks at the buttons',
-      '“Start Free Trial” on Standard, Solo and Business, “Contact sales” on Enterprise — each leads somewhere real (no fake sign-up)',
-      trial.length === 3 && sales.length === 1 && plans.every((p) => /^(mailto:|https?:)/.test(p.href)) && trial.every((p) => p.href.toLowerCase().includes(p.name.toLowerCase())),
+      '“Start Free Trial” on Standard, Solo and Business leads to the platform; “Contact sales” on Enterprise writes to support',
+      trial.length === 3 && sales.length === 1 && trial.every((p) => p.href === PLATFORM) && sales.every((p) => p.href.startsWith(`mailto:${SUPPORT}`)),
       plans.map((p) => `${p.cta} → ${p.href.slice(0, 48)}`).join(' | '),
     )
+    const out = await leave(page, () => page.locator('.slide[data-state="active"] .pr-plan.is-featured .pr-plan__cta').click(), PLATFORM, 'pricing')
+    await step(page, 'desktop', 'Clicks “Start Free Trial” on Business', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    await out.back()
   }
 
   if (has('faq')) {
@@ -399,19 +440,40 @@ const waitFor = async (fn, ms = 4500) => {
     await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.text.slice(0, 70))
   }
 
-  // Final: idea
-  await page.locator('.nav__cta').click()
+  // Final: Contacts, the task, and the way to the platform
+  await page.locator('.nav__item', { hasText: 'Contacts' }).click()
   await sleep(1600)
   const fin = page.locator('.slide[data-state="active"]')
-  await fin.getByRole('button', { name: /Get Early Access/ }).click()
-  await sleep(300)
-  const empty = await page.locator('#fin-status').innerText()
-  await step(page, 'desktop', 'Presses “Get Early Access” with an empty idea', 'Gently asked to write the idea first', /write a few words/i.test(empty))
-  await fin.getByRole('textbox', { name: 'Your business task' }).fill('A marketplace where AI agents negotiate freight for small logistics companies')
-  await fin.getByRole('textbox', { name: 'Your business task' }).press('Enter')
-  await sleep(500)
-  const sent = await page.locator('#fin-status').innerText()
-  await step(page, 'desktop', 'Types an idea and presses Enter', 'A pre-filled email to the team opens (no fake “sent”)', /email app should open/i.test(sent))
+  const foot = await page.evaluate(() => {
+    const f = document.querySelector('.slide[data-state="active"] .fin__foot')
+    return {
+      by: f?.querySelector('.fin__by')?.textContent.trim(),
+      logo: !!f?.querySelector('.fin__by img')?.naturalWidth,
+      social: [...(f?.querySelectorAll('.fin__social a') ?? [])].map((a) => a.getAttribute('aria-label')),
+      legal: [...(f?.querySelectorAll('.fin__legal a') ?? [])].map((a) => a.textContent.trim()),
+    }
+  })
+  await step(
+    page,
+    'desktop',
+    'Clicks “Contacts” in the menu',
+    'The last block, “Run Your AI Business”; at its foot: Created by AIT, LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support, Terms of Use, Privacy Policy',
+    (await idx(page)) === at('start') && /Created by/i.test(foot.by) && foot.logo && foot.social.join('|') === 'LinkedIn|X|Instagram|TikTok|YouTube|GitHub — open source' && foot.legal.join('|') === `${SUPPORT}|Terms of Use|Privacy Policy`,
+    JSON.stringify(foot),
+  )
+  const task = 'A marketplace where AI agents negotiate freight for small logistics companies'
+  await fin.getByRole('textbox', { name: 'Your business task' }).fill(task)
+  {
+    const out = await leave(page, () => fin.getByRole('textbox', { name: 'Your business task' }).press('Enter'), PLATFORM, 'start')
+    const got = out.url ? new URL(out.url).searchParams.get('task') : null
+    await step(page, 'desktop', 'Types a business task and presses Enter', 'The platform opens with the task carried over (?task=…)', got === task, out.url.slice(0, 80))
+    await out.back()
+  }
+  {
+    const out = await leave(page, () => page.locator('.nav__cta').click(), PLATFORM, 'start')
+    await step(page, 'desktop', 'Clicks “Get Early Access” in the top menu', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    await out.back()
+  }
   if (has('employees')) {
     await fin.getByRole('button', { name: /Explore AI Employees/ }).click()
     await sleep(1500)

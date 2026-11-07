@@ -1,5 +1,6 @@
 import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { PLATFORM_URL } from '../../config/links'
 import { DEPARTMENTS } from '../../data/departments'
 import { SLIDES, isSlideOpen, type NavGroup } from '../../data/slides'
 import { FAMILY } from '../Element/Element'
@@ -181,10 +182,10 @@ export function TopNav() {
         />
       </div>
 
-      <button type="button" className="nav__cta" onClick={() => jump('start')}>
+      <a className="nav__cta" href={PLATFORM_URL}>
         Get Early Access
         <ArrowUpRight size={14} strokeWidth={1.8} aria-hidden="true" />
-      </button>
+      </a>
 
       <button
         type="button"
@@ -231,10 +232,10 @@ export function TopNav() {
               )
             })}
           </div>
-          <button type="button" className="btn btn--primary nav__sheet-cta" onClick={() => jump('start')}>
+          <a className="btn btn--primary nav__sheet-cta" href={PLATFORM_URL}>
             Get Early Access
             <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-          </button>
+          </a>
         </div>
       )}
     </header>

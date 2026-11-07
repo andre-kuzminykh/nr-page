@@ -40,6 +40,10 @@ try {
 }
 
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
+// where the buttons lead (src/config/links.ts; the build is checked with its defaults)
+const PLATFORM = process.env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
+const KM = process.env.VITE_KM_URL || 'https://management.neuronium.ai/km'
+const SUPPORT = 'support@neuronium.ai'
 const OUT = path.resolve('validation')
 const SHOTS = path.join(OUT, 'screenshots')
 const VIEWPORTS = [
@@ -242,12 +246,13 @@ async function functionalPass(browser) {
     logoTile: !!document.querySelector('.nav__brand svg, .nav__brand rect') || getComputedStyle(document.querySelector('.nav__logo')).backgroundColor !== 'rgba(0, 0, 0, 0)',
     items: [...document.querySelectorAll('.nav__menu .nav__item')].map((b) => b.textContent.trim()),
     cta: document.querySelector('.nav__cta')?.textContent.trim(),
+    ctaHref: document.querySelector('.nav__cta')?.getAttribute('href'),
     bg: getComputedStyle(document.querySelector('.nav')).backgroundColor,
     counter: !!document.querySelector('.topbar__counter, .slide-index, .theme-switch'),
   }))
   check(
-    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), Get Early Access`,
-    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && /Get Early Access/.test(nav.cta) && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
+    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), Get Early Access to the platform`,
+    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && /Get Early Access/.test(nav.cta) && nav.ctaHref === PLATFORM && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
     JSON.stringify(nav),
   )
   if (OPEN_DEPTS.length > 1) {
@@ -645,12 +650,12 @@ async function functionalPass(browser) {
     const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c, inc], k) => {
       const x = pr.plans[k]
       // the spaces around the price are margins, not text
-      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.includes === inc && x.extra === 0
+      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && (c === 'Start Free Trial' ? x.href === PLATFORM : x.href.startsWith(`mailto:${SUPPORT}`)) && x.includes === inc && x.extra === 0
     })
     check(
-      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise “Contact us” with Contact sales — a name, a price, one line, what it includes and a button, no other copy',
+      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial (to the platform), Enterprise “Contact us” with Contact sales (to support) — a name, a price, one line, what it includes and a button, no other copy',
       asWanted && pr.title === 'Pricing' && pr.copy === 0,
-      pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta}`).join(' | '),
+      pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta} → ${x.href.slice(0, 40)}`).join(' | '),
     )
   }
 
@@ -680,47 +685,103 @@ async function functionalPass(browser) {
     }
   }
 
-  // Final
+  // Final: the task goes to the platform with it (the platform is stood in for, so nothing leaves this machine)
   await go('start')
   const fin = await page.evaluate(() => ({
     title: [...document.querySelectorAll('.fin__title .mask')].map((m) => m.textContent.trim()).join(' '),
     centerMark: !!document.querySelector('.fin .brand-mark'),
     sub: document.querySelector('.fin__sub')?.textContent.trim(),
-    idle: document.querySelector('#fin-status')?.textContent.trim(),
+    status: document.querySelectorAll('#fin-status, .fin__status').length,
+    placeholder: document.querySelector('#fin-idea')?.getAttribute('placeholder'),
   }))
-  const active = page.locator('.slide[data-state="active"]')
-  await active.getByRole('button', { name: /Get Early Access/ }).click()
-  await sleep(200)
-  const emptyMsg = await page.locator('#fin-status').innerText()
-  await active.getByRole('textbox', { name: 'Your business task' }).fill('An AI concierge for boutique hotels')
-  await active.getByRole('button', { name: /Get Early Access/ }).click()
-  await sleep(300)
-  const sentMsg = await page.locator('#fin-status').innerText()
+  const hand = await ctx.newPage()
+  const landed = []
+  await hand.route(`${new URL(PLATFORM).origin}/**`, (r) => {
+    landed.push(r.request().url())
+    return r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Platform</title>' })
+  })
+  await hand.goto(`${BASE}#start`)
+  await hand.waitForTimeout(1600)
+  const handActive = hand.locator('.slide[data-state="active"]')
+  await Promise.all([hand.waitForURL((u) => u.href.startsWith(PLATFORM), { timeout: 5000 }), handActive.getByRole('button', { name: /Get Early Access/ }).click()])
+  await hand.goto(`${BASE}#start`)
+  await hand.waitForTimeout(1600)
+  const task = 'An AI concierge for boutique hotels'
+  await hand.locator('.slide[data-state="active"]').getByRole('textbox', { name: 'Your business task' }).fill(task)
+  await Promise.all([hand.waitForURL((u) => u.href.startsWith(PLATFORM) && u.searchParams.has('task'), { timeout: 5000 }), hand.keyboard.press('Enter')])
+  await hand.close()
+  const withTask = landed.find((u) => new URL(u).searchParams.get('task') === task)
   check(
-    'Final: “Run Your AI Business”, “with Neuronium” smaller below, idea input with no hint text; empty input is caught; submit hands off honestly',
-    fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
-    sentMsg,
+    'Final: “Run Your AI Business”, “with Neuronium” smaller below, “Describe your business task”; Get Early Access opens the platform, and a written task is carried over to it (?task=)',
+    fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.status === 0 && fin.placeholder === 'Describe your business task' && landed[0] === PLATFORM && !!withTask,
+    landed.join(' · '),
   )
-  // Contacts: the menu's last item leads to the final block, which ends with who stands behind Neuronium
+  // Contacts: the menu's last item leads to the final block; its foot holds who made it, the socials, support and the legal pages
   await go('hero')
   await page.locator('.nav__item', { hasText: 'Contacts' }).click()
   await sleep(1300)
   const ct = await page.evaluate(() => {
     const s = document.querySelector('.slide[data-state="active"]')
+    const foot = s.querySelector('.fin__foot')
+    const logo = foot?.querySelector('.fin__by img')
+    const a = [...(foot?.querySelectorAll('a') ?? [])]
     return {
       last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
       title: s.querySelector('.fin__title')?.textContent.trim(),
-      links: [...s.querySelectorAll('.fin__foot a')].map((a) => a.getAttribute('href')),
+      by: foot?.querySelector('.fin__by')?.textContent.trim(),
+      byHref: foot?.querySelector('.fin__by')?.getAttribute('href'),
+      logo: logo ? { loaded: logo.complete && logo.naturalWidth > 0, h: Math.round(logo.getBoundingClientRect().height) } : null,
+      social: [...(foot?.querySelectorAll('.fin__social a') ?? [])].map((x) => [x.getAttribute('aria-label'), x.getAttribute('href'), !!x.querySelector('svg path')]),
+      oss: foot?.querySelector('.fin__icon--oss')?.textContent.trim(),
+      legal: [...(foot?.querySelectorAll('.fin__legal a') ?? [])].map((x) => [x.textContent.trim(), x.getAttribute('href')]),
+      newTab: a.filter((x) => /^https?:/.test(x.getAttribute('href'))).every((x) => x.target === '_blank' && /noreferrer/.test(x.rel)),
       active: document.querySelector('.nav__item.is-active')?.textContent.trim(),
       blocks: document.querySelectorAll('.slide').length,
     }
   })
+  const socialWant = [
+    ['LinkedIn', /linkedin\.com\//],
+    ['X', /^https:\/\/x\.com\//],
+    ['Instagram', /instagram\.com\//],
+    ['TikTok', /tiktok\.com\/@/],
+    ['YouTube', /youtube\.com\/@/],
+    ['GitHub — open source', /^https:\/\/github\.com\/[^/]+$/],
+  ]
+  const legalWant = [
+    [SUPPORT, `mailto:${SUPPORT}`],
+    ['Terms of Use', /^https:\/\/.+\/terms\/?$/],
+    ['Privacy Policy', /^https:\/\/.+\/privacy\/?$/],
+  ]
   check(
-    'Contacts: last in the menu, after FAQ — it opens the final block (“Run Your AI Business”), which ends with Neuronium · Dataist AI · Andre AI Technologies; no separate contacts block',
-    NAV.at(-1)[0] === 'Contacts' && ct.last && ct.title === 'Run Your AI Business' && ct.active === 'Contacts' && ct.links.some((h) => /dataist\.ai/.test(h)) && ct.links.some((h) => /andre\.technology/.test(h)) && ct.blocks === SLIDES.length,
-    JSON.stringify(ct),
+    'Contacts: last in the menu, after FAQ — it opens the final block, whose foot has “Created by” with the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support@neuronium.ai, Terms of Use and Privacy Policy',
+    NAV.at(-1)[0] === 'Contacts' && ct.last && ct.title === 'Run Your AI Business' && ct.active === 'Contacts' && ct.blocks === SLIDES.length &&
+      /Created by/i.test(ct.by) && /andre\.technology/.test(ct.byHref) && ct.logo?.loaded && ct.logo.h >= 14 &&
+      ct.social.length === socialWant.length && socialWant.every(([l, re], k) => ct.social[k][0] === l && re.test(ct.social[k][1]) && ct.social[k][2]) && /open source/i.test(ct.oss) &&
+      ct.legal.length === legalWant.length && legalWant.every(([l, h], k) => ct.legal[k][0] === l && (typeof h === 'string' ? ct.legal[k][1] === h : h.test(ct.legal[k][1]))) &&
+      ct.newTab,
+    JSON.stringify({ by: ct.by, logo: ct.logo, social: ct.social.map((x) => x[1]), legal: ct.legal.map((x) => x[1]) }),
+  )
+  // The way out to the products: Platform (block 2) and Knowledge Management (its block)
+  const outs = {}
+  await go('context')
+  outs.platform = await page.evaluate(() => {
+    const a = document.querySelector('.slide[data-state="active"] .ctx__cta')
+    return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: a.getBoundingClientRect().height > 0 }
+  })
+  if (OPEN_DEPTS.some((dpt) => dpt.id === 'management' && dpt.members.length === 1 && dpt.members[0].n === 1)) {
+    await go('management')
+    outs.km = await page.evaluate(() => {
+      const a = document.querySelector('.slide[data-state="active"] .dept__cta')
+      return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: a.getBoundingClientRect().height > 0 }
+    })
+  }
+  check(
+    `Buttons out: “Open Platform” on the AI Superagent block → ${PLATFORM}${outs.km !== undefined ? `; “Open Knowledge Management” beside the Km element → ${KM}` : ''}`,
+    outs.platform?.text === 'Open Platform' && outs.platform.href === PLATFORM && outs.platform.seen && (outs.km === undefined || (outs.km?.text === 'Open Knowledge Management' && outs.km.href === KM && outs.km.seen)),
+    JSON.stringify(outs),
   )
   await go('start')
+  const active = page.locator('.slide[data-state="active"]')
   const deep = has('employees') ? 'employees' : OPEN_DEPTS[0]?.id ?? 'context'
   if (has('employees')) {
     await active.getByRole('button', { name: /Explore AI Employees/ }).click()

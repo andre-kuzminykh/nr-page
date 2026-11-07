@@ -1,3 +1,4 @@
+import { ArrowUpRight } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { FAMILY } from '../../components/Element/Element'
 import { Panel, useParallax } from '../../components/Kit/Kit'
@@ -104,6 +105,39 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
   const focusIdx = Math.max(0, stage.panels.findIndex((p) => p.members.includes(sel)))
   const current = employeeByN(sel)
 
+  const strip = (
+    <div
+      className={`dept__strip ${auto && live && !solo ? 'is-auto' : ''} ${show && live ? 'is-live' : ''}`}
+      role="tablist"
+      aria-label={`${dept.name} AI employees`}
+      onKeyDown={onStripKey}
+    >
+      {members.map((m, i) => (
+        <button
+          key={m.n}
+          ref={(el) => {
+            tabs.current[i] = el
+          }}
+          type="button"
+          role="tab"
+          id={`tab-${m.n}`}
+          aria-selected={m.n === sel}
+          aria-controls={`stage-${department}`}
+          tabIndex={m.n === sel ? 0 : -1}
+          className="dept__el rv rv--scale"
+          style={{ '--d': 320 + i * 45 } as CSSProperties}
+          data-name={m.name}
+          onClick={() => pick(m.n)}
+        >
+          <span className="dept__el-n">{m.n}</span>
+          <span className="dept__el-sym">{m.symbol}</span>
+          <span className="sr-only">{m.name}</span>
+          {show && <span key={round} className="dept__el-load" aria-hidden="true" />}
+        </button>
+      ))}
+    </div>
+  )
+
   return (
     <div
       className={`slide__frame dept dept--${department} ${solo ? 'is-solo' : ''}`}
@@ -126,36 +160,17 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
           {solo ? (solo.lead?.line ?? solo.description) : dept.description}
         </p>
 
-        <div
-          className={`dept__strip ${auto && live && !solo ? 'is-auto' : ''} ${show && live ? 'is-live' : ''}`}
-          role="tablist"
-          aria-label={`${dept.name} AI employees`}
-          onKeyDown={onStripKey}
-        >
-          {members.map((m, i) => (
-            <button
-              key={m.n}
-              ref={(el) => {
-                tabs.current[i] = el
-              }}
-              type="button"
-              role="tab"
-              id={`tab-${m.n}`}
-              aria-selected={m.n === sel}
-              aria-controls={`stage-${department}`}
-              tabIndex={m.n === sel ? 0 : -1}
-              className="dept__el rv rv--scale"
-              style={{ '--d': 320 + i * 45 } as CSSProperties}
-              data-name={m.name}
-              onClick={() => pick(m.n)}
-            >
-              <span className="dept__el-n">{m.n}</span>
-              <span className="dept__el-sym">{m.symbol}</span>
-              <span className="sr-only">{m.name}</span>
-              {show && <span key={round} className="dept__el-load" aria-hidden="true" />}
-            </button>
-          ))}
-        </div>
+        {show?.cta ? (
+          <div className="dept__act">
+            {strip}
+            <a className="btn btn--primary dept__cta rv" style={d(520)} href={show.cta.href}>
+              {show.cta.label}
+              <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+          </div>
+        ) : (
+          strip
+        )}
 
         {!solo && (
           <div className="dept__caption rv" style={d(520)} aria-live="polite">

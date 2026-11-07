@@ -22,18 +22,50 @@ npm run preview      # serve dist/ at http://localhost:4173
 
 Requires Node 20.19+ or 22.12+. The build is a static site (`dist/`) and can be hosted anywhere.
 
-### Connection points (no fake sign-ups)
+### Where the buttons lead
 
-There is no registration backend in this project, so nothing pretends to submit:
+The landing lives on **neuronium.ai**; the product lives on its own subdomains, and the landing only links to them:
 
-| Variable | Used by | Default |
+| Button | Leads to | Variable |
 |---|---|---|
-| `VITE_EARLY_ACCESS_URL` | “Get Early Access” buttons | `mailto:admin@andre.technology` (published on andre.technology) |
-| `VITE_TRIAL_URL` | “Start Free Trial” on Standard, Solo and Business (`?plan=…` is added) | empty → a pre-filled email naming the plan |
-| `VITE_SALES_URL` | “Contact sales” on Enterprise | empty → an email to the team |
-| `VITE_IDEA_ENDPOINT` | The idea input on the last block (“Run Your AI Business”) | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
+| “Get Early Access” in the top menu (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open Platform” on the AI Superagent block | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open Knowledge Management” beside the Km element | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
+| “Start Free Trial” on Standard, Solo and Business | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Contact sales” on Enterprise | an email to support@neuronium.ai | `VITE_SALES_URL` |
+| The task input on the last block (“Describe your business task” → Get Early Access) | `https://platform.neuronium.ai/?task=<the task>`; empty → the platform | `VITE_PLATFORM_URL` |
+| Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
 
-Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
+The platform can read `?task=` to start with the visitor's task already typed in; without it, the parameter is simply ignored.
+The defaults are in [`src/config/links.ts`](src/config/links.ts); copy `.env.example` to `.env` (or set the variables
+in the host's build settings) to point the buttons elsewhere, e.g. at a staging platform.
+
+The foot of the last block (“Contacts” in the menu) holds: Created by with the orange AIT logo (→ andre.technology),
+LinkedIn, X, Instagram, TikTok, YouTube, GitHub marked “Open source”, support@neuronium.ai, Terms of Use and Privacy Policy.
+The social links are the ones published on andre.technology; they are listed once, in `SOCIAL` in `src/config/links.ts`.
+
+## Hosting on neuronium.ai
+
+The site is plain static files. Navigation uses `#block` links (`neuronium.ai/#pricing`), so the host needs
+**no rewrite rules**: every address is served by `index.html`. File names under `assets/` carry a content hash,
+so they can be cached forever; only `index.html` must stay fresh (both hosts below do this by default).
+
+**Cloudflare Pages (recommended).**
+1. Cloudflare → Workers & Pages → Create → Pages → Connect to Git → this repository, production branch `main`.
+2. Build command `npm run build`, output directory `dist`, environment variable `NODE_VERSION` = `22`.
+3. The project → Custom domains → add `neuronium.ai`, then `www.neuronium.ai`.
+   With the domain's DNS on Cloudflare, the records are created for you. The apex (`neuronium.ai`) needs the
+   domain's nameservers on Cloudflare; the registrar shows where to change them.
+4. Rules → Redirect Rules: `www.neuronium.ai/*` → `https://neuronium.ai/${1}` (301), so there is one address.
+
+Every push to `main` then deploys; every other branch gets its own preview address.
+
+**Vercel (alternative).** Import the repository (the Vite preset fills in `npm run build` and `dist`), then
+Settings → Domains → add `neuronium.ai` and `www.neuronium.ai` and create the DNS records Vercel shows
+(usually `A @ 76.76.21.21` and `CNAME www cname.vercel-dns.com`); choose to redirect `www` to the apex.
+
+**The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. Add their
+DNS records (a CNAME to wherever each app is hosted) in the same DNS zone; nothing in this project serves them.
 
 ## Staged release
 
@@ -54,7 +86,8 @@ such as creating your own AI employees, and follows `release.ts` on its own; the
 
 A department with only one open AI employee is led by it. Now that is Management with 1 · Km:
 - On the left: the title “AI Knowledge Management”, then “Get answers with the full business context—powered by your
-  Corporate World Model.”, then its element. The line under the element fills up until the next answer.
+  Corporate World Model.”, then its element with “Open Knowledge Management” beside it (→ management.neuronium.ai/km).
+  The line under the element fills up until the next answer.
 - On the right, no window — just a search bar at the bottom. A question is typed into it and sent, and above it the
   answer streams in with the three things it was found in, each just an icon and a name
   (`src/slides/Department/panels/knowledge.tsx`).
@@ -109,13 +142,13 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for wh
 | # | Block | What it shows |
 |---|---|---|
 | 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System.” |
-| 02 | AI Superagent works in your business context | A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools. The brain is violet through most of its width and turns orange near its right side. |
+| 02 | AI Superagent works in your business context | “Open Platform” under the title. A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools. The brain is violet through most of its width and turns orange near its right side. |
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Pricing | **Standard** $59 / month, bring your own Provider Key — AI Superagent, AI Management, your AI costs · **Solo** $190 / month, for a solo builder — AI Superagent, AI Management, 1 000 AI Work Hours · **Business** $890 / month, up to 10 people — AI Superagent, AI Management, 10 000 AI Work Hours; each with “Start Free Trial” · **Enterprise**, Contact us, more than 10 people — AI Superagent, AI Management, custom AI Work Hours; “Contact sales”. |
 | 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
-| 17 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below; the business task goes straight into the input (“Describe your business task”) → “Get Early Access”; Neuronium · a Dataist AI label · technology by Andre AI Technologies at the foot. “Contacts”, last in the menu, leads here. |
+| 17 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below; the business task goes straight into the input (“Describe your business task”) → “Get Early Access” opens the platform with it. At the foot: Created by with the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support@neuronium.ai, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
 
 | Department | Headline | Interface pieces |
 |---|---|---|
@@ -139,8 +172,8 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16 (for wh
   piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
   (Northwind Studio, Brightline) are fictional samples.
 - **Pricing** (`src/data/pricing.ts`): Standard $59, Solo $190 and Business $890 per month, each with a free
-  trial; Enterprise is priced with sales. No sign-up backend exists, so the buttons open a pre-filled email
-  until `VITE_TRIAL_URL` / `VITE_SALES_URL` are set.
+  trial; Enterprise is priced with sales. Sign-up happens on the platform: “Start Free Trial” leads to
+  platform.neuronium.ai, and “Contact sales” writes to support@neuronium.ai.
 - No invented customers, testimonials or metrics. The tools in the context brain are examples of what can be
   connected.
 

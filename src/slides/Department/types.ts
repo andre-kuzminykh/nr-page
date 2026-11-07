@@ -35,5 +35,12 @@ export interface DepartmentStage {
    * While an AI employee is the only one open in its department, it can have a show of its own
    * instead of the department's interface: one round every `ms`.
    */
-  solo?: Partial<Record<number, { ms: number; render: (p: SoloRenderProps) => ReactNode }>>
+  solo?: Partial<Record<number, SoloShow>>
+}
+
+export interface SoloShow {
+  ms: number
+  render: (p: SoloRenderProps) => ReactNode
+  /** Where to try it for real: a button beside its element. */
+  cta?: { label: string; href: string }
 }

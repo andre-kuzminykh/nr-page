@@ -58,10 +58,6 @@
     0 30px 80px -30px rgb(0 0 0 / 0.7);
 }
 
-.fin__form--short {
-  border-color: var(--orange);
-}
-
 .fin__form textarea {
   flex: 1;
   min-width: 0;
@@ -86,60 +82,114 @@
   flex-shrink: 0;
 }
 
-.fin__submit:disabled {
-  opacity: 0.6;
-  cursor: progress;
-}
-
-.fin__status {
-  min-height: 1.5em;
-  margin-top: 12px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  color: var(--fg);
-  opacity: 0.7;
-}
-
-.fin__status.is-short,
-.fin__status.is-error {
-  color: var(--orange-hi);
-  opacity: 1;
-}
-
-.fin__status.is-sent {
-  opacity: 1;
-}
-
 .fin__explore {
   margin-top: clamp(10px, 2vh, 20px);
 }
 
+/* ---------- the foot: who made it, where else to find it, support and the legal pages ---------- */
 .fin__foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 10px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px 24px;
+  width: 100%;
+  padding-top: clamp(14px, 2.4vh, 22px);
+  border-top: 1px solid rgb(255 255 255 / 0.08);
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.08em;
-  color: var(--fg);
-  opacity: 0.72;
+  color: rgb(255 255 255 / 0.66);
 }
 
 .fin__foot a {
+  color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid var(--fg-30);
+  transition: color 200ms, background-color 200ms, border-color 200ms;
 }
 
-.fin__foot a:hover {
-  border-bottom-color: var(--fg);
+.fin__foot a:hover,
+.fin__foot a:focus-visible {
+  color: var(--fg);
 }
 
-.fin__sep {
-  color: var(--fg-60);
+.fin__by {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
 }
 
+.fin__by img {
+  display: block;
+  width: auto;
+  height: 20px;
+}
+
+.fin__social {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fin__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.fin__icon:hover,
+.fin__icon:focus-visible {
+  background: rgb(255 255 255 / 0.07);
+}
+
+/* GitHub says what it is: the code is open */
+.fin__icon--oss {
+  padding: 0 13px 0 11px;
+  border-color: rgb(255 255 255 / 0.14);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.fin__legal {
+  justify-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.fin__legal a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* a narrower window: the three groups stack, centred */
+@media (max-width: 1100px) {
+  .fin__foot {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 10px;
+  }
+  .fin__by,
+  .fin__legal {
+    justify-self: center;
+  }
+  .fin__legal {
+    justify-content: center;
+  }
+}
 
 @media (max-width: 600px) {
   .fin__form {
@@ -158,17 +208,23 @@
   .fin__submit {
     height: 48px;
   }
-  .fin__status {
-    font-size: 9.5px;
-  }
   .fin__foot {
+    gap: 8px;
     font-size: 9.5px;
   }
-  .fin__foot .fin__sep {
-    display: none;
+  .fin__by img {
+    height: 17px;
   }
-  .fin__foot > span {
-    flex-basis: 100%;
+  .fin__social {
+    gap: 2px;
+  }
+  .fin__icon {
+    min-width: 32px;
+    height: 32px;
+  }
+  .fin__legal {
+    gap: 4px 12px;
+    letter-spacing: 0.04em;
   }
 }
 
