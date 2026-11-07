@@ -608,7 +608,8 @@ async function functionalPass(browser) {
     ]
     const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c], k) => {
       const x = pr.plans[k]
-      return x.name === n && x.price.replace(/^\$\s?/, '$ ') === p && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.extra === 0
+      // the spaces around the price are margins, not text
+      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.extra === 0
     })
     check(
       'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise with Contact sales — a name, a price, one line and a button each, no other copy',
