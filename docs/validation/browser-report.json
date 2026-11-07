@@ -6,6 +6,11 @@
       "detail": "{\"canvas\":true,\"ready\":true}"
     },
     {
+      "name": "No gradient bleeds at the edges: every gradient under a border spans that border",
+      "ok": true,
+      "detail": "none"
+    },
+    {
       "name": "Hero: NEURONIUM, then “Run AI Business with AI Operating System.”",
       "ok": true,
       "detail": "Run AI Business with AI Operating System."
@@ -21,9 +26,9 @@
       "detail": "1280:fits · 1920:fits · 2560:fits · 1440:fits"
     },
     {
-      "name": "Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (Platform · Management · Pricing · FAQ), Get Early Access",
+      "name": "Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (Platform · Management · Pricing · FAQ · Contacts), Get Early Access",
       "ok": true,
-      "detail": "{\"logo\":\"Nr\",\"logoTile\":false,\"items\":[\"Platform\",\"Management\",\"Pricing\",\"FAQ\"],\"cta\":\"Get Early Access\",\"bg\":\"rgba(0, 0, 0, 0)\",\"counter\":false}"
+      "detail": "{\"logo\":\"Nr\",\"logoTile\":false,\"items\":[\"Platform\",\"Management\",\"Pricing\",\"FAQ\",\"Contacts\"],\"cta\":\"Get Early Access\",\"bg\":\"rgba(0, 0, 0, 0)\",\"counter\":false}"
     },
     {
       "name": "Menu: jumps to sections; with one department open, “Management” links straight to it (no dropdown)",
@@ -31,9 +36,9 @@
       "detail": "{\"active\":\"Management\",\"dropdown\":0}"
     },
     {
-      "name": "Staged release: only the open blocks are on the page (hero · context · management · pricing · faq · start); closed ones are left out and links to them do nothing",
+      "name": "Staged release: only the open blocks are on the page (hero · context · management · pricing · faq · start · contacts); closed ones are left out and links to them do nothing",
       "ok": true,
-      "detail": "6 blocks · 11 closed · #employees ignored"
+      "detail": "7 blocks · 11 closed · #employees ignored"
     },
     {
       "name": "Mouse wheel: one notch moves exactly one block",
@@ -53,7 +58,7 @@
     {
       "name": "Keyboard: End / Home / ArrowDown / ArrowUp",
       "ok": true,
-      "detail": "5,0,1,0"
+      "detail": "6,0,1,0"
     },
     {
       "name": "AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool",
@@ -61,9 +66,9 @@
       "detail": "Find new leads and book demos: Apollo, Sheets, Gmail, Calendar · Sum up today’s calls for the team: Meet, Docs, Slack, Telegram · Collect feedback and ship the fix: WhatsApp, Drive, Code, APIs · icons at rest: 0"
     },
     {
-      "name": "AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy",
+      "name": "AI Superagent: the title “AI Superagent works in your business context”, no extra copy",
       "ok": true,
-      "detail": "AI Superagent works in the context of your business AI SUPER"
+      "detail": "AI Superagent works in your business context AI SUPERAGENT G"
     },
     {
       "name": "Departments: 1 open block(s) with only their open AI employees (1); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element",
@@ -93,7 +98,12 @@
     {
       "name": "Final: “Run Your AI Business”, “with Neuronium” smaller below, idea input with no hint text; empty input is caught; submit hands off honestly",
       "ok": true,
-      "detail": "Your email app should open with the idea. If it doesn’t, write to admin@andre.technology."
+      "detail": "Your email app should open with your task. If it doesn’t, write to admin@andre.technology."
+    },
+    {
+      "name": "Contacts: the last block, in the menu after FAQ — the address on one line as a mailto link, and links to Dataist AI and Andre AI Technologies",
+      "ok": true,
+      "detail": "{\"title\":\"Contacts\",\"href\":\"mailto:admin@andre.technology\",\"oneLine\":true,\"fits\":true,\"links\":[\"https://dataist.ai/\",\"https://andre.technology/\"],\"last\":true}"
     },
     {
       "name": "Final: no “Explore AI Employees” link while the periodic table is closed",
@@ -111,7 +121,7 @@
       "detail": "1, 0"
     },
     {
-      "name": "Phone menu: opens full screen, blocks swipes while open, jumps to a section (FAQ)",
+      "name": "Phone menu: opens full screen, blocks swipes while open, jumps to a section (Contacts)",
       "ok": true,
       "detail": ""
     },
@@ -121,37 +131,37 @@
       "detail": ""
     },
     {
-      "name": "Layout 1920x1080-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 1920x1080-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 1440x900-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 1440x900-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 1280x800-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 1280x800-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 1024x768-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 1024x768-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 768x1024-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 768x1024-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 390x844-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 390x844-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
     {
-      "name": "Layout 375x667-dark: 6 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
+      "name": "Layout 375x667-dark: 7 blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, progress in sync",
       "ok": true,
       "detail": "all slides fit without inner scroll"
     },
@@ -229,6 +239,17 @@
       "progress": 6
     },
     {
+      "viewport": "1920x1080",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 1,
@@ -293,6 +314,17 @@
       "frameOverflowY": 0,
       "offenders": [],
       "progress": 6
+    },
+    {
+      "viewport": "1440x900",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
     },
     {
       "viewport": "1280x800",
@@ -361,6 +393,17 @@
       "progress": 6
     },
     {
+      "viewport": "1280x800",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 1,
@@ -427,6 +470,17 @@
       "progress": 6
     },
     {
+      "viewport": "1024x768",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 1,
@@ -493,6 +547,17 @@
       "progress": 6
     },
     {
+      "viewport": "768x1024",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
       "viewport": "390x844",
       "theme": "dark",
       "slide": 1,
@@ -559,6 +624,17 @@
       "progress": 6
     },
     {
+      "viewport": "390x844",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
+    },
+    {
       "viewport": "375x667",
       "theme": "dark",
       "slide": 1,
@@ -623,10 +699,21 @@
       "frameOverflowY": 0,
       "offenders": [],
       "progress": 6
+    },
+    {
+      "viewport": "375x667",
+      "theme": "dark",
+      "slide": 7,
+      "id": "contacts",
+      "reached": true,
+      "docOverflowX": 0,
+      "frameOverflowY": 0,
+      "offenders": [],
+      "progress": 7
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-07T14:39:33.682Z",
+  "startedAt": "2026-11-07T15:41:40.125Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 41
+  "fps": 40
 }
