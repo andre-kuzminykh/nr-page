@@ -9,7 +9,7 @@
 
 .pr__plans {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 1.2vw, 18px);
 }
 
@@ -56,6 +56,8 @@
   display: flex;
   align-items: baseline;
   gap: 4px;
+  /* as tall as a price, so “Contact us” keeps the cards' lines level */
+  min-height: clamp(40px, min(4.4vw, 7.4vh), 72px);
   margin-top: clamp(18px, 3.2vh, 34px);
   white-space: nowrap;
 }
@@ -247,6 +249,9 @@
   .pr-plan__num {
     font-size: clamp(30px, 4vw, 44px);
   }
+  .pr-plan__price {
+    min-height: clamp(30px, 4vw, 44px);
+  }
   .pr-plan__num.pr-plan__num--word {
     font-size: min(20.5cqi, clamp(30px, 4vw, 44px));
   }
@@ -258,6 +263,10 @@
 /* phones and upright tablets: one plan per row — name and line on the left, the price on the right,
    then the model level, what it includes and the button */
 @media (max-width: 860px) {
+  /* the last plan's button stays clear of the “Write to us” button */
+  .slide__frame.pr {
+    padding-bottom: calc((68px + env(safe-area-inset-bottom, 0px)) / var(--fit));
+  }
   .pr {
     justify-content: center;
     justify-content: safe center;
@@ -289,6 +298,7 @@
   }
   .pr-plan__price {
     grid-area: price;
+    min-height: 0;
     margin: 0;
   }
   .pr-plan__num {
@@ -322,11 +332,11 @@
   .pr-tiers__opt {
     font-size: min(12.5px, 3.6cqi);
   }
-  /* what it includes: one row */
+  /* what it includes: a row, wrapping between whole items */
   .pr-plan__list {
     grid-area: list;
-    flex-flow: row nowrap;
-    gap: 0 9px;
+    flex-flow: row wrap;
+    gap: 2px 9px;
     margin-top: 7px;
     padding-top: 0;
     border-top: 0;

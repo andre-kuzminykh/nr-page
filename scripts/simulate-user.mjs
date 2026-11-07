@@ -452,8 +452,8 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Opens Pricing',
-      'Solo $99 and Team $490 per month on the Medium model, and Scale (Contact us), each with what it includes',
-      plans.map((p) => p.name).join('|') === 'Solo|Team|Scale' && /99/.test(plans[0]?.price) && /490/.test(plans[1]?.price) && plans[2]?.price === 'Contact us',
+      'Own model $19 first, then Solo $99 and Team $490 per month on the Medium model, and Scale (Contact us), each with what it includes',
+      plans.map((p) => p.name).join('|') === 'Own model|Solo|Team|Scale' && /19/.test(plans[0]?.price) && /99/.test(plans[1]?.price) && /490/.test(plans[2]?.price) && plans[3]?.price === 'Contact us',
       plans.map((p) => `${p.name} ${p.price}`).join(' | '),
     )
     const trial = plans.filter((p) => p.cta === 'Start Free Trial')
@@ -462,8 +462,8 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Looks at the buttons',
-      '“Start Free Trial” on Solo and Team leads to the platform with the plan and level; “Contact sales” on Scale is a button for writing to us',
-      trial.length === 2 && sales.length === 1 && trial.every((p) => p.href.startsWith(`${PLATFORM}?plan=`)) && sales.every((p) => p.tag === 'BUTTON'),
+      '“Start Free Trial” on Own model, Solo and Team leads to the platform with the plan (and level); “Contact sales” on Scale is a button for writing to us',
+      trial.length === 3 && sales.length === 1 && trial.every((p) => p.href.startsWith(`${PLATFORM}?plan=`)) && sales.every((p) => p.tag === 'BUTTON'),
       plans.map((p) => `${p.cta} → ${p.href.slice(0, 48) || p.tag}`).join(' | '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
@@ -481,7 +481,8 @@ const waitFor = async (fn, ms = 4500) => {
     await team.getByRole('radio', { name: 'High' }).click()
     await sleep(400)
     const high = await team.locator('.pr-plan__price').innerText()
-    await step(page, 'desktop', 'Picks the High model on Team', 'The price becomes $990 a month', /990/.test(high), high.replace(/\s+/g, ' '))
+    const hours = await team.locator('.pr-plan__list li').last().innerText()
+    await step(page, 'desktop', 'Picks the High model on Team', 'The price becomes $990 a month, with 10 000 AI Workforce hours', /990/.test(high) && /10\s000 AI Workforce hours/.test(hours), `${high.replace(/\s+/g, ' ')} · ${hours}`)
     const out = await leave(page, () => team.locator('.pr-plan__cta').click(), PLATFORM, 'pricing')
     await step(page, 'desktop', 'Clicks “Start Free Trial” on Team', 'The platform opens, told the plan and the level', out.url === `${PLATFORM}?plan=team&model=high`, out.url)
     await out.back()

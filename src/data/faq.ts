@@ -63,11 +63,11 @@ export const FAQ: Question[] = [
   },
   {
     q: 'How much does it cost?',
-    a: 'Solo is $59, $99 or $190 a month for a Low, Medium or High model — or $19 with your own model. Team, for up to 10 people, is $290, $490 or $990. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
+    a: 'Own model is $19 a month with your own Provider Key. Solo is $59, $99 or $190 for a Low, Medium or High model, with 300, 500 or 1 000 hours of AI Workforce. Team, for up to 10 people in a shared workspace, is $290, $490 or $990, with 3 000, 5 000 or 10 000 hours. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
   },
   {
     q: 'What are Low, Medium and High?',
-    a: 'The level of the AI model your plan runs on — you pick it inside the plan. On Solo you can also run on your own model for $19 a month: you connect your AI provider’s key, and the AI usage is billed to you by that provider.',
+    a: 'The level of the AI model Solo or Team runs on — you pick it inside the plan. With Own model you connect your AI provider’s key instead, and the AI usage is billed to you by that provider.',
   },
 ]
 

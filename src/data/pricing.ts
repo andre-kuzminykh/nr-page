@@ -1,25 +1,29 @@
 /**
  * The plans on the Pricing block. Prices are per month, in US dollars.
- * Solo and Team each come at three model levels — Low, Medium, High — chosen inside the card;
- * Solo can also run on the customer's own model. Scale (more than 10 people) is priced with sales.
- * Solo and Team start with a free trial.
+ * Own model runs on the customer's own AI provider key. Solo and Team each come at three model
+ * levels — Low, Medium, High — chosen inside the card; each level comes with its hours of AI
+ * Workforce (High: 1 000 on Solo, 10 000 on Team; the lower levels in proportion to their price).
+ * Team works in a shared workspace. Scale (more than 10 people) is priced with sales.
+ * Own model, Solo and Team start with a free trial.
  */
-export type Tier = 'own' | 'low' | 'medium' | 'high'
+export type Tier = 'low' | 'medium' | 'high'
 
 export const TIERS: { id: Tier; label: string }[] = [
-  { id: 'own', label: 'Own model' },
   { id: 'low', label: 'Low' },
   { id: 'medium', label: 'Medium' },
   { id: 'high', label: 'High' },
 ]
 
 export interface Plan {
-  id: 'solo' | 'team' | 'scale'
+  id: 'own' | 'solo' | 'team' | 'scale'
   name: string
   /** One line: who it is for. */
   line: string
-  /** Per month, USD, by model level; none: priced with sales. */
+  /** Per month, USD: one price, or one per model level; neither: priced with sales. */
+  price?: number
   prices?: Partial<Record<Tier, number>>
+  /** Hours of AI Workforce a month, by model level. */
+  hours?: Partial<Record<Tier, number>>
   /** The level the card opens on. */
   first?: Tier
   /** What it includes; the last item names the model level when there is one. */
@@ -30,10 +34,19 @@ export interface Plan {
 
 export const PLANS: Plan[] = [
   {
+    id: 'own',
+    name: 'Own model',
+    line: 'Bring your own Provider Key',
+    price: 19,
+    includes: ['AI Superagent', 'AI Management', 'Your AI Costs'],
+    cta: 'trial',
+  },
+  {
     id: 'solo',
     name: 'Solo',
     line: 'For a solo builder',
-    prices: { own: 19, low: 59, medium: 99, high: 190 },
+    prices: { low: 59, medium: 99, high: 190 },
+    hours: { low: 300, medium: 500, high: 1000 },
     first: 'medium',
     includes: ['AI Superagent', 'AI Management'],
     cta: 'trial',
@@ -43,8 +56,9 @@ export const PLANS: Plan[] = [
     name: 'Team',
     line: 'Up to 10 people',
     prices: { low: 290, medium: 490, high: 990 },
+    hours: { low: 3000, medium: 5000, high: 10000 },
     first: 'medium',
-    includes: ['AI Superagent', 'AI Management'],
+    includes: ['AI Superagent', 'AI Management', 'Shared workspace'],
     cta: 'trial',
     featured: true,
   },
@@ -52,7 +66,7 @@ export const PLANS: Plan[] = [
     id: 'scale',
     name: 'Scale',
     line: 'More than 10 people',
-    includes: ['AI Superagent', 'AI Management', 'Custom AI Work Hours'],
+    includes: ['AI Superagent', 'AI Management', 'Shared workspace', 'Custom AI Workforce'],
     cta: 'sales',
   },
 ]
@@ -60,6 +74,12 @@ export const PLANS: Plan[] = [
 /** The levels a plan comes at, in order. */
 export const tiersOf = (p: Plan): Tier[] => TIERS.map((t) => t.id).filter((t) => p.prices?.[t] !== undefined)
 
-/** What a plan includes at a level: its own items, then the model. */
-export const includesAt = (p: Plan, tier?: Tier): string[] =>
-  tier ? [...p.includes, tier === 'own' ? 'Your own model' : `${TIERS.find((t) => t.id === tier)!.label} model`] : p.includes
+/** 10000 → “10 000” (the space does not break). */
+const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0')
+
+/** What a plan includes at a level: its own items, then the model and its hours of AI Workforce. */
+export const includesAt = (p: Plan, tier?: Tier): string[] => {
+  if (!tier) return p.includes
+  const hours = p.hours?.[tier]
+  return [...p.includes, `${TIERS.find((t) => t.id === tier)!.label} model`, ...(hours ? [`${thousands(hours)} AI Workforce hours`] : [])]
+}

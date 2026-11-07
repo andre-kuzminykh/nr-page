@@ -42,7 +42,7 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 | “Open Platform” on the AI Superagent block | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | The bar in Knowledge Management | `https://management.neuronium.ai/km?q=<the question>` | `VITE_KM_URL` |
 | “Open Knowledge Management” beside the Km element | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
-| “Start Free Trial” on Solo and Team | `https://platform.neuronium.ai/?plan=<solo|team>&model=<own|low|medium|high>` | `VITE_PLATFORM_URL` |
+| “Start Free Trial” on Own model, Solo and Team | `https://platform.neuronium.ai/?plan=own`, `?plan=<solo|team>&model=<low|medium|high>` | `VITE_PLATFORM_URL` |
 | “Contact sales” on Scale | the “Write to us” widget, about the Scale plan (or a sales page, if set) | `VITE_SALES_URL` |
 | Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
 
@@ -181,7 +181,7 @@ Latest results for the staged release (production build, headless Chromium with 
   - Cases: two rows flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; All cases opens every case with a search.
   - Write to us: it asks for what is missing, holds the block still, sends to the endpoint, says where the reply goes, offers a plain email when sending fails, and closes on Escape.
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
-  - Pricing shows Solo and Team with their model levels (the price, the model in the list and the trial link follow the level picked) and Scale (Contact us), every button white; the FAQ names what is ready today.
+  - Pricing shows Own model, Solo and Team with their model levels (the price, the model, its AI Workforce hours and the trial link follow the level picked) and Scale (Contact us), every button white; the FAQ names what is ready today.
   - Every way out leads where [the table above](#where-the-buttons-lead) says; the last block's task reaches the platform as `?task=`; the foot has the AIT logo, the six socials, support, Terms and Privacy. The platform and Knowledge Management are stand-in pages during the checks, so nothing leaves the machine. [Report](docs/validation/browser-report.md)
 - **Simulated users**: **45 / 45 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. The desktop visitor writes a task into the hero's bar, clicks through to the platform and Knowledge Management and comes back, opens Cases (holds a row, searches All cases), and writes to the team from “Contact sales”. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
@@ -202,7 +202,7 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (fo
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Cases | Built for hundreds of cases. Two rows of cases flow by, one each way — a picture and a title each. Pointing at a row holds it; the case lifts, the others step back. A case with an `href` opens it; until then it says “Soon”. **All cases** opens every case on one page, with a search. The cases are listed in `src/data/cases.ts`: with 12 or more, the two rows share them out; a real `image` replaces a drawn picture. |
-| 16 | Pricing | **Solo**, for a solo builder, and **Team**, up to 10 people — each at the model level chosen inside the card: Solo Own model $19 · Low $59 · Medium $99 · High $190; Team Low $290 · Medium $490 · High $990 (per month). The price rolls to the new one, the list names the model, and “Start Free Trial” tells the platform the plan and level. **Scale**, Contact us, more than 10 people — AI Superagent, AI Management, custom AI Work Hours; “Contact sales”. Every button is white. |
+| 16 | Pricing | **Own model** first — $19 / month, bring your own Provider Key: AI Superagent, AI Management, your AI costs. **Solo**, for a solo builder, and **Team**, up to 10 people in a shared workspace — each at the model level chosen inside the card: Solo Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000. The price rolls to the new one, the list names the model and its hours, and “Start Free Trial” tells the platform the plan and level. **Scale**, Contact us, more than 10 people — shared workspace, custom AI Workforce; “Contact sales”. Every button is white. |
 | 17 | FAQ | Questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
 | 18 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below, then just the input bar (“Describe your business task”): sending it opens the platform with the task. At the foot: the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
 
@@ -227,8 +227,10 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (fo
 - **Illustrative** (labelled “Interface preview · sample data” on screen, not connected to production): every
   piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
   (Northwind Studio, Brightline) are fictional samples.
-- **Pricing** (`src/data/pricing.ts`): Solo — Own model $19, Low $59, Medium $99, High $190; Team — Low $290,
-  Medium $490, High $990 (per month), each with a free trial; Scale (more than 10 people) is priced with sales. Sign-up happens on the platform: “Start Free Trial” leads to
+- **Pricing** (`src/data/pricing.ts`): Own model $19; Solo — Low $59, Medium $99, High $190; Team — Low $290,
+  Medium $490, High $990 (per month), each with a free trial; Scale (more than 10 people) is priced with sales.
+  AI Workforce hours as given for High (1 000 Solo, 10 000 Team); the lower levels are set in proportion to their
+  price (300 / 500 and 3 000 / 5 000) — change them in `hours` if they differ. Sign-up happens on the platform: “Start Free Trial” leads to
   platform.neuronium.ai, and “Contact sales” opens the “Write to us” widget.
 - **Cases** (`src/data/cases.ts`): the articles are being written. Their titles and pictures are on the site; each
   case says “Soon” and links nowhere until it has an `href`. No customer stories are invented.

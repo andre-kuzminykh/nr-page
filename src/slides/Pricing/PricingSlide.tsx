@@ -12,7 +12,7 @@ const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 function PlanCard({ p, k }: { p: Plan; k: number }) {
   const tiers = tiersOf(p)
   const [tier, setTier] = useState<Tier | undefined>(p.first ?? tiers[0])
-  const price = tier ? p.prices?.[tier] : undefined
+  const price = tier ? p.prices?.[tier] : p.price
   const at = tier ? tiers.indexOf(tier) : 0
 
   // ← → move between the levels, as in any group of options
@@ -83,7 +83,7 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
       </ul>
 
       {p.cta === 'trial' ? (
-        <a className="btn pr-plan__cta" href={trialHref(p.id, tier ?? '')}>
+        <a className="btn pr-plan__cta" href={trialHref(p.id, tier)}>
           <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
           <span>Start Free Trial</span>
         </a>
@@ -103,7 +103,7 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
   )
 }
 
-/** Solo and Team, each at the model level you choose inside the card, and Scale, priced with you. */
+/** Own model; Solo and Team, each at the model level chosen inside the card; and Scale, priced with you. */
 export function PricingSlide(_: SlideProps) {
   return (
     <div className="slide__frame pr">
