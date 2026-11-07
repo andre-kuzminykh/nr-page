@@ -173,6 +173,26 @@ async function functionalPass(browser) {
     return { canvas: !!c, ready: c?.dataset.ready === 'true' }
   })
   check('Continuous light background renders with WebGL (single persistent canvas)', bg.canvas && bg.ready, JSON.stringify(bg))
+
+  // A gradient painted inside a border repeats under it: a sliver of its other end shows at the edges.
+  const seams = await page.evaluate(() => {
+    const bad = []
+    for (const el of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(el)
+      if (!cs.backgroundImage.includes('gradient')) continue
+      if (!['Top', 'Right', 'Bottom', 'Left'].some((k) => parseFloat(cs[`border${k}Width`]) > 0)) continue
+      const origin = cs.backgroundOrigin.split(',').map((x) => x.trim())
+      const clip = cs.backgroundClip.split(',').map((x) => x.trim())
+      const repeat = cs.backgroundRepeat.split(',').map((x) => x.trim())
+      origin.forEach((o, k) => {
+        const c = clip[k] ?? clip.at(-1)
+        const r = repeat[k] ?? repeat.at(-1)
+        if (o === 'padding-box' && c === 'border-box' && r !== 'no-repeat') bad.push(`${el.className || el.tagName} (layer ${k + 1})`)
+      })
+    }
+    return bad
+  })
+  check('No gradient bleeds at the edges: every gradient under a border spans that border', seams.length === 0, seams.slice(0, 4).join(' · ') || 'none')
   const canvasBefore = await page.evaluateHandle(() => document.querySelector('.light-field__canvas'))
 
   // Hero
