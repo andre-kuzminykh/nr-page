@@ -309,7 +309,7 @@ const waitFor = async (fn, ms = 4500) => {
         }
       })
       if (alone)
-        await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === first.name && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
+        await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.lead?.title ?? first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === (first.lead?.title ?? first.name) && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
       else
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `“${first.n} · ${first.symbol}” above ${first.name}; its part of the interface is lit`, sel.cap === first.name && sel.no === `${first.n} · ${first.symbol}` && sel.hot, JSON.stringify(sel))
     }
@@ -493,7 +493,7 @@ const waitFor = async (fn, ms = 4500) => {
       }
     })
     if (d.members.length === 1)
-      await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `${m.name} on its own: the search, what it does, its element — all on one screen`, ph.title === m.name && ph.visible === 1 && (d.id !== 'management' || ph.search) && ph.over <= 0, JSON.stringify(ph))
+      await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `${m.lead?.title ?? m.name} on its own: the search, what it does, its element — all on one screen`, ph.title === (m.lead?.title ?? m.name) && ph.visible === 1 && (d.id !== 'management' || ph.search) && ph.over <= 0, JSON.stringify(ph))
     else
       await step(page, 'phone', `Taps element ${m.n} (${m.symbol})`, `One interface at a time: ${m.name}, its part lit`, ph.cap === m.name && ph.visible === 1 && ph.hot, JSON.stringify(ph))
   }

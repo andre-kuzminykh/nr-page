@@ -338,15 +338,15 @@ async function functionalPass(browser) {
       ways: Object.fromEntries(Object.entries(ways).map(([k, v]) => [k, [...v]])),
       maxWay,
       idleIcons,
-      lead: s.querySelector('.prompt__lead')?.textContent.trim(),
+      lead: s.querySelectorAll('.prompt__lead, .prompt > svg').length,
       text: s.querySelector('.slide__frame').innerText.replace(/\s+/g, ' ').trim(),
     }
   })
   const ways = Object.values(cx.ways)
   const reached = new Set(ways.flat())
   check(
-    'AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the Nr bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool',
-    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0 && cx.lead === 'Nr',
+    'AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool',
+    cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0 && cx.lead === 0,
     `${Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · ')} · icons at rest: ${cx.idleIcons}`,
   )
   check('AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy', /^AI Superagent works in the context of your business/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
@@ -452,7 +452,7 @@ async function functionalPass(browser) {
         show: el.querySelectorAll('.dept__solo > *').length,
         load: el.querySelectorAll('.dept__el-load').length,
       }))
-      if (solo.title !== m.name || solo.desc !== (m.short ?? m.description) || solo.label !== dpt.name || solo.count || solo.caption || !solo.show || solo.load !== 1) missing.push(`${m.n} ${m.name} alone: ${JSON.stringify(solo)}`)
+      if (solo.title !== (m.lead?.title ?? m.name) || solo.desc !== (m.lead?.line ?? m.description) || solo.label !== dpt.name || solo.count || solo.caption || !solo.show || solo.load !== 1) missing.push(`${m.n} ${m.name} alone: ${JSON.stringify(solo)}`)
     } else {
       for (const m of dpt.members) {
         await slide.locator(`#tab-${m.n}`).click()

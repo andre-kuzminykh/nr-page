@@ -23,16 +23,6 @@
   letter-spacing: -0.01em;
 }
 
-/* who the command goes to, e.g. Nr — Neuronium: just the letters */
-.prompt__lead {
-  flex-shrink: 0;
-  font-family: var(--font-sans);
-  font-size: clamp(16px, 2.1vh, 19px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: #fff;
-}
-
 .prompt__q {
   --fam: var(--c1);
   flex: 1;
@@ -149,9 +139,6 @@
   }
   .prompt__go {
     width: 38px;
-  }
-  .prompt__lead {
-    font-size: 15px;
   }
 }
 

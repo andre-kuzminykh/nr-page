@@ -58,7 +58,6 @@ export function ContextSlide({ active, shown }: SlideProps) {
             live={live}
             sent={sent}
             onSent={() => setSent(true)}
-            lead="Nr"
             delay={cmd === 0 ? 1500 : 450}
           />
         </div>

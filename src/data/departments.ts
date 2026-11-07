@@ -36,8 +36,8 @@ export interface AIEmployee {
   symbol: string
   name: string
   description: string
-  /** A shorter line, used when the AI employee leads its block on its own. */
-  short?: string
+  /** Its title and line when it leads its block on its own (default: its name and description). */
+  lead?: { title: string; line: string }
   department: DepartmentId
   availability: Availability
 }
@@ -51,7 +51,7 @@ export interface Department {
   members: AIEmployee[]
 }
 
-type Row = [symbol: string, name: string, description: string, short?: string]
+type Row = [symbol: string, name: string, description: string, lead?: { title: string; line: string }]
 
 const define = (
   index: number,
@@ -67,12 +67,12 @@ const define = (
     name,
     headline,
     description,
-    members: rows.map(([symbol, roleName, text, short], i) => ({
+    members: rows.map(([symbol, roleName, text, lead], i) => ({
       n: index * 10 + i + 1,
       symbol,
       name: roleName,
       description: text,
-      ...(short ? { short } : {}),
+      ...(lead ? { lead } : {}),
       department: id,
       availability: 'scope',
     })),
@@ -87,7 +87,10 @@ export const DEPARTMENTS: Department[] = [
     ['From goals and tasks', 'to your calendar.'],
     'Goals, tasks, projects, meetings and the team in one registry — synced with your Google tools.',
     [
-      ['Km', 'Knowledge Management', 'Answers from a search across your knowledge base, including Google Drive — and live, during a Google Meet call.', 'Answers from a search across your knowledge base'],
+      ['Km', 'Knowledge Management', 'Answers from a search across your knowledge base, including Google Drive — and live, during a Google Meet call.', {
+        title: 'AI Knowledge Management',
+        line: 'Get answers with the full business context—powered by your Corporate World Model.',
+      }],
       ['Nt', 'Note Taking', 'After a Google Meet, collects notes with decisions and a task list — in Google Drive, as Google Keep notes and Google Docs.'],
       ['Gm', 'Goals Management', 'Sets goals from your products, business directions and projects.'],
       ['Tm', 'Task Management', 'Keeps the task list by goal, with Pomodoro and the Eisenhower Matrix — as Google Tasks and Google Sheets.'],

@@ -1,5 +1,4 @@
 import { ArrowUp } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { Type } from '../Kit/Kit'
 import './Prompt.css'
 
@@ -13,24 +12,16 @@ export function Prompt({
   live,
   sent,
   onSent,
-  lead,
   delay = 260,
 }: {
   text: string
   live: boolean
   sent: boolean
   onSent: () => void
-  /** Something before the text, such as who the command goes to. */
-  lead?: ReactNode
   delay?: number
 }) {
   return (
-    <div className={`prompt ${live ? 'is-live' : 'is-still'} ${live && sent ? 'is-sent' : ''} ${lead ? 'has-lead' : ''}`}>
-      {lead && (
-        <span className="prompt__lead" aria-hidden="true">
-          {lead}
-        </span>
-      )}
+    <div className={`prompt ${live ? 'is-live' : 'is-still'} ${live && sent ? 'is-sent' : ''}`}>
       <span className="prompt__q">
         <Type text={text} play={live} speed={30} delay={delay} onDone={onSent} />
       </span>

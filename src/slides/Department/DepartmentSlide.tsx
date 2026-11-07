@@ -116,14 +116,14 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
           {!solo && <span className="dept__count">{members.length} AI employees</span>}
         </p>
         <h2 className="h2 dept__title">
-          {(solo ? twoLines(solo.name) : dept.headline).map((line, k) => (
+          {(solo ? twoLines(solo.lead?.title ?? solo.name) : dept.headline).map((line, k) => (
             <span key={k} className="mask" style={d(60 + k * 80)}>
               <span>{line}</span>
             </span>
           ))}
         </h2>
         <p className="dept__desc rv" style={d(260)}>
-          {solo ? (solo.short ?? solo.description) : dept.description}
+          {solo ? (solo.lead?.line ?? solo.description) : dept.description}
         </p>
 
         <div
