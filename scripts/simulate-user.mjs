@@ -452,8 +452,8 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Opens Pricing',
-      'Standard $59, Solo $190, Business $890 per month and Scale (Contact us), each with what it includes',
-      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Scale' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Contact us',
+      'Solo $99 and Team $490 per month on the Medium model, and Scale (Contact us), each with what it includes',
+      plans.map((p) => p.name).join('|') === 'Solo|Team|Scale' && /99/.test(plans[0]?.price) && /490/.test(plans[1]?.price) && plans[2]?.price === 'Contact us',
       plans.map((p) => `${p.name} ${p.price}`).join(' | '),
     )
     const trial = plans.filter((p) => p.cta === 'Start Free Trial')
@@ -462,8 +462,8 @@ const waitFor = async (fn, ms = 4500) => {
       page,
       'desktop',
       'Looks at the buttons',
-      '“Start Free Trial” on Standard, Solo and Business leads to the platform; “Contact sales” on Scale is a button for writing to us',
-      trial.length === 3 && sales.length === 1 && trial.every((p) => p.href === PLATFORM) && sales.every((p) => p.tag === 'BUTTON'),
+      '“Start Free Trial” on Solo and Team leads to the platform with the plan and level; “Contact sales” on Scale is a button for writing to us',
+      trial.length === 2 && sales.length === 1 && trial.every((p) => p.href.startsWith(`${PLATFORM}?plan=`)) && sales.every((p) => p.tag === 'BUTTON'),
       plans.map((p) => `${p.cta} → ${p.href.slice(0, 48) || p.tag}`).join(' | '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
@@ -477,8 +477,13 @@ const waitFor = async (fn, ms = 4500) => {
     await step(page, 'desktop', 'Writes their email and a line, presses Send', '“Sent. We’ll reply to lena@example.com.” — and the message reached the endpoint', /lena@example\.com/.test(done) && contactSent.at(-1)?.subject === 'Scale plan', done)
     await page.keyboard.press('Escape')
     await sleep(300)
-    const out = await leave(page, () => page.locator('.slide[data-state="active"] .pr-plan.is-featured .pr-plan__cta').click(), PLATFORM, 'pricing')
-    await step(page, 'desktop', 'Clicks “Start Free Trial” on Business', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    const team = page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Team' })
+    await team.getByRole('radio', { name: 'High' }).click()
+    await sleep(400)
+    const high = await team.locator('.pr-plan__price').innerText()
+    await step(page, 'desktop', 'Picks the High model on Team', 'The price becomes $990 a month', /990/.test(high), high.replace(/\s+/g, ' '))
+    const out = await leave(page, () => team.locator('.pr-plan__cta').click(), PLATFORM, 'pricing')
+    await step(page, 'desktop', 'Clicks “Start Free Trial” on Team', 'The platform opens, told the plan and the level', out.url === `${PLATFORM}?plan=team&model=high`, out.url)
     await out.back()
   }
 

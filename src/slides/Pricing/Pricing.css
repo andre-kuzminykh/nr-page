@@ -9,7 +9,7 @@
 
 .pr__plans {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(10px, 1.2vw, 18px);
 }
 
@@ -19,7 +19,7 @@
   min-width: 0;
   /* the words on a card stay on one line; sizes follow the card's width */
   container-type: inline-size;
-  padding: clamp(20px, 3vh, 30px) clamp(18px, 1.8vw, 26px);
+  padding: clamp(20px, 3vh, 30px) clamp(18px, 1.9vw, 28px);
   border-radius: 22px;
   border: 1px solid rgb(255 255 255 / 0.09);
   background:
@@ -76,6 +76,20 @@
   color: #fff;
 }
 
+.pr-plan__price .pr-plan__num:not(.pr-plan__num--word) {
+  display: inline-block;
+  animation: pr-roll 520ms var(--ease-out);
+}
+
+/* a new price rolls in when another model level is picked */
+@keyframes pr-roll {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.28em);
+  }
+}
+
 .pr-plan__num--word {
   /* “Contact us” as large as the card allows, never larger than the prices */
   font-size: min(20.5cqi, clamp(40px, min(4.4vw, 7.4vh), 72px));
@@ -98,11 +112,71 @@
   color: rgb(255 255 255 / 0.74);
 }
 
+/* ---------- the model level: Own model · Low · Medium · High ---------- */
+.pr-tiers {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  height: 38px;
+  margin-top: clamp(16px, 2.6vh, 24px);
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.035);
+}
+
+.pr-tiers.is-blank {
+  visibility: hidden;
+}
+
+/* the chosen level: a light that glides under it */
+.pr-tiers__ink {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 520ms var(--ease-out);
+}
+
+.pr-plan.is-featured .pr-tiers__ink {
+  background: linear-gradient(100deg, rgb(160 113 255 / 0.55), rgb(224 106 216 / 0.45), rgb(255 138 51 / 0.5));
+  box-shadow: none;
+}
+
+.pr-tiers__opt {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: min(12.5px, 3.9cqi);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: rgb(255 255 255 / 0.6);
+  transition: color 300ms ease;
+}
+
+.pr-tiers__opt:hover,
+.pr-tiers__opt.is-on {
+  color: #fff;
+}
+
+.pr-tiers__opt:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
 .pr-plan__list {
   display: flex;
   flex-direction: column;
   gap: 9px;
-  margin: clamp(16px, 2.8vh, 26px) 0 0;
+  margin: clamp(14px, 2.4vh, 22px) 0 0;
   padding: clamp(14px, 2.4vh, 22px) 0 0;
   border-top: 1px solid rgb(255 255 255 / 0.08);
   list-style: none;
@@ -158,8 +232,8 @@
   outline-offset: 3px;
 }
 
-/* four narrow columns: the buttons' words get tighter */
-@media (max-width: 1100px) and (min-width: 761px) {
+/* narrower columns: the buttons' words get tighter */
+@media (max-width: 1100px) and (min-width: 861px) {
   .pr-plan__cta {
     gap: 6px;
     padding: 0 8px;
@@ -181,23 +255,12 @@
   }
 }
 
-/* narrow, tall windows (tablets upright): two by two */
-@media (max-width: 860px) and (min-height: 761px) {
-  .pr__plans {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .pr-plan__price {
-    margin-top: 14px;
-  }
-  .pr-plan > :nth-last-child(2) {
-    margin-bottom: 20px;
-  }
-}
-
-/* phones: one plan per row — name and line on the left, the price on the right, the button below */
-@media (max-width: 760px) {
+/* phones and upright tablets: one plan per row — name and line on the left, the price on the right,
+   then the model level, what it includes and the button */
+@media (max-width: 860px) {
   .pr {
-    justify-content: flex-start;
+    justify-content: center;
+    justify-content: safe center;
     gap: 14px;
   }
   .pr__title {
@@ -213,6 +276,7 @@
     grid-template-areas:
       'name price'
       'line price'
+      'tiers tiers'
       'list list'
       'cta cta';
     align-items: center;
@@ -247,6 +311,17 @@
   .pr-plan__num--word {
     font-size: 27px;
   }
+  .pr-tiers {
+    grid-area: tiers;
+    height: 32px;
+    margin-top: 9px;
+  }
+  .pr-tiers.is-blank {
+    display: none;
+  }
+  .pr-tiers__opt {
+    font-size: min(12.5px, 3.6cqi);
+  }
   /* what it includes: one row */
   .pr-plan__list {
     grid-area: list;
@@ -273,7 +348,7 @@
 }
 
 /* short or narrow phones: everything a little tighter */
-@media (max-width: 760px) and (max-height: 720px), (max-width: 380px) {
+@media (max-width: 860px) and (max-height: 720px), (max-width: 380px) {
   .pr {
     gap: 10px;
   }
@@ -295,6 +370,10 @@
   .pr-plan__list {
     gap: 0 8px;
     margin-top: 4px;
+  }
+  .pr-tiers {
+    height: 28px;
+    margin-top: 6px;
   }
   .pr-plan__cta {
     height: 29px;

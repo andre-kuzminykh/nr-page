@@ -28,6 +28,10 @@ export const taskHref = (task: string) => {
   return `${PLATFORM_URL}${PLATFORM_URL.includes('?') ? '&' : '?'}task=${encodeURIComponent(t)}`
 }
 
+/** “Start Free Trial”: the platform, told which plan and model level were picked (`?plan=solo&model=medium`). */
+export const trialHref = (plan: string, model: string) =>
+  `${PLATFORM_URL}${PLATFORM_URL.includes('?') ? '&' : '?'}plan=${encodeURIComponent(plan)}&model=${encodeURIComponent(model)}`
+
 /** “Contact sales” on the Scale plan: a sales page if there is one; empty → the contact widget opens. */
 export const SALES_URL: string = env.VITE_SALES_URL || ''
 

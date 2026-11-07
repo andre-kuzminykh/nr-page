@@ -63,11 +63,11 @@ export const FAQ: Question[] = [
   },
   {
     q: 'How much does it cost?',
-    a: 'Standard is $59 a month with your own Provider Key. Solo is $190 with 1 000 AI Work Hours, and Business $890 for up to 10 people with 10 000 AI Work Hours. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
+    a: 'Solo is $59, $99 or $190 a month for a Low, Medium or High model — or $19 with your own model. Team, for up to 10 people, is $290, $490 or $990. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
   },
   {
-    q: 'What does “Bring your own Provider Key” mean?',
-    a: 'On Standard you connect your own AI provider’s key, and the AI usage is billed to you by that provider — your AI costs, at their price. Solo, Business and Scale include AI Work Hours instead.',
+    q: 'What are Low, Medium and High?',
+    a: 'The level of the AI model your plan runs on — you pick it inside the plan. On Solo you can also run on your own model for $19 a month: you connect your AI provider’s key, and the AI usage is billed to you by that provider.',
   },
 ]
 

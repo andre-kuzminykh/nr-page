@@ -690,22 +690,53 @@ async function functionalPass(browser) {
       }
     })
     const want = [
-      ['Standard', '$ 59 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Your AI Costs'],
-      ['Solo', '$ 190 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|1 000 AI Work Hours'],
-      ['Business', '$ 890 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|10 000 AI Work Hours'],
+      ['Solo', '$ 99 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|Medium model'],
+      ['Team', '$ 490 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|Medium model'],
       ['Scale', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Custom AI Work Hours'],
     ]
-    const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c, inc], k) => {
+    const asWanted = pr.plans.length === 3 && want.every(([n, p, l, c, inc], k) => {
       const x = pr.plans[k]
       // the spaces around the price are margins, not text
-      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && (c === 'Start Free Trial' ? x.href === PLATFORM : x.tag === 'BUTTON') && x.includes === inc && x.extra === 0
+      return x.name === n && x.price.replace(/\s+/g, '') === p.replace(/\s+/g, '') && x.line === l && x.cta === c && (c === 'Start Free Trial' ? x.href === `${PLATFORM}?plan=${n.toLowerCase()}&model=medium` : x.tag === 'BUTTON') && x.includes === inc && x.extra === 0
     })
     // every button is white — the highlighted plan's too
     const white = pr.plans.every((x) => x.bg === pr.plans[0].bg && x.bgImage === 'none' && x.bg.match(/\d+/g).slice(0, 3).every((c) => Number(c) > 235))
     check(
-      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial (to the platform), Scale “Contact us” with Contact sales — a name, a price, one line, what it includes and a button, no other copy; every button white',
+      'Pricing: Solo and Team open on the Medium model ($99, $490) with Start Free Trial (to the platform, with the plan and level), Scale “Contact us” with Contact sales — a name, a price, one line, the model level, what it includes and a button, no other copy; every button white',
       asWanted && white && pr.title === 'Pricing' && pr.copy === 0,
       pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta} → ${x.href.slice(0, 40) || x.tag} · ${x.bg}`).join(' | '),
+    )
+    // the model level inside each plan: the price, the last included item and the trial link follow it
+    const pick = async (plan, level) => {
+      const card = page.locator('.slide[data-state="active"] .pr-plan', { hasText: plan })
+      await card.getByRole('radio', { name: level }).click()
+      await sleep(250)
+      return card.evaluate((x) => ({
+        price: x.querySelector('.pr-plan__price')?.textContent.replace(/\s+/g, ''),
+        last: [...x.querySelectorAll('.pr-plan__list li')].at(-1)?.textContent.trim(),
+        href: x.querySelector('.pr-plan__cta')?.getAttribute('href'),
+        levels: [...x.querySelectorAll('[role="radio"]')].map((r) => r.textContent.trim()).join('|'),
+        checked: x.querySelector('[role="radio"][aria-checked="true"]')?.textContent.trim(),
+      }))
+    }
+    const levels = [
+      ['Solo', 'Own model', '$19/month', 'Your own model', 'own'],
+      ['Solo', 'Low', '$59/month', 'Low model', 'low'],
+      ['Solo', 'High', '$190/month', 'High model', 'high'],
+      ['Team', 'Low', '$290/month', 'Low model', 'low'],
+      ['Team', 'High', '$990/month', 'High model', 'high'],
+    ]
+    const seen = []
+    for (const [plan, level, price, last, model] of levels) {
+      const r = await pick(plan, level)
+      seen.push({ plan, level, ok: r.price === price && r.last === last && r.checked === level && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
+    }
+    const solo = seen[0].r.levels
+    const team = seen[3].r.levels
+    check(
+      'Pricing: inside each plan a model level is chosen — Solo: Own model $19 · Low $59 · Medium $99 · High $190; Team: Low $290 · Medium $490 · High $990 — and the price, the model in the list and the trial link follow it',
+      solo === 'Own model|Low|Medium|High' && team === 'Low|Medium|High' && seen.every((x) => x.ok),
+      seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
     await sleep(500)

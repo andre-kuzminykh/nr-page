@@ -1,23 +1,65 @@
 /**
- * The plans on the Pricing block. Prices are per month, in US dollars; Scale (more than 10 people) is priced with sales.
- * Standard, Solo and Business start with a free trial.
+ * The plans on the Pricing block. Prices are per month, in US dollars.
+ * Solo and Team each come at three model levels — Low, Medium, High — chosen inside the card;
+ * Solo can also run on the customer's own model. Scale (more than 10 people) is priced with sales.
+ * Solo and Team start with a free trial.
  */
+export type Tier = 'own' | 'low' | 'medium' | 'high'
+
+export const TIERS: { id: Tier; label: string }[] = [
+  { id: 'own', label: 'Own model' },
+  { id: 'low', label: 'Low' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'high', label: 'High' },
+]
+
 export interface Plan {
-  id: 'standard' | 'solo' | 'business' | 'scale'
+  id: 'solo' | 'team' | 'scale'
   name: string
-  /** Per month, USD; null: priced with sales. */
-  price: number | null
   /** One line: who it is for. */
   line: string
-  /** What it includes. */
+  /** Per month, USD, by model level; none: priced with sales. */
+  prices?: Partial<Record<Tier, number>>
+  /** The level the card opens on. */
+  first?: Tier
+  /** What it includes; the last item names the model level when there is one. */
   includes: string[]
   cta: 'trial' | 'sales'
   featured?: boolean
 }
 
 export const PLANS: Plan[] = [
-  { id: 'standard', name: 'Standard', price: 59, line: 'Bring your own Provider Key', includes: ['AI Superagent', 'AI Management', 'Your AI Costs'], cta: 'trial' },
-  { id: 'solo', name: 'Solo', price: 190, line: 'For a solo builder', includes: ['AI Superagent', 'AI Management', '1 000 AI Work Hours'], cta: 'trial' },
-  { id: 'business', name: 'Business', price: 890, line: 'Up to 10 people', includes: ['AI Superagent', 'AI Management', '10 000 AI Work Hours'], cta: 'trial', featured: true },
-  { id: 'scale', name: 'Scale', price: null, line: 'More than 10 people', includes: ['AI Superagent', 'AI Management', 'Custom AI Work Hours'], cta: 'sales' },
+  {
+    id: 'solo',
+    name: 'Solo',
+    line: 'For a solo builder',
+    prices: { own: 19, low: 59, medium: 99, high: 190 },
+    first: 'medium',
+    includes: ['AI Superagent', 'AI Management'],
+    cta: 'trial',
+  },
+  {
+    id: 'team',
+    name: 'Team',
+    line: 'Up to 10 people',
+    prices: { low: 290, medium: 490, high: 990 },
+    first: 'medium',
+    includes: ['AI Superagent', 'AI Management'],
+    cta: 'trial',
+    featured: true,
+  },
+  {
+    id: 'scale',
+    name: 'Scale',
+    line: 'More than 10 people',
+    includes: ['AI Superagent', 'AI Management', 'Custom AI Work Hours'],
+    cta: 'sales',
+  },
 ]
+
+/** The levels a plan comes at, in order. */
+export const tiersOf = (p: Plan): Tier[] => TIERS.map((t) => t.id).filter((t) => p.prices?.[t] !== undefined)
+
+/** What a plan includes at a level: its own items, then the model. */
+export const includesAt = (p: Plan, tier?: Tier): string[] =>
+  tier ? [...p.includes, tier === 'own' ? 'Your own model' : `${TIERS.find((t) => t.id === tier)!.label} model`] : p.includes
