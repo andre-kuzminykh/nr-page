@@ -7,11 +7,12 @@ const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 
 /** Questions that open in place — one at a time; opening one closes the others. */
 export function FaqSlide({ shown }: SlideProps) {
-  const [open, setOpen] = useState(0)
+  // nothing is open at first
+  const [open, setOpen] = useState(-1)
   const buttons = useRef<(HTMLButtonElement | null)[]>([])
 
   useEffect(() => {
-    if (!shown) setOpen(0)
+    if (!shown) setOpen(-1)
   }, [shown])
 
   // ↑ ↓ move between the questions (they do not turn the block), Home / End jump to the first / last

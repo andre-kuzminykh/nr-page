@@ -4,59 +4,31 @@
    every case with a search.
    ========================================================= */
 .cs {
-  --card: clamp(250px, 24vw, 380px);
+  /* as wide as the window allows, and low enough for two rows, the title and All cases to fit */
+  --card: clamp(200px, min(24vw, calc((50vh - 194px) * 1.6)), 380px);
   --row-gap: clamp(12px, 2vh, 22px);
   display: grid;
   /* the column never takes the width of a row's long track */
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto;
   align-content: center;
   align-content: safe center;
   gap: clamp(18px, 3.6vh, 38px);
-}
-
-.cs__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
 }
 
 .cs__title {
   font-size: clamp(34px, min(4.4vw, 7.4vh), 72px);
 }
 
+/* under all the rows: every case, with a search */
 .cs-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  height: 42px;
-  padding: 0 16px 0 18px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: 999px;
-  background: rgb(11 10 15 / 0.35);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--fg);
-  transition:
-    border-color 300ms,
-    background-color 300ms;
-}
-
-.cs-all:hover,
-.cs-all:focus-visible {
-  border-color: rgb(255 255 255 / 0.42);
-  background: rgb(255 255 255 / 0.06);
+  margin-top: clamp(-6px, -0.6vh, 0px);
 }
 
 .cs-all__n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
   color: rgb(255 255 255 / 0.5);
-  letter-spacing: 0.06em;
 }
 
 /* ---------- the rows ---------- */
@@ -409,22 +381,17 @@
 @media (max-width: 1279px) {
   /* where the gutter is narrower than the “Write to us” button, the rows stop above it */
   .slide__frame.cs {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc((76px + env(safe-area-inset-bottom, 0px)) / var(--fit));
   }
 }
 
 @media (max-width: 860px) {
   .cs {
-    --card: clamp(210px, 62vw, 300px);
+    --card: clamp(180px, min(62vw, calc((50vh - 170px) * 1.6)), 300px);
     gap: 18px;
   }
   .cs__title {
     font-size: clamp(30px, 8vw, 44px);
-  }
-  .cs-all {
-    height: 38px;
-    padding: 0 13px 0 15px;
-    font-size: 10px;
   }
   .cs-pic {
     border-radius: 16px;
@@ -446,12 +413,6 @@
   .cx__grid {
     grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
     gap: 20px 12px;
-  }
-}
-
-@media (max-width: 860px) and (max-height: 720px) {
-  .cs {
-    --card: clamp(190px, 56vw, 250px);
   }
 }
 

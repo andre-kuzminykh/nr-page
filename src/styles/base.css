@@ -176,21 +176,62 @@ svg {
   flex-shrink: 0;
 }
 
+/* A block never scrolls inside. When its content is taller than the window, the whole block is
+   drawn smaller (--fit, set by useFitToHeight) — its clearance under the menu, its sides and its
+   column stay the size they are on screen, so only the content shrinks. */
 .slide__frame {
+  --fit: 1;
   position: relative;
   width: 100%;
-  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  max-width: calc((var(--frame-max) + 2 * var(--gutter)) / var(--fit));
   height: 100%;
   margin: 0 auto;
-  padding: calc(var(--topbar-h) + env(safe-area-inset-top, 0px) + clamp(4px, 2.4vh, 30px)) var(--gutter)
-    calc(clamp(26px, 5vh, 56px) + env(safe-area-inset-bottom, 0px));
+  padding: calc((var(--topbar-h) + env(safe-area-inset-top, 0px) + clamp(4px, 2.4vh, 30px)) / var(--fit))
+    calc(var(--gutter) / var(--fit)) calc((clamp(26px, 5vh, 56px) + env(safe-area-inset-bottom, 0px)) / var(--fit));
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+  overflow: hidden;
+  zoom: var(--fit);
+}
+
+/* ---------- a quiet link: no background, a line draws under it and the arrow moves on hover ---------- */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  align-self: flex-start;
+  padding: 6px 0;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: rgb(255 255 255 / 0.86);
+  text-decoration: none;
+  background: linear-gradient(90deg, #a071ff, #e06ad8 50%, #ff8a33) 0 100% / 0 1.5px no-repeat;
+  transition:
+    background-size 500ms var(--ease-out),
+    color 300ms ease;
+}
+
+.more svg {
+  flex-shrink: 0;
+  transition: transform 400ms var(--ease-out);
+}
+
+.more:hover,
+.more:focus-visible {
+  color: #fff;
+  background-size: 100% 1.5px;
+}
+
+.more:hover svg,
+.more:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+.more:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 /* ---------- reveal on arrival (no scroll-to-reveal; everything arrives on its own) ---------- */

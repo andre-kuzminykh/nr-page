@@ -223,17 +223,9 @@
   margin-top: clamp(6px, 1.4vh, 14px);
 }
 
-/* its element, and beside it the way to try it for real */
-.dept__act {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 18px clamp(18px, 2vw, 28px);
-  margin-top: clamp(6px, 1.4vh, 14px);
-}
-
-.dept.is-solo .dept__act .dept__strip {
-  margin-top: 0;
+/* “About …” sits under the line, the elements under it */
+.dept.is-solo .dept__more {
+  margin-top: -4px;
 }
 
 /* the line under the element fills up until the next round of its show */
@@ -397,13 +389,6 @@
   .dept__desc {
     display: none;
   }
-  .dept__cta {
-    height: 46px;
-    gap: 10px;
-    padding: 0 18px 0 20px;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-  }
 }
 
 @media (max-width: 860px) {
@@ -475,27 +460,14 @@
     font-size: 16px;
   }
   .dept.is-solo .dept__strip {
-    order: 5;
+    order: 6;
     grid-template-columns: 60px;
     margin-top: 2px;
   }
-  .dept__act {
+  .dept.is-solo .dept__more {
     order: 5;
-    flex-wrap: nowrap;
-    gap: 14px;
-    margin-top: 2px;
-  }
-  .dept.is-solo .dept__act .dept__strip {
-    order: 0;
-    width: auto;
-    flex: none;
-  }
-  .dept__cta {
-    min-width: 0;
-    height: 44px;
-    padding: 0 14px 0 16px;
-    font-size: 10.5px;
-    letter-spacing: 0.08em;
+    margin-top: -6px;
+    font-size: 14px;
   }
 }
 

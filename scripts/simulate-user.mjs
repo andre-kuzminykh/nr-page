@@ -361,8 +361,8 @@ const waitFor = async (fn, ms = 4500) => {
       if (alone) {
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.lead?.title ?? first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === (first.lead?.title ?? first.name) && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
         if (d.id === 'management' && first.n === 1) {
-          const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__cta').click(), KM, d.id)
-          await step(page, 'desktop', 'Clicks “Open Knowledge Management” beside the element', `Knowledge Management opens (${KM})`, out.url === KM, out.url)
+          const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), KM, d.id)
+          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', `Knowledge Management opens (${KM})`, out.url === KM, out.url)
           await out.back()
         }
       } else
@@ -387,8 +387,8 @@ const waitFor = async (fn, ms = 4500) => {
   })
   await step(page, 'desktop', 'Opens Platform and watches', 'A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear', brain.sent && brain.on.length >= 2 && brain.rest >= 6 && brain.icons <= 6 && brain.way > 4, JSON.stringify(brain))
   {
-    const out = await leave(page, () => page.locator('.slide[data-state="active"] .ctx__cta').click(), PLATFORM, 'context')
-    await step(page, 'desktop', 'Clicks “Open Platform” under the title', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    const out = await leave(page, () => page.locator('.slide[data-state="active"] .ctx__more').click(), PLATFORM, 'context')
+    await step(page, 'desktop', 'Clicks “About Platform” under the title', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
     await out.back()
   }
 

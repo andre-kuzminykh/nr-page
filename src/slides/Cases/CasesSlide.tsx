@@ -39,18 +39,11 @@ export function CasesSlide({ active }: SlideProps) {
 
   return (
     <div className={`slide__frame cs ${active && !reducedMotion ? 'is-live' : ''}`}>
-      <div className="cs__head">
-        <h2 className="h2 cs__title">
-          <span className="mask" style={d(40)}>
-            <span>Cases</span>
-          </span>
-        </h2>
-        <button type="button" className="cs-all rv" style={d(260)} onClick={() => setAll(true)}>
-          All cases
-          <span className="cs-all__n">{CASES.length}</span>
-          <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
-        </button>
-      </div>
+      <h2 className="h2 cs__title">
+        <span className="mask" style={d(40)}>
+          <span>Cases</span>
+        </span>
+      </h2>
 
       <div className="cs__rows">
         {RUNS.map(({ run, own }, r) => (
@@ -61,6 +54,12 @@ export function CasesSlide({ active }: SlideProps) {
           </div>
         ))}
       </div>
+
+      <button type="button" className="more cs-all rv" style={d(520)} onClick={() => setAll(true)}>
+        All cases
+        <span className="cs-all__n">{CASES.length}</span>
+        <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
+      </button>
 
       {all && <CasesIndex onClose={() => setAll(false)} />}
     </div>

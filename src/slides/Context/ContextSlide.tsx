@@ -31,8 +31,8 @@ export function ContextSlide({ active, shown }: SlideProps) {
             </span>
           ))}
         </h2>
-        <a className="btn btn--primary ctx__cta rv" style={d(360)} href={PLATFORM_URL}>
-          Open Platform
+        <a className="more ctx__more rv" style={d(360)} href={PLATFORM_URL}>
+          About Platform
           <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
         </a>
       </div>

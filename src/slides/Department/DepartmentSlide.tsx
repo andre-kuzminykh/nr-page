@@ -163,17 +163,13 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
           {solo ? (solo.lead?.line ?? solo.description) : dept.description}
         </p>
 
-        {show?.cta ? (
-          <div className="dept__act">
-            {strip}
-            <a className="btn btn--primary dept__cta rv" style={d(520)} href={show.cta.href}>
-              {show.cta.label}
-              <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-            </a>
-          </div>
-        ) : (
-          strip
+        {show?.cta && (
+          <a className="more dept__more rv" style={d(300)} href={show.cta.href}>
+            {show.cta.label}
+            <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+          </a>
         )}
+        {strip}
 
         {!solo && (
           <div className="dept__caption rv" style={d(520)} aria-live="polite">

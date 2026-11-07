@@ -412,7 +412,7 @@ export const management: DepartmentStage = {
     1: {
       ms: ANSWER_MS,
       render: (p) => <KnowledgeSearch key={p.round} {...p} />,
-      cta: { label: 'Open Knowledge Management', href: KM_URL },
+      cta: { label: 'About Knowledge Management', href: KM_URL },
     },
   },
 }

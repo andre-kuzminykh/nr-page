@@ -1,4 +1,5 @@
-import { forwardRef, type ReactNode } from 'react'
+import { forwardRef, useCallback, useRef, type ReactNode } from 'react'
+import { useFitToHeight } from '../../hooks/useFitToHeight'
 
 interface Props {
   id: string
@@ -17,9 +18,20 @@ export const Slide = forwardRef<HTMLElement, Props>(function Slide(
   ref,
 ) {
   const active = state === 'active'
+  const own = useRef<HTMLElement | null>(null)
+  const setRef = useCallback(
+    (el: HTMLElement | null) => {
+      own.current = el
+      if (typeof ref === 'function') ref(el)
+      else if (ref) ref.current = el
+    },
+    [ref],
+  )
+  // a block never scrolls inside: too tall a block is drawn smaller
+  useFitToHeight(own, active)
   return (
     <section
-      ref={ref}
+      ref={setRef}
       id={`slide-${id}`}
       data-slide={position}
       data-state={state}

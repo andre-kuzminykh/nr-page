@@ -51,11 +51,14 @@ const SHOTS = path.join(OUT, 'screenshots')
 const VIEWPORTS = [
   [1920, 1080],
   [1440, 900],
+  [1440, 760],
+  [1366, 657],
   [1280, 800],
   [1024, 768],
   [768, 1024],
   [390, 844],
   [375, 667],
+  [360, 640],
 ]
 const THEMES = ['dark']
 const SETTLE = Number(process.env.SETTLE || 1700)
@@ -108,6 +111,16 @@ async function layoutPass(browser) {
             { timeout: 9000 },
           )
           .catch(() => {})
+        // the FAQ is measured at its tallest: with its longest answer open
+        if (SLIDES[i].id === 'faq') {
+          const longest = await page.evaluate(() => {
+            const items = [...document.querySelectorAll('.slide[data-state="active"] .faq__item')]
+            const len = items.map((it) => it.querySelector('.faq__a')?.textContent.length ?? 0)
+            return len.indexOf(Math.max(...len))
+          })
+          await page.locator('.slide[data-state="active"] .faq__q').nth(longest).click()
+          await sleep(900)
+        }
         const idx = await activeIndex(page)
         const m = await page.evaluate(() => {
           const slide = document.querySelector('.slide[data-state="active"]')
@@ -154,6 +167,23 @@ async function layoutPass(browser) {
           return {
             docOverflowX: document.documentElement.scrollWidth - vw,
             frameOverflowY: frame ? frame.scrollHeight - frame.clientHeight : 0,
+            // a block never scrolls inside; a block too tall for the window is drawn smaller to fit
+            scrolls: frame ? getComputedStyle(frame).overflowY !== 'hidden' : true,
+            fit: frame ? Number(getComputedStyle(frame).zoom) || 1 : 1,
+            cut: frame
+              ? (() => {
+                  const z = Number(getComputedStyle(frame).zoom) || 1
+                  let top = Infinity
+                  let bottom = -Infinity
+                  for (const c of frame.children) {
+                    if (!c.offsetHeight || getComputedStyle(c).position === 'absolute') continue
+                    top = Math.min(top, c.offsetTop)
+                    bottom = Math.max(bottom, c.offsetTop + c.offsetHeight)
+                  }
+                  const pb = parseFloat(getComputedStyle(frame).paddingBottom)
+                  return Math.max(0, Math.round((bottom + pb - frame.clientHeight) * z), Math.round(-top * z))
+                })()
+              : 0,
             offenders: offenders.slice(0, 4),
             progress: Number(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')),
           }
@@ -164,9 +194,9 @@ async function layoutPass(browser) {
       }
       await ctx.close()
       const rows = results.layout.filter((r) => r.viewport === `${w}x${h}` && r.theme === theme)
-      const bad = rows.filter((r) => !r.reached || r.docOverflowX > 0 || r.offenders.length || r.progress !== r.slide)
-      const scrolls = rows.filter((r) => r.frameOverflowY > 2).map((r) => r.slide)
-      check(`Layout ${label}: ${SLIDES.length} blocks reached by keyboard, no horizontal overflow, no cut headlines or panel titles, nothing under the widget, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX })) ) : scrolls.length ? `inner scroll used on slide(s) ${scrolls.join(', ')}` : 'all slides fit without inner scroll')
+      const bad = rows.filter((r) => !r.reached || r.docOverflowX > 0 || r.offenders.length || r.progress !== r.slide || r.scrolls || r.cut > 1 || r.fit < 0.6)
+      const scaled = rows.filter((r) => r.fit < 0.999).map((r) => `${r.id} ×${r.fit.toFixed(2)}`)
+      check(`Layout ${label}: ${SLIDES.length} blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync`, bad.length === 0, bad.length ? JSON.stringify(bad.map((b) => ({ slide: b.slide, off: b.offenders, x: b.docOverflowX, cut: b.cut, scrolls: b.scrolls, fit: b.fit })) ) : scaled.length ? `drawn smaller to fit: ${scaled.join(', ')}` : 'every block fits at full size')
     }
   }
 }
@@ -692,6 +722,8 @@ async function functionalPass(browser) {
   // FAQ
   if (has('faq')) {
     await go('faq')
+    const closedAtFirst = await page.evaluate(() => document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]').length === 0)
+    check('FAQ: no question is open at first', closedAtFirst)
     await page.getByRole('button', { name: /Who stays in control/ }).click()
     await sleep(700)
     const faqState = await page.evaluate(() => ({
@@ -797,19 +829,24 @@ async function functionalPass(browser) {
   const outs = {}
   await go('context')
   outs.platform = await page.evaluate(() => {
-    const a = document.querySelector('.slide[data-state="active"] .ctx__cta')
-    return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: a.getBoundingClientRect().height > 0 }
+    const a = document.querySelector('.slide[data-state="active"] .ctx__more')
+    return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: a.getBoundingClientRect().height > 0, bg: getComputedStyle(a).backgroundColor }
   })
   if (OPEN_DEPTS.some((dpt) => dpt.id === 'management' && dpt.members.length === 1 && dpt.members[0].n === 1)) {
     await go('management')
     outs.km = await page.evaluate(() => {
-      const a = document.querySelector('.slide[data-state="active"] .dept__cta')
-      return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: a.getBoundingClientRect().height > 0 }
+      const s = document.querySelector('.slide[data-state="active"]')
+      const a = s.querySelector('.dept__more')
+      const desc = s.querySelector('.dept__desc')?.getBoundingClientRect()
+      const el = s.querySelector('.dept__strip')?.getBoundingClientRect()
+      const r = a?.getBoundingClientRect()
+      return a && { text: a.textContent.trim(), href: a.getAttribute('href'), seen: r.height > 0, bg: getComputedStyle(a).backgroundColor, order: !!desc && !!el && desc.bottom <= r.top + 1 && r.bottom <= el.top + 1 }
     })
   }
   check(
-    `Buttons out: “Open Platform” on the AI Superagent block → ${PLATFORM}${outs.km !== undefined ? `; “Open Knowledge Management” beside the Km element → ${KM}` : ''}`,
-    outs.platform?.text === 'Open Platform' && outs.platform.href === PLATFORM && outs.platform.seen && (outs.km === undefined || (outs.km?.text === 'Open Knowledge Management' && outs.km.href === KM && outs.km.seen)),
+    `Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → ${PLATFORM}${outs.km !== undefined ? `; “About Knowledge Management” under its line, above the Km element → ${KM}` : ''}`,
+    outs.platform?.text === 'About Platform' && outs.platform.href === PLATFORM && outs.platform.seen && outs.platform.bg === 'rgba(0, 0, 0, 0)' &&
+      (outs.km === undefined || (outs.km?.text === 'About Knowledge Management' && outs.km.href === KM && outs.km.seen && outs.km.bg === 'rgba(0, 0, 0, 0)' && outs.km.order)),
     JSON.stringify(outs),
   )
   // Cases: rows of pictures and titles flow by, one each way; pointing holds a row; All cases opens every case with a search
@@ -840,6 +877,11 @@ async function functionalPass(browser) {
           link: c.tagName === 'A' ? c.getAttribute('href') : null,
         })),
         all: s.querySelector('.cs-all')?.textContent.replace(/\s+/g, ' ').trim(),
+        allBelow: (() => {
+          const rows = s.querySelector('.cs__rows')?.getBoundingClientRect()
+          const all = s.querySelector('.cs-all')
+          return !!rows && !!all && all.getBoundingClientRect().top >= rows.bottom - 1 && getComputedStyle(all).backgroundColor === 'rgba(0, 0, 0, 0)'
+        })(),
       }
     })
     await page.locator('.slide[data-state="active"] .cs-all').click()
@@ -865,9 +907,9 @@ async function functionalPass(browser) {
     const closed = (await page.locator('.cx').count()) === 0 && (await page.evaluate(() => document.activeElement?.classList.contains('cs-all')))
     const flows = x0.every((v, k) => Math.abs(v - x1[k]) > 4) && Math.sign(x1[0] - x0[0]) !== Math.sign(x1[1] - x0[1])
     check(
-      'Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases” opens every case with a search (empty state, the block holds still, Escape closes)',
+      'Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes)',
       cs.title === 'Cases' && cs.rows === 2 && flows && Math.abs(h0[0] - h1[0]) < 1 && Math.abs(h0[1] - h1[1]) > 4 &&
-        cs.own.length === ix.cards && cs.own.every((c) => c.title && c.picture > 5 && (c.link ? c.go === '' : c.go === 'Soon')) && /All cases/.test(cs.all) &&
+        cs.own.length === ix.cards && cs.own.every((c) => c.title && c.picture > 5 && (c.link ? c.go === '' : c.go === 'Soon')) && /All cases/.test(cs.all) && cs.allBelow &&
         ix.dialog && ix.focus === 'search' && hits.length >= 1 && hits.every((t) => t.toLowerCase().includes(word.toLowerCase())) && /Nothing matches/.test(none) && held && closed &&
         NAV.findIndex(([, id]) => id === 'cases') === NAV.findIndex(([, id]) => id === 'pricing') - 1,
       JSON.stringify({ flows, held: [h0, h1].map((h) => h.map(Math.round)), cases: cs.own.length, index: ix.cards, search: `${word} → ${hits.length}` }),
