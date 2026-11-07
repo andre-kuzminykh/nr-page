@@ -27,8 +27,8 @@ export const SALES_URL: string =
 export const IDEA_ENDPOINT: string | undefined = import.meta.env.VITE_IDEA_ENDPOINT || undefined
 
 export const ideaMailto = (idea: string) =>
-  `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Neuronium — early access: my idea')}&body=${encodeURIComponent(
-    `My idea:\n\n${idea}\n\n— sent from the Neuronium website`,
+  `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Neuronium — early access: my business task')}&body=${encodeURIComponent(
+    `My business task:\n\n${idea}\n\n— sent from the Neuronium website`,
   )}`
 
 export const COMPANY_URL = 'https://andre.technology/'

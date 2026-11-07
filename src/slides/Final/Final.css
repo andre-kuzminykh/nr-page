@@ -10,10 +10,14 @@
   align-items: center;
   width: 100%;
   margin: auto 0;
+  /* the title is sized from this column, so it always fits on one line */
+  container-type: inline-size;
 }
 
 .fin__title {
-  font-size: clamp(42px, min(8.4vw, 12.8vh), 144px);
+  /* one line: “Run Your AI Business” is about 9.3em wide */
+  font-size: min(clamp(34px, 13vh, 132px), calc(100cqi / 9.6));
+  white-space: nowrap;
   font-weight: 520;
   line-height: 0.94;
   letter-spacing: -0.058em;
@@ -111,31 +115,6 @@
   margin-top: clamp(10px, 2vh, 20px);
 }
 
-.fin__foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 10px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: var(--fg);
-  opacity: 0.72;
-}
-
-.fin__foot a {
-  text-decoration: none;
-  border-bottom: 1px solid var(--fg-30);
-}
-
-.fin__foot a:hover {
-  border-bottom-color: var(--fg);
-}
-
-.fin__sep {
-  color: var(--fg-60);
-}
-
 @media (max-width: 600px) {
   .fin__form {
     flex-direction: column;
@@ -155,14 +134,5 @@
   }
   .fin__status {
     font-size: 9.5px;
-  }
-  .fin__foot {
-    font-size: 9.5px;
-  }
-  .fin__foot .fin__sep {
-    display: none;
-  }
-  .fin__foot > span {
-    flex-basis: 100%;
   }
 }

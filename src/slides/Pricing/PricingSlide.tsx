@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check } from 'lucide-react'
+import { Check, MessageCircle, Sparkles } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
@@ -43,12 +43,13 @@ export function PricingSlide(_: SlideProps) {
                 ))}
               </ul>
             )}
-            <a
-              className={`btn ${p.featured ? 'btn--primary' : 'btn--ghost'} pr-plan__cta`}
-              href={p.cta === 'trial' ? trialHref(p.name) : SALES_URL}
-            >
-              {p.cta === 'trial' ? 'Start Free Trial' : 'Contact sales'}
-              <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
+            <a className="btn pr-plan__cta" href={p.cta === 'trial' ? trialHref(p.name) : SALES_URL}>
+              {p.cta === 'trial' ? (
+                <Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />
+              ) : (
+                <MessageCircle size={16} strokeWidth={1.8} aria-hidden="true" />
+              )}
+              <span>{p.cta === 'trial' ? 'Start Free Trial' : 'Contact sales'}</span>
             </a>
           </article>
         ))}

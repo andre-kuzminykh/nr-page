@@ -21,6 +21,7 @@ const ALL_ITEMS: { key: NavGroup; label: string; target: string }[] = [
   { key: 'custom', label: 'Use cases', target: 'custom' },
   { key: 'pricing', label: 'Pricing', target: 'pricing' },
   { key: 'faq', label: 'FAQ', target: 'faq' },
+  { key: 'contacts', label: 'Contacts', target: 'contacts' },
 ]
 
 /** Only the sections that are open. */

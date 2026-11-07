@@ -2,13 +2,13 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import { isSlideOpen } from '../../data/slides'
 import { useDeck, type SlideProps } from '../../components/SlideController/DeckContext'
-import { COMPANY_URL, CONTACT_EMAIL, IDEA_ENDPOINT, MEDIA_LABEL_URL, ideaMailto } from '../../config/links'
+import { CONTACT_EMAIL, IDEA_ENDPOINT, ideaMailto } from '../../config/links'
 import './Final.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 type Status = 'idle' | 'short' | 'sending' | 'sent' | 'mail' | 'error'
 
-/** Final CTA — write the idea straight into the input. The light does the rest. */
+/** Final CTA — write the business task straight into the input. The light does the rest. */
 export function FinalSlide(_: SlideProps) {
   const { goTo } = useDeck()
   const [idea, setIdea] = useState('')
@@ -45,10 +45,10 @@ export function FinalSlide(_: SlideProps) {
 
   const message: Record<Status, string> = {
     idle: '',
-    short: 'Write a few words about your idea first.',
+    short: 'Write a few words about your business task first.',
     sending: 'Sending…',
-    sent: 'Thank you — your idea has reached the Neuronium team.',
-    mail: `Your email app should open with the idea. If it doesn’t, write to ${CONTACT_EMAIL}.`,
+    sent: 'Thank you — your task has reached the Neuronium team.',
+    mail: `Your email app should open with your task. If it doesn’t, write to ${CONTACT_EMAIL}.`,
     error: `Couldn’t send right now. Please write to ${CONTACT_EMAIL}.`,
   }
 
@@ -57,10 +57,7 @@ export function FinalSlide(_: SlideProps) {
       <div className="fin__center">
         <h2 className="fin__title">
           <span className="mask" style={d(80)}>
-            <span>Run Your</span>
-          </span>
-          <span className="mask" style={d(170)}>
-            <span>AI Business</span>
+            <span>Run Your AI Business</span>
           </span>
         </h2>
         <p className="fin__sub rv rv--blur" style={d(360)}>
@@ -69,7 +66,7 @@ export function FinalSlide(_: SlideProps) {
 
         <form className={`fin__form rv fin__form--${status}`} style={d(480)} onSubmit={submit}>
           <label htmlFor="fin-idea" className="sr-only">
-            Your idea
+            Your business task
           </label>
           <textarea
             id="fin-idea"
@@ -77,7 +74,7 @@ export function FinalSlide(_: SlideProps) {
             rows={1}
             value={idea}
             maxLength={2000}
-            placeholder="Describe your idea — a product, a service, a business…"
+            placeholder="Describe your business task"
             onChange={(e) => {
               setIdea(e.target.value)
               if (status !== 'idle' && status !== 'sending') setStatus('idle')
@@ -116,24 +113,6 @@ export function FinalSlide(_: SlideProps) {
         )}
       </div>
 
-      <footer className="fin__foot rv rv--fade" style={d(800)}>
-        <span>Neuronium</span>
-        <span className="fin__sep" aria-hidden="true">·</span>
-        <span>
-          A{' '}
-          <a href={MEDIA_LABEL_URL} target="_blank" rel="noreferrer">
-            Dataist AI
-          </a>{' '}
-          label
-        </span>
-        <span className="fin__sep" aria-hidden="true">·</span>
-        <span>
-          Technology by{' '}
-          <a href={COMPANY_URL} target="_blank" rel="noreferrer">
-            Andre AI Technologies
-          </a>
-        </span>
-      </footer>
     </div>
   )
 }

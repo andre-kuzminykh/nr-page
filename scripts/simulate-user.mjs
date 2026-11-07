@@ -80,6 +80,7 @@ const NAV_LABELS = [
   ['Use cases', 'custom'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
+  ['Contacts', 'contacts'],
 ]
   .filter(([, id]) => id && has(id))
   .map(([l]) => l)
@@ -406,8 +407,8 @@ const waitFor = async (fn, ms = 4500) => {
   await sleep(300)
   const empty = await page.locator('#fin-status').innerText()
   await step(page, 'desktop', 'Presses “Get Early Access” with an empty idea', 'Gently asked to write the idea first', /write a few words/i.test(empty))
-  await fin.getByRole('textbox', { name: 'Your idea' }).fill('A marketplace where AI agents negotiate freight for small logistics companies')
-  await fin.getByRole('textbox', { name: 'Your idea' }).press('Enter')
+  await fin.getByRole('textbox', { name: 'Your business task' }).fill('A marketplace where AI agents negotiate freight for small logistics companies')
+  await fin.getByRole('textbox', { name: 'Your business task' }).press('Enter')
   await sleep(500)
   const sent = await page.locator('#fin-status').innerText()
   await step(page, 'desktop', 'Types an idea and presses Enter', 'A pre-filled email to the team opens (no fake “sent”)', /email app should open/i.test(sent))
@@ -511,9 +512,9 @@ const waitFor = async (fn, ms = 4500) => {
   }
   await page.evaluate(() => (location.hash = '#start'))
   await sleep(1400)
-  await page.getByRole('textbox', { name: 'Your idea' }).tap()
+  await page.getByRole('textbox', { name: 'Your business task' }).tap()
   await page.keyboard.type('AI tutor for my language school')
-  await step(page, 'phone', 'Types an idea on the phone', 'Input and button are comfortably reachable', (await page.getByRole('textbox', { name: 'Your idea' }).inputValue()).length > 10)
+  await step(page, 'phone', 'Types a business task on the phone', 'Input and button are comfortably reachable', (await page.getByRole('textbox', { name: 'Your business task' }).inputValue()).length > 10)
   await ctx.close()
 }
 

@@ -29,6 +29,7 @@ const NAV = [
   ['Use cases', 'custom'],
   ['Pricing', 'pricing'],
   ['FAQ', 'faq'],
+  ['Contacts', 'contacts'],
 ].filter(([, id]) => id && has(id))
 let chromium
 try {
@@ -349,7 +350,7 @@ async function functionalPass(browser) {
     cx.nodes === 13 && /Gmail.*Calendar.*Meet.*Slack.*Telegram.*WhatsApp.*Drive.*Docs.*Sheets.*Apollo.*Code.*APIs/.test(cx.labels) && ways.length === 3 && ways.every((w) => w.length === 4) && reached.size === 12 && cx.maxWay > 4 && cx.idleIcons === 0 && cx.lead === 0,
     `${Object.entries(cx.ways).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' · ')} · icons at rest: ${cx.idleIcons}`,
   )
-  check('AI Superagent: the title “AI Superagent works in the context of your business”, no extra copy', /^AI Superagent works in the context of your business/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
+  check('AI Superagent: the title “AI Superagent works in your business context”, no extra copy', /^AI Superagent works in your business context/.test(cx.text) && !/MCP|sample data|Knowledge Graph\./.test(cx.text), cx.text.slice(0, 60))
 
   // Periodic table of 100 AI employees
   if (has('employees')) {
@@ -657,7 +658,7 @@ async function functionalPass(browser) {
   await active.getByRole('button', { name: /Get Early Access/ }).click()
   await sleep(200)
   const emptyMsg = await page.locator('#fin-status').innerText()
-  await active.getByRole('textbox', { name: 'Your idea' }).fill('An AI concierge for boutique hotels')
+  await active.getByRole('textbox', { name: 'Your business task' }).fill('An AI concierge for boutique hotels')
   await active.getByRole('button', { name: /Get Early Access/ }).click()
   await sleep(300)
   const sentMsg = await page.locator('#fin-status').innerText()
@@ -666,6 +667,27 @@ async function functionalPass(browser) {
     fin.title === 'Run Your AI Business' && !fin.centerMark && fin.sub === 'with Neuronium' && fin.idle === '' && /write a few words/i.test(emptyMsg) && /email app/i.test(sentMsg),
     sentMsg,
   )
+  // Contacts: the last block — the address and who stands behind Neuronium
+  await go('contacts')
+  const ct = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    const mail = s.querySelector('.ct__mail')
+    const text = s.querySelector('.ct__mail-text')
+    return {
+      title: s.querySelector('.ct__title')?.textContent.trim(),
+      href: mail?.getAttribute('href'),
+      oneLine: text ? text.getBoundingClientRect().height < parseFloat(getComputedStyle(text).fontSize) * 1.6 : false,
+      fits: text ? text.scrollWidth <= text.clientWidth + 1 && text.getBoundingClientRect().right <= innerWidth : false,
+      links: [...s.querySelectorAll('.ct__foot a')].map((a) => a.getAttribute('href')),
+      last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
+    }
+  })
+  check(
+    'Contacts: the last block, in the menu after FAQ — the address on one line as a mailto link, and links to Dataist AI and Andre AI Technologies',
+    ct.title === 'Contacts' && ct.href === 'mailto:admin@andre.technology' && ct.oneLine && ct.fits && ct.links.some((h) => /dataist\.ai/.test(h)) && ct.links.some((h) => /andre\.technology/.test(h)) && ct.last && NAV.at(-1)[0] === 'Contacts',
+    JSON.stringify(ct),
+  )
+  await go('start')
   const deep = has('employees') ? 'employees' : OPEN_DEPTS[0]?.id ?? 'context'
   if (has('employees')) {
     await active.getByRole('button', { name: /Explore AI Employees/ }).click()

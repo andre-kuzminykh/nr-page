@@ -5,7 +5,7 @@ import { Brain, COMMANDS } from './Brain'
 import './Context.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-const TITLE = ['AI Superagent works', 'in the context', 'of your business']
+const TITLE = ['AI Superagent works', 'in your business context']
 
 /**
  * The tools of the business are one context — a brain. Commands are typed into the bar below it;
