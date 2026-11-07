@@ -5,8 +5,8 @@
  * its element; a department block opens as soon as one of its AI employees is open. Everything else
  * stays in the code, hidden, until it is opened here.
  *
- * Until all 100 AI employees are open, Pricing shows one subscription for what is ready and the FAQ
- * answers for today; the full plans and answers come back once everything is open.
+ * Until all 100 AI employees are open, the FAQ answers for today; the full answers come back once
+ * everything is open.
  *
  * (No imports here: the validation scripts read this file directly.)
  */

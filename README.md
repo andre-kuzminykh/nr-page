@@ -6,7 +6,7 @@ Full-screen blocks, one gesture per block, over one continuous WebGL light field
 
 The site opens step by step. **Open now:** the hero, Platform (the AI Superagent in your business context),
 Management with its first AI employee (**1 · Km**, Knowledge Management), Pricing, FAQ and the final
-block. Pricing and FAQ describe what is ready today. The other 11 blocks are built and stay hidden
+block. The FAQ answers for what is ready today. The other 11 blocks are built and stay hidden
 until they are opened — see [Staged release](#staged-release).
 
 ![Desktop, the open blocks](docs/screenshots/sheets/1440x900.jpg)
@@ -29,6 +29,8 @@ There is no registration backend in this project, so nothing pretends to submit:
 | Variable | Used by | Default |
 |---|---|---|
 | `VITE_EARLY_ACCESS_URL` | “Get Early Access” buttons | `mailto:admin@andre.technology` (published on andre.technology) |
+| `VITE_TRIAL_URL` | “Start Free Trial” on Standard, Solo and Business (`?plan=…` is added) | empty → a pre-filled email naming the plan |
+| `VITE_SALES_URL` | “Contact sales” on Enterprise | empty → an email to the team |
 | `VITE_IDEA_ENDPOINT` | The idea input on the last block (“Run Your AI Business”) | empty → opens a pre-filled email with the idea; when set → `POST {"idea","source"}` JSON |
 
 Copy `.env.example` to `.env` to set them. See `src/config/links.ts`.
@@ -45,16 +47,10 @@ What is open is set in one file, [`src/data/release.ts`](src/data/release.ts):
 | `OPEN_BLOCKS.pricing` | Pricing | `true` |
 | `OPEN_BLOCKS.faq` | FAQ | `true` |
 
-Until all 100 AI employees are open, Pricing and FAQ describe what is ready:
-
-- **Pricing** shows one subscription: “One AI employee today. A hundred to come.” Its small periodic table
-  lights only the open elements, and it lists them (now 1 · Km Knowledge Management) with the shared
-  business context and the AI Superagent. Price on request.
-- **FAQ** gives the answers for today, for example “Ready today: Knowledge Management. New AI employees are
-  added one by one.” It leaves out questions about closed blocks, such as creating your own AI employees.
-- Both follow `release.ts` on their own: open another AI employee and it appears in the subscription and
-  the answers. The three plans and the full answers (`src/data/pricing.ts`, `src/data/faq.ts`) come back
-  once all 100 are open.
+Until all 100 AI employees are open, the **FAQ** gives the answers for today, for example “Ready today:
+Knowledge Management. New AI employees are added one by one.” It leaves out questions about closed blocks,
+such as creating your own AI employees, and follows `release.ts` on its own; the full answers
+(`src/data/faq.ts`) come back once all 100 are open.
 
 A department with only one open AI employee is led by it. Now that is Management with 1 · Km:
 - On the left: the title “AI Knowledge Management”, then “Get answers with the full business context—powered by your
@@ -98,7 +94,7 @@ Latest results for the staged release (production build, headless Chromium with 
   - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
   - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ; links to closed blocks do nothing.
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
-  - Pricing shows one subscription that lights only the open elements; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
+  - Pricing shows Standard $59, Solo $190, Business $890 with Start Free Trial and Enterprise with Contact sales; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
 - **Simulated users**: **31 / 31 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all 17 blocks (last run: 66 / 66 walkthrough steps).
 
@@ -117,7 +113,7 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15 and 16 (for
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
-| 15 | Pricing | Department (10 AI employees), Company (all 100), Custom (101+). Early access — price on request. Until all 100 are open: one subscription for what is ready. |
+| 15 | Pricing | **Standard** $59 / month, bring your own LLM key · **Solo** $190 / month, for a solo builder · **Business** $890 / month, up to 10 people — each with “Start Free Trial” · **Enterprise**, more than 10 people — “Contact sales”. |
 | 16 | FAQ | Eight questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
 | 17 | Run Your AI Business | “Run Your AI Business”, “with Neuronium” smaller below; the idea goes straight into the input → “Get Early Access”; “Explore AI Employees” once the table is open. |
 
@@ -142,8 +138,9 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15 and 16 (for
 - **Illustrative** (labelled “Interface preview · sample data” on screen, not connected to production): every
   piece of interface in the context, department, use-case and FAQ blocks. Company and product names in them
   (Northwind Studio, Brightline) are fictional samples.
-- **Pricing** (`src/data/pricing.ts`) describes the intended early-access packages; `price` is `null`, shown as
-  “Price on request”, until real prices are set.
+- **Pricing** (`src/data/pricing.ts`): Standard $59, Solo $190 and Business $890 per month, each with a free
+  trial; Enterprise is priced with sales. No sign-up backend exists, so the buttons open a pre-filled email
+  until `VITE_TRIAL_URL` / `VITE_SALES_URL` are set.
 - No invented customers, testimonials or metrics. The tools in the context brain are examples of what can be
   connected.
 
@@ -172,7 +169,7 @@ src/
     pricing.ts, faq.ts            plans and questions
     slides.ts                     block order, menu groups and light composition per block
     release.ts                    what is open on the site right now (staged release)
-    ready.ts                      the open AI employees, for Pricing and FAQ
+    ready.ts                      the open AI employees, for the FAQ
   config/links.ts                 CTA destinations and the idea endpoint
 scripts/                          validate-data, validate-browser, simulate-user
 ```

@@ -51,8 +51,7 @@ export const FAQ: Question[] = [
   },
   {
     q: 'How much does it cost?',
-    a: 'Early-access pricing is agreed with each team. Describe your idea on the last screen and we will come back with a proposal.',
-    now: 'The subscription is priced on request. Describe your idea on the last screen and we will come back with a proposal.',
+    a: 'Standard is $59 a month with your own LLM key, Solo $190 for a solo builder, and Business $890 for up to 10 people — each starts with a free trial. Enterprise is priced with sales.',
   },
 ]
 

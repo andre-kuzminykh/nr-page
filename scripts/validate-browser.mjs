@@ -588,25 +588,33 @@ async function functionalPass(browser) {
     const pr = await page.evaluate(() => {
       const s = document.querySelector('.slide[data-state="active"]')
       return {
-        prices: [...s.querySelectorAll('.pr-plan__price')].map((e) => e.textContent.trim()),
-        names: [...s.querySelectorAll('.pr-plan__name')].map((e) => e.textContent.trim()),
-        lit: [...s.querySelectorAll('.pr-plan')].map((x) => x.querySelectorAll('.pr-grid i.is-on').length),
-        list: [...s.querySelectorAll('.pr-plan__list li')].map((li) => li.textContent.trim()),
-        title: [...s.querySelectorAll('.pr__title .mask')].map((m) => m.textContent.trim()).join(' '),
-        note: s.querySelectorAll('.pr__note').length,
+        plans: [...s.querySelectorAll('.pr-plan')].map((x) => ({
+          name: x.querySelector('.pr-plan__name')?.textContent.trim(),
+          price: x.querySelector('.pr-plan__price')?.textContent.replace(/\s+/g, ' ').trim(),
+          line: x.querySelector('.pr-plan__line')?.textContent.trim(),
+          cta: x.querySelector('.pr-plan__cta')?.textContent.trim(),
+          href: x.querySelector('.pr-plan__cta')?.getAttribute('href') ?? '',
+          extra: x.querySelectorAll('ul, li, .pr-grid, .pr-plan__tag').length,
+        })),
+        title: s.querySelector('.pr__title')?.textContent.trim(),
+        copy: s.querySelectorAll('.pr__copy, .pr__note').length,
       }
     })
-    const onRequest = pr.prices.every((x) => x === 'Price on request') && pr.note === 0
-    if (ALL_EMPLOYEES_OPEN) {
-      check('Pricing: three plans, prices on request (no invented numbers), no fine print', pr.prices.length === 3 && onRequest, pr.prices.join(' | '))
-    } else {
-      const ready = OPEN_DEPTS.flatMap((dpt) => dpt.members)
-      check(
-        `Pricing: one subscription for what is ready (${ready.map((x) => `${x.n} · ${x.symbol}`).join(', ')}); its table lights only those elements; price on request, no fine print`,
-        pr.names.join('|') === 'Subscription' && pr.prices.length === 1 && pr.lit[0] === ready.length && (ready.length > 4 ? pr.list.some((li) => li.includes(`${ready.length} AI employees`)) : ready.every((x) => pr.list.some((li) => li.includes(x.name)))) && onRequest && /today/.test(pr.title),
-        `${pr.title} · ${pr.lit[0]} lit · ${pr.prices.join(' | ')}`,
-      )
-    }
+    const want = [
+      ['Standard', '$ 59 / month', 'Bring your own LLM key', 'Start Free Trial'],
+      ['Solo', '$ 190 / month', 'For a solo builder', 'Start Free Trial'],
+      ['Business', '$ 890 / month', 'Up to 10 people', 'Start Free Trial'],
+      ['Enterprise', 'Custom', 'More than 10 people', 'Contact sales'],
+    ]
+    const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c], k) => {
+      const x = pr.plans[k]
+      return x.name === n && x.price.replace(/^\$\s?/, '$ ') === p && x.line === l && x.cta === c && /^(mailto:|https?:)/.test(x.href) && x.extra === 0
+    })
+    check(
+      'Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise with Contact sales — a name, a price, one line and a button each, no other copy',
+      asWanted && pr.title === 'Pricing' && pr.copy === 0,
+      pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta}`).join(' | '),
+    )
   }
 
   // FAQ

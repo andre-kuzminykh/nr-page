@@ -10,7 +10,7 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { ALL_SLIDES, SLIDES } from '../src/data/slides.ts'
 import { DEPARTMENTS } from '../src/data/departments.ts'
-import { ALL_EMPLOYEES_OPEN, OPEN_EMPLOYEES } from '../src/data/release.ts'
+import { OPEN_EMPLOYEES } from '../src/data/release.ts'
 
 const require = createRequire(import.meta.url)
 let chromium
@@ -354,20 +354,32 @@ const waitFor = async (fn, ms = 4500) => {
     // Pricing
     await page.locator('.nav__item', { hasText: 'Pricing' }).click()
     await sleep(1300)
-    const prices = await page.$$eval('.pr-plan__price', (els) => els.map((e) => e.textContent))
-    const ready = OPEN_DEPTS.flatMap((d) => d.members)
-    const sub = await page.$$eval('.pr-plan__list li', (els) => els.map((e) => e.textContent))
+    const plans = await page.$$eval('.pr-plan', (els) =>
+      els.map((x) => ({
+        name: x.querySelector('.pr-plan__name')?.textContent.trim(),
+        price: x.querySelector('.pr-plan__price')?.textContent.replace(/\s+/g, ' ').trim(),
+        cta: x.querySelector('.pr-plan__cta')?.textContent.trim(),
+        href: x.querySelector('.pr-plan__cta')?.getAttribute('href') ?? '',
+      })),
+    )
     await step(
       page,
       'desktop',
       'Opens Pricing',
-      ALL_EMPLOYEES_OPEN ? 'Three plans; no invented prices' : `One subscription for what is ready today (${ready.map((m) => m.name).join(', ')}); no invented prices`,
-      prices.length === (ALL_EMPLOYEES_OPEN ? 3 : 1) && prices.every((p) => p === 'Price on request') && (ALL_EMPLOYEES_OPEN || (ready.length > 4 ? sub.some((li) => li.includes(`${ready.length} AI employees`)) : ready.every((m) => sub.some((li) => li.includes(m.name))))),
-      prices.join(' | '),
+      'Standard $59, Solo $190, Business $890 and Enterprise — prices per month, nothing else around them',
+      plans.map((p) => p.name).join('|') === 'Standard|Solo|Business|Enterprise' && /59/.test(plans[0]?.price) && /190/.test(plans[1]?.price) && /890/.test(plans[2]?.price) && plans[3]?.price === 'Custom',
+      plans.map((p) => `${p.name} ${p.price}`).join(' | '),
     )
-    await page.locator('.pr-plan.is-featured').getByRole('button', { name: /Get Early Access/ }).click()
-    await sleep(1500)
-    await step(page, 'desktop', `Clicks “Get Early Access” on the ${ALL_EMPLOYEES_OPEN ? 'Company plan' : 'subscription'}`, 'Goes to the final block with the idea input', (await idx(page)) === at('start'))
+    const trial = plans.filter((p) => p.cta === 'Start Free Trial')
+    const sales = plans.filter((p) => p.cta === 'Contact sales')
+    await step(
+      page,
+      'desktop',
+      'Looks at the buttons',
+      '“Start Free Trial” on Standard, Solo and Business, “Contact sales” on Enterprise — each leads somewhere real (no fake sign-up)',
+      trial.length === 3 && sales.length === 1 && plans.every((p) => /^(mailto:|https?:)/.test(p.href)) && trial.every((p) => p.href.toLowerCase().includes(p.name.toLowerCase())),
+      plans.map((p) => `${p.cta} → ${p.href.slice(0, 48)}`).join(' | '),
+    )
   }
 
   if (has('faq')) {
