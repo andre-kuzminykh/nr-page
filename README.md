@@ -48,24 +48,38 @@ The social links are the ones published on andre.technology; they are listed onc
 
 The site is plain static files. Navigation uses `#block` links (`neuronium.ai/#pricing`), so the host needs
 **no rewrite rules**: every address is served by `index.html`. File names under `assets/` carry a content hash,
-so they can be cached forever; only `index.html` must stay fresh (both hosts below do this by default).
+so they can be cached forever; only `index.html` must stay fresh (Vercel and Cloudflare do this by default).
 
-**Cloudflare Pages (recommended).**
-1. Cloudflare → Workers & Pages → Create → Pages → Connect to Git → this repository, production branch `main`.
-2. Build command `npm run build`, output directory `dist`, environment variable `NODE_VERSION` = `22`.
-3. The project → Custom domains → add `neuronium.ai`, then `www.neuronium.ai`.
-   With the domain's DNS on Cloudflare, the records are created for you. The apex (`neuronium.ai`) needs the
-   domain's nameservers on Cloudflare; the registrar shows where to change them.
-4. Rules → Redirect Rules: `www.neuronium.ai/*` → `https://neuronium.ai/${1}` (301), so there is one address.
+The domain is registered at **GoDaddy**. The simplest path keeps its DNS there and hosts the site on **Vercel**:
+nothing moves away from GoDaddy, and existing records (such as mail for support@neuronium.ai) stay as they are.
 
-Every push to `main` then deploys; every other branch gets its own preview address.
+**1. Vercel: deploy the site.**
+1. vercel.com → Add New → Project → import this GitHub repository. The Vite preset fills in the build command
+   (`npm run build`) and the output directory (`dist`); leave them. Deploy.
+2. The project → Settings → Domains → add `neuronium.ai`, then `www.neuronium.ai`, and choose to redirect `www` to
+   `neuronium.ai`. Vercel shows the DNS records each domain needs; keep that page open.
 
-**Vercel (alternative).** Import the repository (the Vite preset fills in `npm run build` and `dist`), then
-Settings → Domains → add `neuronium.ai` and `www.neuronium.ai` and create the DNS records Vercel shows
-(usually `A @ 76.76.21.21` and `CNAME www cname.vercel-dns.com`); choose to redirect `www` to the apex.
+**2. GoDaddy: point the domain at Vercel.** My Products → Domains → `neuronium.ai` → DNS.
+1. If the domain has **Forwarding** set, remove it first; GoDaddy keeps the `@` record locked while forwarding is on.
+2. Records for `@`: delete any existing `A` record (often “Parked”) and any `AAAA` record. Then add `A` · name `@` ·
+   value from the Vercel domain page (usually `76.76.21.21`).
+3. Record for `www`: edit the existing `CNAME www` (GoDaddy points it at `@`) to the value Vercel shows
+   (usually `cname.vercel-dns.com`).
+4. Leave the `MX`, `TXT` and `NS` records alone: mail and verification depend on them.
 
-**The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. Add their
-DNS records (a CNAME to wherever each app is hosted) in the same DNS zone; nothing in this project serves them.
+Most changes are live within an hour (up to 48 hours). Vercel issues the HTTPS certificate on its own once the
+records match, and the domains turn green on its Domains page. From then on every push to `main` deploys, and
+every other branch and pull request gets a preview address.
+
+**Alternative: Cloudflare Pages.** Build command `npm run build`, output `dist`, `NODE_VERSION` = `22`. A root domain
+on Cloudflare Pages needs the domain's DNS on Cloudflare: add the site to Cloudflare, check that it copied every
+existing record (above all `MX` for mail), then replace the nameservers at GoDaddy (Domain → DNS → Nameservers →
+change → enter my own) with the two Cloudflare shows. Then add `neuronium.ai` and `www.neuronium.ai` under the
+Pages project's Custom domains, and redirect `www` to the apex with a Redirect Rule.
+
+**The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. In the same
+GoDaddy DNS add `CNAME platform` and `CNAME management`, each pointing to wherever that app is hosted (its host
+shows the value); nothing in this project serves them.
 
 ## Staged release
 
