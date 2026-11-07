@@ -669,15 +669,21 @@ async function functionalPass(browser) {
   )
   // Contacts: the last block — the address and who stands behind Neuronium
   await go('contacts')
+  // let the address finish arriving before measuring it
+  await sleep(900)
   const ct = await page.evaluate(() => {
     const s = document.querySelector('.slide[data-state="active"]')
     const mail = s.querySelector('.ct__mail')
     const text = s.querySelector('.ct__mail-text')
+    const col = s.querySelector('.ct__main')?.getBoundingClientRect()
+    const range = document.createRange()
+    if (text) range.selectNodeContents(text)
+    const tr = range.getBoundingClientRect()
     return {
       title: s.querySelector('.ct__title')?.textContent.trim(),
       href: mail?.getAttribute('href'),
       oneLine: text ? text.getBoundingClientRect().height < parseFloat(getComputedStyle(text).fontSize) * 1.6 : false,
-      fits: text ? text.scrollWidth <= text.clientWidth + 1 && text.getBoundingClientRect().right <= innerWidth : false,
+      fits: !!text && !!col && tr.left >= col.left - 1 && tr.right <= col.right + 1,
       links: [...s.querySelectorAll('.ct__foot a')].map((a) => a.getAttribute('href')),
       last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
     }
