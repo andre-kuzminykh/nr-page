@@ -123,12 +123,13 @@ and a running `npm run preview` (override the URL with `BASE_URL=…`). Output g
 Latest results for the staged release (production build, headless Chromium with software WebGL):
 
 - **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
-- **Browser**: **34 / 34 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
+- **Browser**: **35 / 35 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
   - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, and no JavaScript errors.
-  - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ; links to closed blocks do nothing.
+  - Only the open blocks are on the page; the menu shows Platform · Management · Pricing · FAQ · Contacts; links to closed blocks do nothing.
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
-  - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Enterprise (Contact us) with Contact sales, each with what it includes; the FAQ names what is ready today. [Report](docs/validation/browser-report.md)
-- **Simulated users**: **31 / 31 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+  - Pricing shows Standard $59, Solo $190 and Business $890 with Start Free Trial and Enterprise (Contact us) with Contact sales, each with what it includes; the FAQ names what is ready today.
+  - Every way out leads where [the table above](#where-the-buttons-lead) says; the last block's task reaches the platform as `?task=`; the foot has the AIT logo, the six socials, support, Terms and Privacy. The platform and Knowledge Management are stand-in pages during the checks, so nothing leaves the machine. [Report](docs/validation/browser-report.md)
+- **Simulated users**: **35 / 35 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. The desktop visitor clicks through to the platform and Knowledge Management and comes back. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
 
 Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),

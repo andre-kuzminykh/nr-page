@@ -26,9 +26,9 @@
       "detail": "1280:fits · 1920:fits · 2560:fits · 1440:fits"
     },
     {
-      "name": "Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (Platform · Management · Pricing · FAQ · Contacts), Get Early Access",
+      "name": "Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (Platform · Management · Pricing · FAQ · Contacts), Get Early Access to the platform",
       "ok": true,
-      "detail": "{\"logo\":\"Nr\",\"logoTile\":false,\"items\":[\"Platform\",\"Management\",\"Pricing\",\"FAQ\",\"Contacts\"],\"cta\":\"Get Early Access\",\"bg\":\"rgba(0, 0, 0, 0)\",\"counter\":false}"
+      "detail": "{\"logo\":\"Nr\",\"logoTile\":false,\"items\":[\"Platform\",\"Management\",\"Pricing\",\"FAQ\",\"Contacts\"],\"cta\":\"Get Early Access\",\"ctaHref\":\"https://platform.neuronium.ai/\",\"bg\":\"rgba(0, 0, 0, 0)\",\"counter\":false}"
     },
     {
       "name": "Menu: jumps to sections; with one department open, “Management” links straight to it (no dropdown)",
@@ -68,7 +68,7 @@
     {
       "name": "AI Superagent: the title “AI Superagent works in your business context”, no extra copy",
       "ok": true,
-      "detail": "AI Superagent works in your business context AI SUPERAGENT G"
+      "detail": "AI Superagent works in your business context OPEN PLATFORM A"
     },
     {
       "name": "Departments: 1 open block(s) with only their open AI employees (1); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element",
@@ -81,9 +81,9 @@
       "detail": "What did we agree on pilot pricing? → Who owns the landing page? · {\"sources\":3,\"plain\":true,\"cites\":0,\"answer\":80,\"frame\":0,\"lead\":0}"
     },
     {
-      "name": "Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial, Enterprise “Contact us” with Contact sales — a name, a price, one line, what it includes and a button, no other copy",
+      "name": "Pricing: Standard $59, Solo $190, Business $890 with Start Free Trial (to the platform), Enterprise “Contact us” with Contact sales (to support) — a name, a price, one line, what it includes and a button, no other copy",
       "ok": true,
-      "detail": "Standard $59/ month · Start Free Trial | Solo $190/ month · Start Free Trial | Business $890/ month · Start Free Trial | Enterprise Contact us · Contact sales"
+      "detail": "Standard $59/ month · Start Free Trial → https://platform.neuronium.ai/ | Solo $190/ month · Start Free Trial → https://platform.neuronium.ai/ | Business $890/ month · Start Free Trial → https://platform.neuronium.ai/ | Enterprise Contact us · Contact sales → mailto:support@neuronium.ai?subject=Neur"
     },
     {
       "name": "FAQ: answers open in place, one at a time — opening one closes the others",
@@ -96,14 +96,19 @@
       "detail": "7 questions · Neuronium is in early access. Ready today: Knowledge Management. New AI employees are adde"
     },
     {
-      "name": "Final: “Run Your AI Business”, “with Neuronium” smaller below, idea input with no hint text; empty input is caught; submit hands off honestly",
+      "name": "Final: “Run Your AI Business”, “with Neuronium” smaller below, “Describe your business task”; Get Early Access opens the platform, and a written task is carried over to it (?task=)",
       "ok": true,
-      "detail": "Your email app should open with your task. If it doesn’t, write to admin@andre.technology."
+      "detail": "https://platform.neuronium.ai/ · https://platform.neuronium.ai/?task=An%20AI%20concierge%20for%20boutique%20hotels"
     },
     {
-      "name": "Contacts: last in the menu, after FAQ — it opens the final block (“Run Your AI Business”), which ends with Neuronium · Dataist AI · Andre AI Technologies; no separate contacts block",
+      "name": "Contacts: last in the menu, after FAQ — it opens the final block, whose foot has “Created by” with the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub (open source), support@neuronium.ai, Terms of Use and Privacy Policy",
       "ok": true,
-      "detail": "{\"last\":true,\"title\":\"Run Your AI Business\",\"links\":[\"https://dataist.ai/\",\"https://andre.technology/\"],\"active\":\"Contacts\",\"blocks\":6}"
+      "detail": "{\"by\":\"Created by\",\"logo\":{\"loaded\":true,\"h\":20},\"social\":[\"https://www.linkedin.com/in/andre-kuzminykh/\",\"https://x.com/andre_dataist\",\"https://www.instagram.com/andre_dataist\",\"https://www.tiktok.com/@andre_dataist\",\"https://www.youtube.com/@andre_dataist\",\"https://github.com/andre-kuzminykh\"],\"legal\":[\"mailto:support@neuronium.ai\",\"https://andre.technology/terms/\",\"https://andre.technology/privacy/\"]}"
+    },
+    {
+      "name": "Buttons out: “Open Platform” on the AI Superagent block → https://platform.neuronium.ai/; “Open Knowledge Management” beside the Km element → https://management.neuronium.ai/km",
+      "ok": true,
+      "detail": "{\"platform\":{\"text\":\"Open Platform\",\"href\":\"https://platform.neuronium.ai/\",\"seen\":true},\"km\":{\"text\":\"Open Knowledge Management\",\"href\":\"https://management.neuronium.ai/km\",\"seen\":true}}"
     },
     {
       "name": "Final: no “Explore AI Employees” link while the periodic table is closed",
@@ -636,7 +641,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-07T17:52:36.300Z",
+  "startedAt": "2026-11-07T19:46:02.848Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 43
+  "fps": 42
 }
