@@ -1124,8 +1124,8 @@ async function kmPagePass(browser) {
   await sleep(1300)
   const turned = await activeIndex(page)
   check(
-    'Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, “Open Knowledge Management” leads to the product and the logo back to the landing',
-    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Knowledge Management' && top.cta[1] === KM && top.home === '/' && top.bar && turned === 1,
+    'Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open Platform” as on the landing, and the logo leads back to the landing',
+    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Platform' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
     JSON.stringify(top),
   )
   // the report generator: it opens on a finished report, then the next request runs its stages

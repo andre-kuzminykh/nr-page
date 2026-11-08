@@ -376,7 +376,7 @@
   }
 }
 
-/* phones: Open source is its mark alone, and the product button says its short name */
+/* phones: Open source is its mark alone, so Open Platform always fits beside it */
 @media (max-width: 640px) {
   .nav__oss {
     width: 36px;
@@ -385,11 +385,5 @@
   }
   .nav__oss > span {
     display: none;
-  }
-  .nav__cta[data-short] > span {
-    display: none;
-  }
-  .nav__cta[data-short]::before {
-    content: attr(data-short);
   }
 }

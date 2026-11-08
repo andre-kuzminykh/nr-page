@@ -36,13 +36,13 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 
 | Button | Leads to | Variable |
 |---|---|---|
-| “Open Platform” in the top menu (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open Platform” in the top menu of both pages, at every screen size (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | “Open source”, next to it | `https://github.com/andre-kuzminykh` | `GITHUB_URL` in `links.ts` |
 | The bar on the hero and on the AI Superagent block, and the bar on the last block | `https://platform.neuronium.ai/?task=<the task>`; empty on the last block → the platform | `VITE_PLATFORM_URL` |
 | “About Platform” under the AI Superagent title | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | The bar in Knowledge Management | `https://management.neuronium.ai/km?q=<the question>` | `VITE_KM_URL` |
 | “About Knowledge Management” under its line | its own page, `/knowledge-management/` | `VITE_KM_ABOUT_URL` |
-| “Open Knowledge Management” on that page | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
+| “Open Knowledge Management” at the end of that page | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
 | “Start Free Trial” on Own model, Solo and Team | `https://platform.neuronium.ai/?plan=own`, `?plan=<solo|team>&model=<low|medium|high>` | `VITE_PLATFORM_URL` |
 | “Contact sales” on Scale | the “Write to us” widget, about the Scale plan (or a sales page, if set) | `VITE_SALES_URL` |
 | Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
@@ -117,8 +117,8 @@ blocks, gestures, transitions, light field, menu and progress line (`src/compone
    what, before a decision. 8. **Pricing** — the same block as on the landing. 9. **FAQ** — its own.
    10. **Ask your company** — its own end, with the bar and the foot.
 
-The menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, with “Open Knowledge Management”
-(the product; “Open app” on phones) on the right; the logo leads back to the landing. The example reports use the product's demo
+The menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, with Open source and “Open Platform”
+on the right, as on the landing; the logo leads back to the landing. The example reports use the product's demo
 workspace (its goals, tasks and people are samples). Static hosts serve the page at `/knowledge-management/` with no
 extra rule.
 
@@ -227,7 +227,7 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (fo
 | # | Block | What it shows |
 |---|---|---|
 | 01 | Hero | **NEURONIUM** · “Run AI Business with AI Operating System”, and the input bar: example tasks type themselves, then “Try it yourself”. |
-| 02 | AI Superagent works in your business context | “Open Platform” under the title. A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools; then the bar says “Try it yourself”, and a task written there goes to the platform. The brain is violet through most of its width and turns orange near its right side. |
+| 02 | AI Superagent works in your business context | “About Platform” under the title. A brain-shaped graph whose nodes are the tools — Gmail, Calendar, Meet, Slack, Telegram, WhatsApp, Drive, Docs, Sheets, Apollo, Code, APIs. At rest the brain shows no tools, just its points and connections. Below it a command is typed and sent, and the AI Superagent runs its own way from the core through the tools that command needs — each appears with its icon and name as the agent reaches it, and is gone again as the way fades out. Three commands (“Find new leads and book demos”, “Sum up today’s calls for the team”, “Collect feedback and ship the fix”) take three different ways and together reach all twelve tools; then the bar says “Try it yourself”, and a task written there goes to the platform. The brain is violet through most of its width and turns orange near its right side. |
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |

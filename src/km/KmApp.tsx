@@ -3,7 +3,7 @@ import { ContactWidget } from '../components/Contact/ContactWidget'
 import { Deck } from '../components/Deck/Deck'
 import { TopNav } from '../components/Nav/TopNav'
 import type { SlideProps } from '../components/SlideController/DeckContext'
-import { HOME_URL, KM_URL } from '../config/links'
+import { HOME_URL } from '../config/links'
 import type { SlideMeta } from '../data/slides'
 import { FaqSlide } from '../slides/Faq/FaqSlide'
 import { PricingSlide } from '../slides/Pricing/PricingSlide'
@@ -39,7 +39,7 @@ export function KmApp() {
     <Deck
       slides={KM_SLIDES}
       render={render}
-      nav={<TopNav slides={KM_SLIDES} items={KM_NAV} cta={{ label: 'Open Knowledge Management', short: 'Open app', href: KM_URL }} home={HOME_URL} />}
+      nav={<TopNav slides={KM_SLIDES} items={KM_NAV} home={HOME_URL} />}
       title={title}
       skip={{ to: 'report', label: 'Skip to the report generator' }}
     >

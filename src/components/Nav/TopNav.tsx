@@ -49,7 +49,7 @@ interface TopNavProps {
   /** The menu's sections. */
   items?: NavItem[]
   /** The white button on the right. */
-  cta?: { label: string; href: string; short?: string }
+  cta?: { label: string; href: string }
   /** When set, the logo leads to this page instead of the first block. */
   home?: string
 }
@@ -206,8 +206,8 @@ export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open Pl
         <BrandIcon brand="github" size={15} />
         <span>Open source</span>
       </a>
-      <a className="nav__cta" href={cta.href} data-short={cta.short} aria-label={cta.short ? cta.label : undefined}>
-        <span>{cta.label}</span>
+      <a className="nav__cta" href={cta.href}>
+        {cta.label}
         <ArrowUpRight size={14} strokeWidth={1.8} aria-hidden="true" />
       </a>
 
