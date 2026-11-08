@@ -145,20 +145,6 @@
   max-height: min(64vh, 560px);
 }
 
-/* ---------- 10 · it grows ---------- */
-.kd--grow {
-  display: grid;
-  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
-  align-items: center;
-  gap: clamp(28px, 4vw, 72px);
-}
-
-.kd--grow > div {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 2vh, 20px);
-}
-
 /* ---------- 11 · use cases ---------- */
 .kp-uses {
   display: grid;
@@ -815,61 +801,6 @@
   color: #c9a6ff;
 }
 
-/* ask in your own words */
-.kp-intents {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(12px, 1.4vw, 20px);
-}
-
-.kp-intent {
-  padding: 24px 24px 22px;
-  border: 1px solid rgb(255 255 255 / 0.09);
-  border-radius: 20px;
-  background: rgb(14 12 21 / 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transition:
-    border-color 400ms,
-    transform 500ms var(--ease-out);
-}
-
-.kp-intent:hover {
-  border-color: rgb(224 106 216 / 0.45);
-  transform: translateY(-3px);
-}
-
-.kp-intent__q {
-  font-size: clamp(17px, 1.35vw, 20px);
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
-}
-
-.kp-intent__ru {
-  margin-top: 6px;
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.5);
-}
-
-.kp-intent__r {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 18px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #d9c2ff;
-}
-
-.kp-intent__note {
-  margin-top: 6px;
-  font-size: 13.5px;
-  color: rgb(255 255 255 / 0.55);
-}
-
 /* the knowledge graph */
 .kp-graph {
   padding: clamp(16px, 2vw, 30px);
@@ -1044,93 +975,6 @@
   background: var(--grad);
 }
 
-/* the ontology */
-.kp-nums {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: clamp(28px, 5vh, 48px);
-}
-
-.kp-num span {
-  display: block;
-  font-size: clamp(56px, 8vw, 120px);
-  font-weight: 540;
-  line-height: 0.95;
-  letter-spacing: -0.06em;
-  background: linear-gradient(100deg, #fff 30%, #e9d5ff 60%, #ffd2b3);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-variant-numeric: tabular-nums;
-}
-
-.kp-num small {
-  display: block;
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.55);
-}
-
-.kp-domains {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
-  gap: 8px;
-}
-
-.kp-domain {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 48px;
-  padding: 10px 14px;
-  border: 1px solid rgb(255 255 255 / 0.09);
-  border-radius: 14px;
-  background: rgb(14 12 21 / 0.5);
-  text-align: left;
-  transition:
-    border-color 300ms,
-    background-color 300ms;
-}
-
-.kp-domain__n {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: rgb(255 255 255 / 0.4);
-}
-
-.kp-domain__name {
-  font-size: 14px;
-  line-height: 1.3;
-  color: rgb(255 255 255 / 0.84);
-}
-
-.kp-domain:hover,
-.kp-domain.is-open {
-  border-color: rgb(224 106 216 / 0.55);
-  background: rgb(60 30 90 / 0.4);
-}
-
-.kp-domain.is-open .kp-domain__n {
-  color: #e9b6ff;
-}
-
-.kp-domain__types {
-  min-height: 3em;
-  margin-top: 18px;
-  font-size: 15px;
-  line-height: 1.55;
-  color: rgb(255 255 255 / 0.7);
-}
-
-.kp-domain__types b {
-  font-weight: 560;
-  color: #fff;
-}
-
 /* access */
 .kp-access {
   display: grid;
@@ -1217,41 +1061,6 @@
   color: #fde68a;
 }
 
-/* honesty */
-.kp-gaps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(10px, 1.2vw, 16px);
-}
-
-.kp-gap {
-  padding: 22px;
-  border: 1px solid rgb(255 255 255 / 0.08);
-  border-radius: 18px;
-  background: rgb(14 12 21 / 0.55);
-}
-
-.kp-gap__code {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fcd34d;
-}
-
-.kp-gap p {
-  margin-top: 10px;
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: rgb(255 255 255 / 0.72);
-}
-
-.kp-gap-report {
-  max-width: 720px;
-  margin-top: clamp(24px, 4vh, 40px);
-}
-
-/* it grows */
 .kp-grow {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
@@ -1259,48 +1068,10 @@
   gap: clamp(28px, 4vw, 72px);
 }
 
-.kp-ring {
-  width: 100%;
-  max-width: 420px;
-  height: auto;
-  margin: 0 auto;
-}
-
-.kp-ring circle {
-  fill: rgb(255 255 255 / 0.12);
-  stroke: rgb(255 255 255 / 0.22);
-}
-
-.kp-ring circle.is-on {
-  fill: #e06ad8;
-  stroke: none;
-  filter: drop-shadow(0 0 10px rgb(224 106 216 / 0.9));
-}
-
-.slide[data-state="active"] .kp-ring circle:not(.is-on) {
-  animation: kp-wait 3.6s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.14s);
-}
-
 @keyframes kp-wait {
   50% {
     fill: rgb(255 255 255 / 0.28);
   }
-}
-
-.kp-ring__n {
-  font-size: 34px;
-  font-weight: 560;
-  letter-spacing: -0.03em;
-  fill: #fff;
-}
-
-.kp-ring__l {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  fill: rgb(255 255 255 / 0.55);
 }
 
 /* =========================================================
@@ -1344,8 +1115,6 @@
     margin-top: 4px;
   }
   .kp-rules,
-  .kp-intents,
-  .kp-gaps,
   .kp-uses {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1365,14 +1134,10 @@
 
 @media (max-width: 900px) {
   .kd--report,
-  .kd--graph,
-  .kd--grow {
+  .kd--graph {
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
     align-content: safe center;
-  }
-  .kd--grow .kp-ring {
-    max-width: 200px;
   }
 }
 
@@ -1471,8 +1236,7 @@
     margin-top: 14px;
     padding-top: 12px;
   }
-  .kp-rules,
-  .kp-intents {
+  .kp-rules {
     grid-template-columns: minmax(0, 1fr);
   }
   .kp-uses {
@@ -1484,7 +1248,6 @@
   }
   /* small cards: what matters, no more */
   .kp-card p,
-  .kp-intent__ru,
   .kp-use__res {
     display: none;
   }
@@ -1499,57 +1262,12 @@
     margin-top: 10px;
     font-size: 17px;
   }
-  .kp-intent,
   .kp-use {
     padding: 12px 14px;
     gap: 4px;
   }
-  .kp-intent__q,
   .kp-use__ask {
     font-size: 15px;
-  }
-  .kp-intent__r {
-    margin-top: 6px;
-  }
-  .kp-gaps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  .kp-gap {
-    padding: 12px;
-  }
-  .kp-gap p {
-    font-size: 12.5px;
-  }
-  .kp-nums {
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .kp-num span {
-    font-size: clamp(40px, 13vw, 64px);
-  }
-  /* the domains: a cloud of small pills */
-  .kp-domains {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  .kp-domain {
-    min-height: 0;
-    padding: 5px 9px;
-    gap: 6px;
-    border-radius: 999px;
-  }
-  .kp-domain__n {
-    display: none;
-  }
-  .kp-domain__name {
-    font-size: 12px;
-  }
-  .kp-domain__types {
-    min-height: 0;
-    margin-top: 4px;
-    font-size: 13px;
   }
   .kp-viewers button {
     padding: 10px 14px;

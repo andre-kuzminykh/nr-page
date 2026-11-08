@@ -8,7 +8,7 @@ import './Hero.css'
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 const WORD = 'NEURONIUM'
 /** Business tasks the bar types by itself before it says “Try it yourself”. */
-const TASKS = ['Plan the launch of our new product', 'Turn today’s calls into tasks', 'Answer customers on every channel']
+const TASKS = ['Plan the launch of our new product', 'Prepare the Monday review for the team', 'Find out why our market review is behind']
 
 /** Main block: the name, very large — then what it is, and the bar to give it a business task. */
 export function HeroSlide({ active, shown }: SlideProps) {
@@ -57,18 +57,18 @@ export function HeroSlide({ active, shown }: SlideProps) {
             </span>
           ))}
         </h1>
-        <div className="hero__rule rv rv--line" style={d(620)} aria-hidden="true">
+        <div className="hero__rule rv rv--line" style={d(480)} aria-hidden="true">
           <span className="hero__trace" />
         </div>
         <p ref={line} className="hero__line">
-          <span className="hero__run rv rv--blur" style={d(700)}>
+          <span className="hero__run rv" style={d(560)}>
             Run AI Business
           </span>
-          <span className="hero__os rv rv--blur" style={d(800)}>
+          <span className="hero__os rv" style={d(640)}>
             with AI Operating System
           </span>
         </p>
-        <div className="hero__bar rv" style={d(980)}>
+        <div className="hero__bar rv" style={d(780)}>
           <Prompt
             {...demo.bar}
             label="Your business task"

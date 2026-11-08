@@ -27,7 +27,7 @@ export function FinalSlide(_: SlideProps) {
             <span>Run Your AI Business</span>
           </span>
         </h2>
-        <p className="fin__sub rv rv--blur" style={d(360)}>
+        <p className="fin__sub rv" style={d(360)}>
           with Neuronium
         </p>
 

@@ -364,10 +364,10 @@ const waitFor = async (fn, ms = 4500) => {
           const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), `${BASE}knowledge-management/`, d.id)
           await sleep(1500)
           const kmPage = await page.evaluate(() => ({ h1: [...document.querySelectorAll('.kd-h1 .mask')].map((m) => m.textContent.trim()).join(' '), blocks: document.querySelectorAll('.slide').length }))
-          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks > 10, JSON.stringify(kmPage))
+          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks >= 8, JSON.stringify(kmPage))
           await page.keyboard.press('PageDown')
           const report = await page.waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 20000 }).then((e) => e.textContent()).catch(() => '')
-          await step(page, 'desktop', 'Turns to the next block there', 'The report generator writes a report by itself: the four stages, then the document', !!report, report)
+          await step(page, 'desktop', 'Turns to the next block there', 'The report generator is there with a finished report, then writes the next one by itself', !!report, report)
           await out.back()
         }
       } else

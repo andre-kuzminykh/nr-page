@@ -763,7 +763,7 @@ async function functionalPass(browser) {
       open: [...document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]')].map((b) => b.textContent),
       text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
     }))
-    check('FAQ: answers open in place, one at a time — opening one closes the others', faqState.open.length === 1 && /Who stays in control/.test(faqState.open[0]) && /AI Governance/.test(faqState.text), faqState.text.slice(0, 60))
+    check('FAQ: answers open in place, one at a time — opening one closes the others', faqState.open.length === 1 && /Who stays in control/.test(faqState.open[0]) && /stay with people/.test(faqState.text), faqState.text.slice(0, 60))
     if (!ALL_EMPLOYEES_OPEN) {
       await page.getByRole('button', { name: /Is it available today/ }).click()
       await sleep(700)
@@ -1128,33 +1128,37 @@ async function kmPagePass(browser) {
     top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Knowledge Management' && top.cta[1] === KM && top.home === '/' && top.bar && turned === 1,
     JSON.stringify(top),
   )
-  // the report generator
+  // the report generator: it opens on a finished report, then the next request runs its stages
   await go('report')
-  const stages = await page.waitForSelector('.kr-steps', { timeout: 15000 }).then(() => page.$$eval('.kr-steps li', (li) => li.map((x) => x.textContent.trim()))).catch(() => [])
   const first = await page
-    .waitForSelector('.kr-sheet .kr-title', { timeout: 20000 })
+    .waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 4000 })
     .then(async () => {
-      await sleep(2800)
+      await sleep(2400)
       return page.evaluate(() => {
-        const s = document.querySelector('.kr-sheet')
+        const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
         return {
           title: s.querySelector('.kr-title')?.textContent.trim(),
           figs: [...s.querySelectorAll('.kr-fig__v')].map((f) => f.textContent.replace(/\s+/g, '')),
           bar: Math.round((parseFloat(getComputedStyle(s.querySelector('.kr-bar__fill')).width) / parseFloat(getComputedStyle(s.querySelector('.kr-bar__track')).width)) * 100),
           parts: [...s.querySelectorAll('.kr-part h4')].map((h) => h.textContent.trim()).join('|'),
           badges: [...s.querySelectorAll('.kr-badge')].map((b) => b.textContent.trim()).join('|'),
+          query: document.querySelector('.slide[data-state="active"] .kr-bar-row .prompt__q .sr-only')?.textContent.trim(),
         }
       })
     })
     .catch(() => null)
+  const stages = await page.waitForSelector('.slide[data-state="active"] .kr-steps', { timeout: 15000 }).then(() => page.$$eval('.slide[data-state="active"] .kr-steps li', (li) => li.map((x) => x.textContent.trim()))).catch(() => [])
   check(
-    'Knowledge Management page: the report generator types a request, runs the four stages (with the records walked), and a report arrives — title, figures counted up, the bar grown against plan, findings with their statuses, limitations, sources',
-    stages.length === 4 && /Walking the company graph/.test(stages[1]) && first?.title === 'Root-cause report — Cyprus AI market review' && first.figs.join(' ') === '33% −27pp 4 7' && Math.abs(first.bar - 33) <= 2 && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed',
+    'Knowledge Management page: the report generator opens on a finished report — title, figures counted up, the bar grown against plan, findings with their statuses, limitations, sources — then the next request is typed and runs the four stages (with the records walked)',
+    first?.title === 'Root-cause report — Cyprus AI market review' && first.query === 'Why is the Cyprus AI market review at risk?' && first.figs.join(' ') === '33% −27pp 4 7' && Math.abs(first.bar - 33) <= 2 && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed' && stages.length === 4 && /Walking the company graph/.test(stages[1]),
     JSON.stringify({ stages: stages.length, ...first }),
   )
-  await page.locator('.slide[data-state="active"] .kr-tpl', { hasText: 'Profit (not connected)' }).click()
+  await page.locator('.slide[data-state="active"] .kr-tpl', { hasText: 'Profit' }).click()
   const gap = await page
-    .waitForFunction(() => document.querySelector('.slide[data-state="active"] .kr-sheet .kr-title')?.textContent.trim() === 'Расчёт', null, { timeout: 15000 })
+    .waitForFunction(() => {
+      const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
+      return /profit last month/.test(s?.querySelector('.kr-prep')?.textContent ?? '') && s.querySelector('.kr-limits')
+    }, null, { timeout: 15000 })
     .then(() => page.evaluate(() => ({ figs: document.querySelectorAll('.slide[data-state="active"] .kr-sheet .kr-fig').length, limit: document.querySelector('.slide[data-state="active"] .kr-sheet .kr-limits li')?.textContent.trim() })))
     .catch(() => null)
   await go('access')
@@ -1165,17 +1169,10 @@ async function kmPagePass(browser) {
   await act.getByRole('radio', { name: 'Operator' }).click()
   await sleep(400)
   const operator = await act.locator('.kp-answer__a').innerText()
-  await go('ontology')
-  await page.locator('.slide[data-state="active"] .kp-domain', { hasText: 'Finance' }).click()
-  const types = await page.locator('.slide[data-state="active"] .kp-domain__types').innerText()
-  const dom = await page.evaluate(() => {
-    const s = document.querySelector('.slide[data-state="active"]')
-    return { domains: s.querySelectorAll('.kp-domain').length, nums: [...s.querySelectorAll('.kp-num small')].map((x) => x.textContent).join('|') }
-  })
   check(
-    'Knowledge Management page: a template plays its report (a request in Russian gets a Russian report, and a missing module is an honest gap, not a number); “Viewing as” changes the answer; the 27 ontology domains show their types',
-    gap?.figs === 0 && /модуля «Финансы»/.test(gap?.limit ?? '') && /300\.00 EUR/.test(operator) && /No amount/.test(delivery) && dom.domains === 27 && /Profit & margin/.test(types) && dom.nums === 'domains|entity types|Neuronium modules',
-    JSON.stringify({ gap, delivery: delivery.slice(0, 40), operator: operator.slice(0, 40), ...dom }),
+    'Knowledge Management page: a template plays its report (a missing module is an honest gap, not a number); “Viewing as” changes the answer',
+    gap?.figs === 0 && /Finance module, which is not connected yet/.test(gap?.limit ?? '') && /300\.00 EUR/.test(operator) && /No amount/.test(delivery),
+    JSON.stringify({ gap, delivery: delivery.slice(0, 40), operator: operator.slice(0, 40) }),
   )
   // its own use cases, the shared pricing, its own FAQ, its own end
   await go('cases')

@@ -239,8 +239,8 @@
   .pr-plan__cta {
     gap: 6px;
     padding: 0 8px;
-    font-size: 10px;
-    letter-spacing: 0.08em;
+    font-size: 13px;
+    letter-spacing: -0.015em;
   }
   .pr-plan__cta svg {
     width: 13px;

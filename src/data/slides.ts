@@ -53,9 +53,9 @@ export const ALL_SLIDES: SlideMeta[] = [
   dept('development', 'Development', 0.84, 0.44),
   dept('engineering', 'Engineering', 0.8, 0.68),
   { id: 'custom', label: 'Custom use cases', nav: 'custom', light: { x: 0.76, y: 0.52, radius: 0.5, energy: 0.85, spread: 1.05 } },
-  { id: 'cases', label: 'Cases', nav: 'cases', light: { x: 0.24, y: 0.3, radius: 0.5, energy: 0.82, spread: 1.1 } },
-  { id: 'pricing', label: 'Pricing', nav: 'pricing', light: { x: 0.5, y: 1.08, radius: 0.55, energy: 0.85, spread: 1.15 } },
-  { id: 'faq', label: 'FAQ', nav: 'faq', light: { x: 0.14, y: 0.92, radius: 0.48, energy: 0.72, spread: 1.05 } },
+  { id: 'cases', label: 'Cases', nav: 'cases', light: { x: 0.24, y: 0.3, radius: 0.5, energy: 0.6, spread: 1.1 } },
+  { id: 'pricing', label: 'Pricing', nav: 'pricing', light: { x: 0.5, y: 1.08, radius: 0.55, energy: 0.6, spread: 1.15 } },
+  { id: 'faq', label: 'FAQ', nav: 'faq', light: { x: 0.14, y: 0.92, radius: 0.48, energy: 0.56, spread: 1.05 } },
   { id: 'start', label: 'Run your AI business', nav: 'start', light: { x: 0.5, y: 0.56, radius: 0.62, energy: 1.25, spread: 0.78 } },
 ]
 

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type NavSource = 'wheel' | 'key' | 'touch' | 'ui'
 
 /** Time a transition owns the screen; input arriving meanwhile cannot start another one. */
-export const TRANSITION_MS = 820
+export const TRANSITION_MS = 700
 const WHEEL_GAP_MS = 170
 const WHEEL_THRESHOLD = 28
 const SWIPE_THRESHOLD = 46

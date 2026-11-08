@@ -45,18 +45,17 @@ export interface Scenario {
 }
 
 const EN = { findings: 'Findings', limits: 'Limitations', sources: 'Sources', expected: 'expected' }
-const RU = { findings: 'Находки', limits: 'Ограничения', sources: 'Источники', expected: 'ожидается' }
 
 export const SCENARIOS: Scenario[] = [
   {
     id: 'cause',
     template: 'Why is a goal at risk',
-    query: 'Why is Cyprus AI market review at risk?',
+    query: 'Why is the Cyprus AI market review at risk?',
     intent: 'cause',
     walked: 46,
     title: 'Root-cause report — Cyprus AI market review',
-    prepared: 'Prepared for Operator — workspace owner · 07.11.2026',
-    summary: 'Cyprus AI market review: at risk — 33% done against 60% expected by elapsed time (−27 pp).',
+    prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
+    summary: 'Cyprus AI market review is at risk: 33% done against 60% expected by elapsed time (−27 pp).',
     figures: [
       { value: 33, unit: '%', label: 'Progress', tone: 'warn' },
       { value: -27, unit: ' pp', label: 'Against plan', tone: 'bad' },
@@ -65,7 +64,7 @@ export const SCENARIOS: Scenario[] = [
     ],
     chart: [{ label: 'Cyprus AI market review', value: 33, expected: 60 }],
     findings: [
-      { status: 'Calculated', text: 'At risk: 33% done against 60% expected by elapsed time — by the goal rules of Goals.', cites: ['c1', 'c2'] },
+      { status: 'Calculated', text: 'At risk: 33% done against 60% expected by elapsed time, by the goal rules.', cites: ['c1', 'c2'] },
       { status: 'Confirmed', text: 'Open work under the goal: Draft the article, Proofread & publish.', cites: ['c3', 'c4'] },
     ],
     limits: ['No Decision records: the Ideas & Decisions module is not connected yet.'],
@@ -79,7 +78,7 @@ export const SCENARIOS: Scenario[] = [
     intent: 'overview',
     walked: 58,
     title: 'Company report — Neuronium',
-    prepared: 'Prepared for Operator — workspace owner · 07.11.2026',
+    prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
     summary: '3 goals at 19% on average, 2 off plan; 11 open tasks; 4 people.',
     figures: [
       { value: 19, unit: '%', label: 'Average progress', tone: 'warn' },
@@ -95,7 +94,7 @@ export const SCENARIOS: Scenario[] = [
       { status: 'Calculated', text: 'Goals: 3, 19% on average; 2 off plan.', cites: ['c1'] },
       { status: 'Confirmed', text: 'Work: 11 open tasks across the board’s processes.', cites: ['c2', 'c3'] },
     ],
-    limits: ['Not connected yet: team pulse (HR), market share, profit, bugs, uptime — their modules are not connected.'],
+    limits: ['Not connected yet: team pulse (HR), market share, profit, bugs, uptime. Their modules come later.'],
     sources: ['Goals · all', 'Tasks · by status', 'People · workspace'],
     words: EN,
   },
@@ -106,7 +105,7 @@ export const SCENARIOS: Scenario[] = [
     intent: 'sum',
     walked: 31,
     title: 'Calculation report',
-    prepared: 'Prepared for Operator — workspace owner · 07.11.2026',
+    prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
     summary: 'Counted 3 task records with status in progress.',
     figures: [
       { value: 3, label: 'Records', tone: 'ok' },
@@ -121,84 +120,31 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'gap',
-    template: 'Profit (not connected)',
-    query: 'Какая прибыль за прошлый месяц?',
+    template: 'Profit',
+    query: 'What was profit last month?',
     intent: 'sum',
     walked: 12,
-    title: 'Расчёт',
-    prepared: 'Подготовлено для Operator — workspace owner · 07.11.2026',
-    summary: 'Цифры нет: записи «Прибыль и маржа» приходят из модуля «Финансы», который ещё не подключён.',
+    title: 'Calculation report',
+    prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
+    summary: 'No figure: Profit & margin records come from the Finance module, which is not connected yet.',
     figures: [],
     findings: [],
-    limits: ['Записи «Прибыль и маржа» приходят из модуля «Финансы», который ещё не подключён.'],
+    limits: ['Profit & margin records come from the Finance module, which is not connected yet. No number is made up in its place.'],
     sources: [],
-    words: RU,
+    words: EN,
   },
 ]
 
 /** The four stages a report goes through before it arrives. */
 export const STAGES = ['Understanding the request', 'Walking the company graph', 'Calculating', 'Composing the report']
 
-/** How it works: GraphRAG, step by step. */
+/** How a report gets built, step by step. */
 export const PIPELINE = [
-  { n: '01', title: 'Understand', text: 'What is asked: how much, why, what effect, how it is going, or what is linked.' },
-  { n: '02', title: 'Link', text: 'The request is tied to records and entity types of your company’s ontology.' },
-  { n: '03', title: 'Walk the graph', text: 'Through the typed knowledge graph — only through what the reader may see.' },
-  { n: '04', title: 'Calculate', text: 'What needs counting is counted, by named rules.' },
-  { n: '05', title: 'Compose', text: 'A report is written from what was found — with its sources.' },
-]
-
-/** Ask in your own words: what kind of question becomes what kind of report. */
-export const INTENTS = [
-  { ask: 'Why is Triage inbox paused?', ru: 'Почему задача на паузе?', report: 'Root-cause report', note: 'stored reasons, the rule behind a verdict, the open work' },
-  { ask: 'How much do we owe Lena Stone?', ru: 'Сколько мы должны исполнителям?', report: 'Calculation report', note: 'a count, or money summed per currency' },
-  { ask: 'What is the progress of the goals?', ru: 'Какой прогресс у цели?', report: 'Status report', note: 'progress, verdict, deviation, days to deadline' },
-  { ask: 'What tasks does MK own?', ru: 'Кто держит роль Designer?', report: 'Records report', note: 'what is linked, and the field the link lives in' },
-  { ask: 'What effect did the campaign have?', ru: 'Какой эффект дала задача?', report: 'Effect assessment', note: 'never claimed without measurements' },
-  { ask: 'Company overview', ru: 'Отчёт по компании', report: 'Company report', note: 'goals, work, people, bookings, money, processes' },
-]
-
-export const TEMPLATES = ['Company overview', 'Goals status', 'Why is a goal at risk', 'Work in progress', 'Bookings', 'What we owe', 'Process steps', 'Profit (not connected)']
-
-/** The company ontology: 27 domains (0–26). */
-export const DOMAINS: { name: string; types: string }[] = [
-  { name: 'Company & counterparties', types: 'Company, Legal entity, Direction, Team, Person, Organisation, Counterparty, Client' },
-  { name: 'People, roles & responsibility', types: 'Executor, Role, Role assignment, Responsibility' },
-  { name: 'Market', types: 'Market, Market share, Segment, Buyer persona, User class, Need, Research, Competitor, Comparison' },
-  { name: 'Product', types: 'Product, Feature, Use case, Value proposition' },
-  { name: 'Commercial offer', types: 'Offer, Plan, Price, Terms revision' },
-  { name: 'Goals & metrics', types: 'Goal, Key result, Metric, Measurement, KPI' },
-  { name: 'Ideas, hypotheses & decisions', types: 'Observation, Insight, Idea, Hypothesis, Decision, Experiment' },
-  { name: 'Requirements', types: 'Requirement, PRD / BRD / TRD, Client request, Acceptance criteria' },
-  { name: 'Projects & tasks', types: 'Project, Assignment, Project stage, Task, Work session, Risk, Budget' },
-  { name: 'Processes', types: 'Process, Stage, Process version, Operation, Process run, Operation run' },
-  { name: 'Marketing', types: 'Strategy, Campaign, Customer journey, Touchpoint' },
-  { name: 'SMM & content', types: 'Content plan, Material, Publication, Channel, Subscriber' },
-  { name: 'Sales', types: 'Prospect, Lead, Qualification, Outreach sequence, Deal' },
-  { name: 'Communication & meetings', types: 'Conversation, Message, Calendar event, Booking, Meeting, Minutes' },
-  { name: 'Design', types: 'Design, Prototype, Landing page, Usability check, Design system' },
-  { name: 'Development', types: 'System, Specification, Code change, Review, Test case, Test run, Build, Release, Deployment, Feature release, User, Usage event' },
-  { name: 'Engineering', types: 'Environment, Component, Pipeline, Alert, SLO, Availability, Vulnerability, Incident, Backup, Restore check' },
-  { name: 'Support', types: 'Ticket, Bug, Feature request, FAQ' },
-  { name: 'HR', types: 'Position, Invitation, Vacancy, Candidate, Employment, Absence, Development plan, Course, Skill assessment, Performance review, Wellbeing survey' },
-  { name: 'Partnerships', types: 'Partnership, Referral, Commission, Payout' },
-  { name: 'Procurement', types: 'Purchase request, Supplier, Supplier offer, Purchase order, Receipt, Supplier invoice' },
-  { name: 'Contracts, orders & subscriptions', types: 'Contract, Order, Subscription, Entitlement' },
-  { name: 'Finance', types: 'Accrual, Invoice, Payment, Revenue, Costs, Profit & margin, Refund' },
-  { name: 'Data', types: 'Data source, Dataset, Processing, Data asset, Forecast' },
-  { name: 'Documents, knowledge & reports', types: 'Document, Revision, Source fragment, Report, Regulation, Signature, Note' },
-  { name: 'Automation', types: 'Event, Rule, Automation run, Approval' },
-  { name: 'Graph rules', types: 'Identifiers, links, statuses, access, answers — built into how the graph behaves' },
-]
-
-/** Honest gaps: instead of a made-up number, the report says what is missing and why. */
-export const GAPS = [
-  { code: 'Module not connected', text: '“What was profit last month?” — Profit & margin records come from the Finance module, which is not connected yet.' },
-  { code: 'No records', text: 'The type is kept, but there are no records you can see.' },
-  { code: 'No links', text: 'The record is there, but not the link the question needs.' },
-  { code: 'No decisions', text: 'A “why” with no Decision records says so instead of guessing.' },
-  { code: 'No measurements', text: 'An effect is never claimed without measurements and a way to compare.' },
-  { code: 'Not recognised', text: 'No record, type or filter in the request — it asks again rather than invents.' },
+  { n: '01', title: 'Understand', text: 'Works out what you are asking: a count, a cause, a status or an effect.' },
+  { n: '02', title: 'Link', text: 'Matches your words to real records: goals, tasks, people, money.' },
+  { n: '03', title: 'Walk the graph', text: 'Follows the links between records, only the ones you may see.' },
+  { n: '04', title: 'Calculate', text: 'Counts and sums by fixed, named rules.' },
+  { n: '05', title: 'Compose', text: 'Writes the report and cites every source.' },
 ]
 
 /** Who is reading changes what the graph holds. */
@@ -208,7 +154,7 @@ export const VIEWERS = [
     name: 'Operator',
     role: 'workspace owner',
     sees: 'Everything.',
-    answer: { kind: 'sum' as const, text: 'Sum of 1 accrual record linked to Lena Stone: 300.00 EUR — to pay 300.00 EUR, paid 0.' },
+    answer: { kind: 'sum' as const, text: 'Sum of 1 accrual record linked to Lena Stone: 300.00 EUR. To pay 300.00 EUR, paid 0.' },
   },
   {
     id: 'delivery',
@@ -219,21 +165,21 @@ export const VIEWERS = [
   },
   {
     id: 'sales',
-    name: 'Sales — MK',
+    name: 'Sales · MK',
     role: 'workspace and the Sales funnel',
     sees: 'The workspace and the Sales funnel process.',
     answer: { kind: 'gap' as const, text: 'No amount: accruals and payments are outside your access.' },
   },
 ]
 
-/** Who uses it for what — each a request and the report it gets (from the product's examples). */
+/** Who uses it for what: each a request and the report it gets (from the product's examples). */
 export const USE_CASES = [
   { who: 'Monday review', ask: 'Company overview report', report: 'Company report', result: '3 goals at 19% on average, 2 off plan; 11 open tasks; 4 people' },
-  { who: 'A goal slips', ask: 'Why is Cyprus AI market review at risk?', report: 'Root-cause report', result: '−27 pp against plan, 4 days to deadline, and the open work under it' },
-  { who: 'Paying executors', ask: 'How much do we owe Lena Stone?', report: 'Calculation report', result: '300.00 EUR to pay, 0 paid — summed per currency' },
+  { who: 'A goal slips', ask: 'Why is the Cyprus AI market review at risk?', report: 'Root-cause report', result: '−27 pp against plan, 4 days to the deadline, and the open work under it' },
+  { who: 'Paying executors', ask: 'How much do we owe Lena Stone?', report: 'Calculation report', result: '300.00 EUR to pay, 0 paid, summed per currency' },
   { who: 'Daily stand-up', ask: 'How many tasks are in progress?', report: 'Calculation report', result: '3 tasks in progress, each with its source' },
   { who: 'Who does what', ask: 'What tasks does MK own?', report: 'Records report', result: 'Maria Kovacs → owns → Cyprus bank AI audit, Fund portfolio demo' },
-  { who: 'Before a decision', ask: 'What effect did Collect market sources have?', report: 'Effect assessment', result: 'Execution is recorded, not a measured result — no effect is claimed' },
+  { who: 'Before a decision', ask: 'What effect did Collect market sources have?', report: 'Effect assessment', result: 'The work is recorded but no result was measured, so no effect is claimed' },
 ]
 
 /** The page's own questions. */
@@ -245,11 +191,11 @@ export const KM_FAQ: { q: string; a: string }[] = [
   { q: 'Which languages can I ask in?', a: 'English and Russian. The report comes in the language you asked in.' },
   {
     q: 'Where do the numbers come from?',
-    a: 'From your company’s knowledge graph — goals, tasks, processes, people, bookings and money records. What is counted is counted by named rules, and every confirmed claim links to its source.',
+    a: 'From your company’s knowledge graph: goals, tasks, processes, people, bookings and money records. Counts follow named rules, and every confirmed claim links to its source.',
   },
   {
     q: 'What if the data is not there?',
-    a: 'The report says so. A missing module, record, link or measurement becomes a limitation with its reason — never a made-up number.',
+    a: 'The report says so. A missing module, record, link or measurement becomes a limitation with its reason. It never makes up a number.',
   },
   {
     q: 'Who sees what?',
@@ -259,9 +205,9 @@ export const KM_FAQ: { q: string; a: string }[] = [
     q: 'What can it answer today?',
     a: 'Everything Management keeps: goals, tasks, directions, processes and their stages, people and roles, bookings, accruals and payments. The other entity types are recognised and answered with an honest gap until their module connects.',
   },
-  { q: 'Can I print a report?', a: 'Yes — every report has Print; the printed copy leaves out shadows and frames.' },
+  { q: 'Can I print a report?', a: 'Yes. Every report has Print, and the printed copy leaves out shadows and frames.' },
   {
     q: 'How much does it cost?',
-    a: 'It comes with every plan: Own model $19 a month, Solo from $59, Team from $290 — each with a free trial. For more than 10 people, Scale is priced with you.',
+    a: 'It comes with every plan: Own model at $19 a month, Solo from $59, Team from $290, each with a free trial. For more than 10 people, Scale is priced with you.',
   },
 ]

@@ -33,10 +33,7 @@ export function FaqSlide({ shown, questions: FAQ = QUESTIONS }: SlideProps & { q
     <div className="slide__frame faq">
       <h2 className="h2 faq__title">
         <span className="mask" style={d(40)}>
-          <span>Questions,</span>
-        </span>
-        <span className="mask" style={d(120)}>
-          <span>answered.</span>
+          <span>FAQ</span>
         </span>
       </h2>
 

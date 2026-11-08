@@ -36,24 +36,23 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  transform: translate3d(0, 108%, 0) rotate(8deg);
-  transform-origin: 0 100%;
+  transform: translate3d(0, 108%, 0);
 }
 
+/* the letters rise straight up, one after another; one sheen passes once they have landed */
 [data-shown] .hero__ch {
   transform: none;
-  transition: transform 1300ms var(--ease-out);
-  transition-delay: calc(140ms + var(--i) * 55ms);
-  animation: hero-sheen 7.5s var(--ease-in-out) infinite;
-  animation-delay: calc(2.2s + var(--i) * 0.07s);
+  transition: transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(120ms + var(--i) * 34ms);
+  animation: hero-sheen 2.4s var(--ease-in-out) both;
+  animation-delay: calc(1.3s + var(--i) * 0.06s);
 }
 
 @keyframes hero-sheen {
-  0% {
+  from {
     background-position: 100% 0;
   }
-  32%,
-  100% {
+  to {
     background-position: 0% 0;
   }
 }
@@ -77,15 +76,14 @@
 }
 
 [data-shown] .hero__trace {
-  animation: hero-trace 7.5s var(--ease-in-out) 1.4s infinite;
+  animation: hero-trace 2.2s var(--ease-in-out) 1.1s both;
 }
 
 @keyframes hero-trace {
-  0% {
+  from {
     transform: translateX(-100%);
   }
-  55%,
-  100% {
+  to {
     transform: translateX(300%);
   }
 }

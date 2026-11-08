@@ -54,14 +54,18 @@
   text-wrap: pretty;
 }
 
+.kq-w {
+  display: inline-block;
+}
+
 .kq.is-sent .kq-w {
-  animation: kq-word 560ms var(--ease-out) calc(var(--start) + var(--i) * 42ms) backwards;
+  animation: kq-word 420ms var(--ease-out) calc(var(--start) + var(--i) * 30ms) backwards;
 }
 
 @keyframes kq-word {
   from {
     opacity: 0;
-    filter: blur(6px);
+    transform: translateY(0.18em);
   }
 }
 
@@ -133,8 +137,7 @@
 @keyframes kq-out {
   to {
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 }
 

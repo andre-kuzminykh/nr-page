@@ -7,7 +7,7 @@ import { HOME_URL, KM_URL } from '../config/links'
 import type { SlideMeta } from '../data/slides'
 import { FaqSlide } from '../slides/Faq/FaqSlide'
 import { PricingSlide } from '../slides/Pricing/PricingSlide'
-import { KmAccess, KmAsk, KmCases, KmEnd, KmGaps, KmGraph, KmGrow, KmHow, KmOntology, KmOverview, KmReport, KmRules } from './Blocks'
+import { KmAccess, KmCases, KmEnd, KmGraph, KmHow, KmOverview, KmReport, KmRules } from './Blocks'
 import { KM_FAQ } from './content'
 import { KM_NAV, KM_SLIDES } from './slides'
 
@@ -18,12 +18,8 @@ const BLOCKS: Record<string, ComponentType<SlideProps>> = {
   report: KmReport,
   how: KmHow,
   rules: KmRules,
-  ask: KmAsk,
   graph: KmGraph,
-  ontology: KmOntology,
   access: KmAccess,
-  gaps: KmGaps,
-  grow: KmGrow,
   cases: KmCases,
   pricing: PricingSlide,
   faq: KmFaq,
@@ -43,7 +39,7 @@ export function KmApp() {
     <Deck
       slides={KM_SLIDES}
       render={render}
-      nav={<TopNav slides={KM_SLIDES} items={KM_NAV} cta={{ label: 'Open Knowledge Management', href: KM_URL }} home={HOME_URL} />}
+      nav={<TopNav slides={KM_SLIDES} items={KM_NAV} cta={{ label: 'Open Knowledge Management', short: 'Open app', href: KM_URL }} home={HOME_URL} />}
       title={title}
       skip={{ to: 'report', label: 'Skip to the report generator' }}
     >

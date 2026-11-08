@@ -1,4 +1,4 @@
-import { CalendarDays, FilePlay, FileSpreadsheet, FileText, Mail, MessageSquareText, type LucideIcon } from 'lucide-react'
+import { CalendarCheck, Coins, FilePlay, FileText, ListTodo, Target, UserRound, type LucideIcon } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Sym } from '../../../components/Kit/Kit'
 import { Prompt } from '../../../components/Prompt/Prompt'
@@ -26,7 +26,7 @@ export interface Answer {
 export const ANSWERS: Answer[] = [
   {
     q: 'What did we agree on pilot pricing?',
-    a: 'The pilot price stays fixed for the first three months — agreed at the weekly review on Oct 12 and written into the pilot terms.',
+    a: 'The pilot price stays fixed for the first three months. It was agreed at the weekly review on Oct 12 and written into the pilot terms.',
     sources: [
       { icon: FileText, title: 'Pricing notes', app: 'Drive', note: '“…fixed for three months…”' },
       { icon: FilePlay, title: 'Weekly review · Oct 12', app: 'Meet', note: 'Transcript · 14:32' },
@@ -34,21 +34,21 @@ export const ANSWERS: Answer[] = [
     ],
   },
   {
-    q: 'Who owns the landing page?',
-    a: 'The design lead owns it. The copy is due on Nov 14 and the release is on Nov 20.',
+    q: 'Why is the Cyprus AI market review at risk?',
+    a: 'It is 33% done against 60% expected, with 4 days to the deadline. Two tasks under it are still open: Draft the article, and Proofread & publish.',
     sources: [
-      { icon: FileText, title: 'Launch plan', app: 'Docs', note: 'Owner · design lead' },
-      { icon: FileSpreadsheet, title: 'Content schedule', app: 'Sheets', note: 'Landing page copy · Nov 14' },
-      { icon: CalendarDays, title: 'Release · Nov 20', app: 'Calendar', note: '10:00' },
+      { icon: Target, title: 'Cyprus AI market review', app: 'Goals', note: 'Progress · 33%' },
+      { icon: ListTodo, title: 'Draft the article', app: 'Tasks', note: 'In progress' },
+      { icon: ListTodo, title: 'Proofread & publish', app: 'Tasks', note: 'Open' },
     ],
   },
   {
-    q: 'What do customers ask about most?',
-    a: 'How to send reports to their own clients — as a PDF or as a link. It came up again in last week’s customer call.',
+    q: 'How much do we owe Lena Stone?',
+    a: '300.00 EUR to pay, nothing paid yet. It comes from one accrual, for her booking as a designer.',
     sources: [
-      { icon: Mail, title: 'Report export', app: 'Gmail', note: '“…can I send it as a PDF?”' },
-      { icon: MessageSquareText, title: '#customer-feedback', app: 'Slack', note: '“…a link, not a file”' },
-      { icon: FilePlay, title: 'Customer call', app: 'Meet', note: 'Transcript · 09:12' },
+      { icon: Coins, title: 'Accrual · 300.00 EUR', app: 'Finance', note: 'To pay · 300.00 EUR' },
+      { icon: CalendarCheck, title: 'Booking · Lena Stone', app: 'Bookings', note: 'Designer' },
+      { icon: UserRound, title: 'Lena Stone', app: 'People', note: 'Executor' },
     ],
   },
 ]

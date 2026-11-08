@@ -21,20 +21,27 @@ export const FAQ: Question[] = [
     q: 'What is Neuronium?',
     a: 'An AI Operating System for creating and running AI businesses. It brings one shared business context, an AI Superagent and 100 AI employees across ten departments into a single system.',
     now: (ready) =>
-      `An AI Operating System for running a business with AI: one shared business context, the AI Superagent, and AI employees, each for one job. They are added one by one — ready today: ${readyList(ready)}.`,
+      `An AI Operating System for your business. You give the AI Superagent tasks in plain words; AI employees each do one job, all in one shared business context. Ready today: ${readyList(ready)}. More arrive one by one.`,
+  },
+  {
+    q: 'Is it available today?',
+    a: 'Neuronium is in early access. The 100 AI employees describe the intended product scope; what is available can vary by release and integration.',
+    now: (ready) =>
+      `Yes, in early access. Ready today: ${readyList(ready)}. New AI employees are added one by one, and every plan starts with a free trial.`,
   },
   {
     q: 'What does the AI Superagent do?',
-    a: 'You give it a task in plain words, and it carries the task through the tools it needs, inside your business context. AI employees take on the specialised jobs; the Superagent brings them together.',
+    a: 'You give it a task in plain words. It works through the tools the task needs, using what your company already knows. AI employees take the specialised jobs.',
   },
   {
     q: 'What is an AI employee?',
     a: 'A ready AI specialist for one job — for example Lead Qualification or Code Review. Each one works with AI Agents, AI Workflows and AI Skills, inside your business context.',
-    now: 'A ready AI specialist for one job, working inside your business context. The first, Knowledge Management, answers from a search across your knowledge base — including Google Drive, and live during a Google Meet call — and shows where each answer was found.',
+    now: 'An AI specialist for one job. The first is Knowledge Management: ask a question and get the answer from your Drive files, your Meet calls and your company’s records, even live in a call, with its sources.',
   },
   {
     q: 'Who stays in control?',
     a: 'You do. AI Governance is part of the system: policies, access rights, oversight and control over what AI employees may do. Important decisions and approvals stay with people.',
+    now: 'You do. Access is set per person, team or role, and Knowledge Management only reads what that reader may see. Decisions and approvals stay with people.',
   },
   {
     q: 'AI-First or AI-Native?',
@@ -44,7 +51,7 @@ export const FAQ: Question[] = [
   {
     q: 'Which tools does it connect to?',
     a: 'Sources connect through MCP and integrations — for example Google Workspace, email and messengers, Apollo and code repositories. Availability varies by release and integration.',
-    now: 'Knowledge Management works with Google Drive and Google Meet. More tools connect as new AI employees are added.',
+    now: 'Knowledge Management reads your Google Drive files, your Google Meet calls and the goals, tasks, people and money kept in Management. The other tools on the Platform block connect as their AI employees are released.',
   },
   {
     q: 'Can I create my own AI employees?',
@@ -53,21 +60,15 @@ export const FAQ: Question[] = [
   },
   {
     q: 'Is it open source?',
-    a: 'Yes. The code is open on GitHub — the link is at the top of the page.',
-  },
-  {
-    q: 'Is it available today?',
-    a: 'Neuronium is in early access. The 100 AI employees describe the intended product scope; what is available can vary by release and integration.',
-    now: (ready) =>
-      `Yes, in early access. Ready today: ${readyList(ready)}; new AI employees are added one by one. Every plan starts with a free trial on the platform.`,
+    a: 'Yes. The code is on GitHub: “Open source” at the top of the page.',
   },
   {
     q: 'How much does it cost?',
-    a: 'Own model is $19 a month with your own Provider Key. Solo is $59, $99 or $190 for a Low, Medium or High model, with 300, 500 or 1 000 hours of AI Workforce. Team, for up to 10 people in a shared workspace, is $290, $490 or $990, with 3 000, 5 000 or 10 000 hours. Each starts with a free trial. For more than 10 people, Scale is priced with you — write to us from the corner of the page.',
+    a: 'From $19 a month, and every plan starts with a free trial. Solo starts at $59 and Team, for up to 10 people, at $290; both come in Low, Medium and High. For more than 10 people, Scale is priced with you: press Contact sales.',
   },
   {
     q: 'What are Low, Medium and High?',
-    a: 'The level of the AI model Solo or Team runs on — you pick it inside the plan. With Own model you connect your AI provider’s key instead, and the AI usage is billed to you by that provider.',
+    a: 'The level of the AI model Solo or Team runs on, picked inside the plan. Higher levels come with more AI Workforce hours. With Own model you connect your AI provider’s key instead, and that provider bills you for the AI usage.',
   },
 ]
 

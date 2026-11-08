@@ -105,21 +105,20 @@ blocks, gestures, transitions, light field, menu and progress line (`src/compone
 
 1. **AI Knowledge Management** — the name, the line, and the bar (example requests type themselves, then “Try it
    yourself”; a request opens Knowledge Management with it).
-2. **The report generator, live** — a request is sent, four stages run (*Understanding the request → Walking the
-   company graph — N records → Calculating → Composing the report*), and the report slides up: title, summary,
-   figures that count up, bars that grow against the expected mark, findings with their status and citations,
-   limitations, sources. Templates play their reports; a request in Russian gets a Russian report; a missing module is
-   an honest gap.
-3. **How it works** (GraphRAG in five steps) · 4. **Three principles** · 5. **Questions → reports** ·
-6. **The company knowledge graph** (it draws itself, then questions walk it) · 7. **The ontology** (27 domains,
-   156 entity types, 25 modules) · 8. **Access** (“Viewing as” changes the answer) · 9. **Honesty** ·
-10. **It grows with Neuronium** (1 of 25 modules).
-11. **Use cases** — its own: Monday review, a goal slipping, paying executors, stand-up, who does what, before a
-    decision. 12. **Pricing** — the same block as on the landing. 13. **FAQ** — its own. 14. **Ask your company** —
-    its own end, with the bar and the foot.
+2. **Ask a question. Get a report.** — the block opens on a finished report (title, summary, figures that count up,
+   a bar grown against the expected mark, findings with their status and citations, limitations, sources). Then the
+   next request types itself, four stages run (*Understanding the request → Walking the company graph — N records →
+   Calculating → Composing the report*) and its report slides up. Templates play their reports; a missing module is an
+   honest gap, not a number.
+3. **How a report gets built** (five steps) · 4. **A report you can check** (labelled claims, missing data said
+   out loud, same question → same report) · 5. **Your company as connected records** (the graph draws itself, then
+   questions walk it) · 6. **Access** (“Viewing as” changes the answer).
+7. **Use cases** — six questions it answers: Monday review, a goal slipping, paying executors, stand-up, who does
+   what, before a decision. 8. **Pricing** — the same block as on the landing. 9. **FAQ** — its own.
+   10. **Ask your company** — its own end, with the bar and the foot.
 
 The menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, with “Open Knowledge Management”
-(the product) on the right; the logo leads back to the landing. The example reports use the product's demo
+(the product; “Open app” on phones) on the right; the logo leads back to the landing. The example reports use the product's demo
 workspace (its goals, tasks and people are samples). Static hosts serve the page at `/knowledge-management/` with no
 extra rule.
 
@@ -157,17 +156,19 @@ What is open is set in one file, [`src/data/release.ts`](src/data/release.ts):
 | `OPEN_BLOCKS.faq` | FAQ | `true` |
 
 Until all 100 AI employees are open, the **FAQ** gives the answers for today, for example “Ready today:
-Knowledge Management. New AI employees are added one by one.” It leaves out questions about closed blocks,
+Knowledge Management. More arrive one by one.” It leaves out questions about closed blocks,
 such as creating your own AI employees, and follows `release.ts` on its own; the full answers
 (`src/data/faq.ts`) come back once all 100 are open.
 
 A department with only one open AI employee is led by it. Now that is Management with 1 · Km:
 - On the left: the title “AI Knowledge Management”, then “Get answers with the full business context—powered by your
-  Corporate World Model.”, then its element with “Open Knowledge Management” beside it (→ management.neuronium.ai/km).
-  The line under the element fills up until the next answer.
+  Corporate World Model.”, then “About Knowledge Management →” (its page on this site), then its element. The line
+  under the element fills up until the next answer.
 - On the right, no window — just a search bar at the bottom. A question is typed into it and sent, and above it the
-  answer streams in with the three things it was found in, each just an icon and a name
-  (`src/slides/Department/panels/knowledge.tsx`).
+  answer comes in word by word with the three things it was found in, each just an icon and a name
+  (`src/slides/Department/panels/knowledge.tsx`). The questions are the ones the Knowledge Management page answers:
+  pilot pricing (from Drive, Meet and Docs), why a goal is at risk, and what is owed to an executor; then “Try it
+  yourself”.
 - Once a second AI employee of the department opens, the department's headline, its elements and its turning
   interface come back.
 
@@ -204,7 +205,7 @@ Latest results for the staged release (production build, headless Chromium with 
 - **Contact function**: `validate:api` passes — method, missing key, bad input, the bot trap, Reply-To and failures of the email provider.
 - **Browser**: **58 / 58 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
   - No block scrolls inside or is cut (a block too tall for a window is drawn smaller); no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, no JavaScript errors — on the landing and on the AI Knowledge Management page.
-  - The AI Knowledge Management page: its report generator (stages, figures counted, bar grown, statuses), templates (a Russian request, an honest gap), viewers, ontology, use cases, the shared pricing, its FAQ and its end.
+  - The AI Knowledge Management page: its report generator (opens on a finished report — figures counted, bar grown, statuses — then the stages of the next request), a template with an honest gap, viewers, use cases, the shared pricing, its FAQ and its end.
   - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open Platform; links to closed blocks do nothing.
   - The input bar: the hero types its examples, then “Try it yourself”; clicking into the Superagent bar stops its demo and waits for the visitor's task.
   - Cases: two rows flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; All cases opens every case with a search.
@@ -232,7 +233,7 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (fo
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
 | 15 | Cases | Built for hundreds of cases. Two rows of cases flow by, one each way — a picture and a title each. Pointing at a row holds it; the case lifts, the others step back. A case with an `href` opens it; until then it says “Soon”. **All cases** opens every case on one page, with a search. The cases are listed in `src/data/cases.ts`: with 12 or more, the two rows share them out; a real `image` replaces a drawn picture. |
 | 16 | Pricing | **Own model** first — $19 / month, bring your own Provider Key: AI Superagent, AI Management, your AI costs. **Solo**, for a solo builder, and **Team**, up to 10 people in a shared workspace — each at the model level chosen inside the card: Solo Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000. The price rolls to the new one, the list names the model and its hours, and “Start Free Trial” tells the platform the plan and level. **Scale**, Contact us, more than 10 people — shared workspace, custom AI Workforce; “Contact sales”. Every button is white. |
-| 17 | FAQ | Questions that open in place — one at a time. Until all 100 are open: the answers for today, without questions about closed blocks. |
+| 17 | FAQ | Titled just “FAQ”. Questions that open in place — one at a time; none is open at first. Until all 100 are open: the answers for today, without questions about closed blocks. |
 | 18 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below, then just the input bar (“Describe your business task”): sending it opens the platform with the task. At the foot: the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
 
 | Department | Headline | Interface pieces |
@@ -312,8 +313,10 @@ scripts/                          validate-data, validate-api, validate-browser,
 - **Light field**: two anisotropic potentials (violet, orange) that orbit, rotate and stretch; their overlap
   computes a third light. A clean synthetic gradient with slow film grain; resolution adapts to frame time,
   rendering pauses in hidden tabs and freezes for reduced motion.
-- **Motion**: ~820 ms block transitions; headlines rise line by line; interface pieces enter in 3D and follow the
-  pointer with a light parallax; the selected AI employee’s panel lifts, the others dim.
+- **Motion**: the leaving block fades in ~0.3 s and the arriving one settles in ~0.7 s, with no full-screen blur;
+  headlines rise line by line; the hero's letters rise straight up and one light passes over them once; interface
+  pieces enter in 3D and follow the pointer with a light parallax; the selected AI employee’s panel lifts, the others
+  dim. Only opacity and transform are animated in loops (the “Try it yourself” glow is a separate layer).
 - **Navigation**: a trackpad flick with inertia counts as one gesture; while a menu is open the deck stays put.
   Arrow keys inside the periodic table, the department elements and the FAQ stay inside them; PageUp/PageDown
   always move blocks. On phones only the focused piece of interface is shown and the table opens cards on tap.

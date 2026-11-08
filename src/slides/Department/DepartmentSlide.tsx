@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { FAMILY } from '../../components/Element/Element'
 import { Panel, useParallax } from '../../components/Kit/Kit'
@@ -166,7 +166,7 @@ export function DepartmentSlide({ department, active, shown }: SlideProps & { de
         {show?.cta && (
           <a className="more dept__more rv" style={d(300)} href={show.cta.href}>
             {show.cta.label}
-            <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
+            {/^https?:/.test(show.cta.href) ? <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" /> : <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />}
           </a>
         )}
         {strip}

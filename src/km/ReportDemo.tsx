@@ -135,20 +135,23 @@ export function Report({ s, run }: { s: Scenario; run: boolean }) {
 }
 
 /**
- * The report generator, playing by itself: a request is typed and sent, the four stages run,
- * and the report arrives. Then the next request. A template plays its report at once; a request
+ * The report generator, playing by itself. It opens on a finished report; then a request is typed
+ * and sent, the four stages run, and its report arrives. Then the next request. A template plays its report at once; a request
  * written by the visitor opens Knowledge Management with it.
  */
 export function ReportDemo({ live }: { live: boolean }) {
   const [k, setK] = useState(0)
   const [run, setRun] = useState(0)
-  const [phase, setPhase] = useState<'type' | 'stages' | 'report'>(live ? 'type' : 'report')
+  // the block opens on a finished report (no empty panel); the next request types itself after it
+  const [phase, setPhase] = useState<'type' | 'stages' | 'report'>('report')
+  const [first, setFirst] = useState(true)
   const [stage, setStage] = useState(0)
   const [own, setOwn] = useState(false)
   const s = SCENARIOS[k]
   const timer = useRef(0)
 
   const play = (i: number) => {
+    setFirst(false)
     setK(i)
     setRun((r) => r + 1)
     setStage(0)
@@ -183,7 +186,7 @@ export function ReportDemo({ live }: { live: boolean }) {
           label="Ask Knowledge Management"
           placeholder="Ask anything about your company"
           href={kmHref}
-          live={live && !own}
+          live={live && !own && !first}
           text={s.query}
           sent={phase !== 'type'}
           onSent={() => {

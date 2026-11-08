@@ -14,7 +14,7 @@ export interface CaseStudy {
 }
 
 export const CASES: CaseStudy[] = [
-  { id: 'knowledge', title: 'One question, the whole business context', art: 'knowledge', tone: 'violet' },
+  { id: 'knowledge', title: 'Answers with sources, from Drive and Meet', art: 'knowledge', tone: 'violet' },
   { id: 'calls', title: 'From today’s calls to the team’s tasks', art: 'calls', tone: 'pink' },
-  { id: 'leads', title: 'New leads to booked demos', art: 'leads', tone: 'orange' },
+  { id: 'leads', title: 'From new leads to booked demos', art: 'leads', tone: 'orange' },
 ]
