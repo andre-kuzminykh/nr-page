@@ -2,7 +2,7 @@ import { Check, MessageCircle, SignalHigh, SignalLow, SignalMedium, Sparkles, ty
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
-import { PLANS, TIERS, WORKFORCE_HOUR, gainOf, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
+import { PLANS, TIERS, WORKFORCE_HOUR, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
 import { openContact } from '../../lib/events'
 import './Pricing.css'
 
@@ -66,7 +66,6 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
                   role="radio"
                   data-tier={t}
                   aria-checked={t === tier}
-                  aria-label={`${label}, ${gainOf(p, t)} AI Workforce`}
                   tabIndex={t === tier ? 0 : -1}
                   className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
                   onClick={() => setTier(t)}
@@ -76,15 +75,6 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
                 </button>
               )
             })}
-          </div>
-          {/* how much more AI Workforce each level gives than the lowest, under each level */}
-          <div className="pr-gains" style={{ '--n': tiers.length } as CSSProperties} aria-hidden="true">
-            {tiers.map((t) => (
-              <span key={t} className={t === tier ? 'is-on' : ''} title={`${gainOf(p, t)} the AI Workforce hours of ${TIERS.find((x) => x.id === tiers[0])!.label}`}>
-                {gainOf(p, t)}
-                <small> AI Workforce</small>
-              </span>
-            ))}
           </div>
         </div>
       ) : (

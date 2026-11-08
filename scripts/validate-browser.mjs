@@ -724,9 +724,7 @@ async function functionalPass(browser) {
         model: [...x.querySelectorAll('.pr-plan__list li')].some((li) => / model$/.test(li.textContent.trim())),
         href: x.querySelector('.pr-plan__cta')?.getAttribute('href'),
         levels: [...x.querySelectorAll('[role="radio"]')].map((r) => `${r.querySelector('.pr-tiers__l')?.textContent.trim()}${r.querySelector('svg') ? '' : ' (no icon)'}`).join('|'),
-        gains: [...x.querySelectorAll('.pr-gains span')].map((g) => g.firstChild?.textContent.trim()).join('|'),
-        gainOn: x.querySelector('.pr-gains span.is-on')?.firstChild?.textContent.trim(),
-        gainInside: !!x.querySelector('.pr-tiers .pr-gains, .pr-tiers [class*="__x"]'),
+        multiplier: /×\s?\d/.test(x.textContent),
         checked: x.querySelector('[role="radio"][aria-checked="true"] .pr-tiers__l')?.textContent.trim(),
       }))
     }
@@ -739,14 +737,14 @@ async function functionalPass(browser) {
     const seen = []
     for (const [plan, level, price, last, model] of levels) {
       const r = await pick(plan, level)
-      seen.push({ plan, level, ok: r.price === price && r.last === last && !r.model && r.checked === level && r.gainOn === { Low: '×1', Medium: '×1.7', High: '×3.3' }[level] && !r.gainInside && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
+      seen.push({ plan, level, ok: r.price === price && r.last === last && !r.model && r.checked === level && !r.multiplier && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
     }
-    const solo = `${seen[0].r.levels} · ${seen[0].r.gains}`
-    const team = `${seen[2].r.levels} · ${seen[2].r.gains}`
+    const solo = seen[0].r.levels
+    const team = seen[2].r.levels
     check(
-      'Pricing: inside Solo and Team a model level is chosen — a switch of mark and word, and under it, outside the switch, how many times Low’s AI Workforce each level gives (×1, ×1.7, ×3.3, the chosen one lit); Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model',
-      solo === 'Low|Medium|High · ×1|×1.7|×3.3' && team === solo && seen.every((x) => x.ok),
-      `${solo} · ` + seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
+      'Pricing: inside Solo and Team a model level is chosen — a switch of a mark and a word for each level, with no multipliers; Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model',
+      solo === 'Low|Medium|High' && team === solo && seen.every((x) => x.ok),
+      seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
     await sleep(500)

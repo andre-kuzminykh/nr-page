@@ -86,11 +86,3 @@ export const includesAt = (p: Plan, tier?: Tier): string[] => {
   const hours = p.hours?.[tier]
   return [...p.includes, ...(hours ? [`${thousands(hours)} AI Workforce hours`] : [])]
 }
-
-/** How many times the plan's lowest level a level gives in AI Workforce hours: 1 → “×1”, 1.67 → “×1.7”. */
-export const gainOf = (p: Plan, tier: Tier): string => {
-  const base = p.hours?.[tiersOf(p)[0]]
-  const hours = p.hours?.[tier]
-  if (!base || !hours) return ''
-  return `×${String(Math.round((hours / base) * 10) / 10)}`
-}

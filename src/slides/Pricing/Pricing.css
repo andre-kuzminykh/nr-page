@@ -115,14 +115,14 @@
 }
 
 /* ---------- the model level: Own model · Low · Medium · High ---------- */
-/* the model level: a switch of mark and word, and under it how much AI Workforce each gives */
+/* the model level: a switch of a mark and a word */
 .pr-level {
   margin-top: clamp(16px, 2.6vh, 24px);
 }
 
 .pr-level.is-blank {
   visibility: hidden;
-  height: calc(42px + 8px + 18px);
+  height: 42px;
 }
 
 .pr-tiers {
@@ -197,34 +197,6 @@
   .pr-tiers__opt svg {
     display: none;
   }
-}
-
-.pr-gains {
-  display: grid;
-  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
-  margin-top: 8px;
-  padding: 0 3px;
-  text-align: center;
-}
-
-.pr-gains span {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: rgb(255 255 255 / 0.4);
-  transition: color 300ms ease;
-}
-
-.pr-gains small {
-  display: none;
-}
-
-.pr-gains span.is-on {
-  background: linear-gradient(90deg, #c9a8ff, #f3a6e6 50%, #ffc08f);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .pr-plan__list {
@@ -377,39 +349,19 @@
   .pr-plan__num--word {
     font-size: 27px;
   }
-  /* one line on phones: the switch, and beside it what the chosen level gives */
   .pr-level {
     grid-area: tiers;
-    display: flex;
-    align-items: center;
-    gap: 10px;
     margin-top: 9px;
   }
   .pr-level.is-blank {
     display: none;
   }
   .pr-tiers {
-    flex: 1;
     height: 34px;
   }
   .pr-tiers__opt {
     gap: 5px;
     font-size: min(13px, 3.8cqi);
-  }
-  .pr-gains {
-    display: block;
-    margin: 0;
-    padding: 0;
-    white-space: nowrap;
-  }
-  .pr-gains span:not(.is-on) {
-    display: none;
-  }
-  .pr-gains small {
-    display: inline;
-    font-family: var(--font-sans);
-    font-size: 11px;
-    font-weight: 500;
   }
   /* what it includes: a row, wrapping between whole items */
   .pr-plan__list {
