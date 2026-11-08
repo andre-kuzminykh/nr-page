@@ -24,7 +24,8 @@ export type NavGroup = 'platform' | 'employees' | 'departments' | 'custom' | 'ca
 export interface SlideMeta {
   id: string
   label: string
-  nav?: NavGroup
+  /** the top-menu section it belongs to (a NavGroup on the landing) */
+  nav?: string
   department?: DepartmentId
   light: LightPreset
 }

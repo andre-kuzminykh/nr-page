@@ -4,10 +4,10 @@ import '@fontsource-variable/geist'
 import '@fontsource-variable/jetbrains-mono'
 import '../styles/tokens.css'
 import '../styles/base.css'
-import { KmPage } from './KmPage'
+import { KmApp } from './KmApp'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <KmPage />
+    <KmApp />
   </StrictMode>,
 )

@@ -225,3 +225,43 @@ export const VIEWERS = [
     answer: { kind: 'gap' as const, text: 'No amount: accruals and payments are outside your access.' },
   },
 ]
+
+/** Who uses it for what — each a request and the report it gets (from the product's examples). */
+export const USE_CASES = [
+  { who: 'Monday review', ask: 'Company overview report', report: 'Company report', result: '3 goals at 19% on average, 2 off plan; 11 open tasks; 4 people' },
+  { who: 'A goal slips', ask: 'Why is Cyprus AI market review at risk?', report: 'Root-cause report', result: '−27 pp against plan, 4 days to deadline, and the open work under it' },
+  { who: 'Paying executors', ask: 'How much do we owe Lena Stone?', report: 'Calculation report', result: '300.00 EUR to pay, 0 paid — summed per currency' },
+  { who: 'Daily stand-up', ask: 'How many tasks are in progress?', report: 'Calculation report', result: '3 tasks in progress, each with its source' },
+  { who: 'Who does what', ask: 'What tasks does MK own?', report: 'Records report', result: 'Maria Kovacs → owns → Cyprus bank AI audit, Fund portfolio demo' },
+  { who: 'Before a decision', ask: 'What effect did Collect market sources have?', report: 'Effect assessment', result: 'Execution is recorded, not a measured result — no effect is claimed' },
+]
+
+/** The page's own questions. */
+export const KM_FAQ: { q: string; a: string }[] = [
+  {
+    q: 'What is AI Knowledge Management?',
+    a: 'A report generator over your company’s knowledge. Ask in your own words or pick a template, and get a document: a summary, key figures, a chart against plan, findings, limitations and numbered sources.',
+  },
+  { q: 'Which languages can I ask in?', a: 'English and Russian. The report comes in the language you asked in.' },
+  {
+    q: 'Where do the numbers come from?',
+    a: 'From your company’s knowledge graph — goals, tasks, processes, people, bookings and money records. What is counted is counted by named rules, and every confirmed claim links to its source.',
+  },
+  {
+    q: 'What if the data is not there?',
+    a: 'The report says so. A missing module, record, link or measurement becomes a limitation with its reason — never a made-up number.',
+  },
+  {
+    q: 'Who sees what?',
+    a: 'Rights are given to a person, a team or a role. Records outside a reader’s rights never enter their graph: they cannot be found, counted or quoted.',
+  },
+  {
+    q: 'What can it answer today?',
+    a: 'Everything Management keeps: goals, tasks, directions, processes and their stages, people and roles, bookings, accruals and payments. The other entity types are recognised and answered with an honest gap until their module connects.',
+  },
+  { q: 'Can I print a report?', a: 'Yes — every report has Print; the printed copy leaves out shadows and frames.' },
+  {
+    q: 'How much does it cost?',
+    a: 'It comes with every plan: Own model $19 a month, Solo from $59, Team from $290 — each with a free trial. For more than 10 people, Scale is priced with you.',
+  },
+]

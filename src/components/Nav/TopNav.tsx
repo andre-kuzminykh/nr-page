@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { GITHUB_URL, PLATFORM_URL } from '../../config/links'
 import { BrandIcon } from '../Brand/BrandIcon'
 import { DEPARTMENTS } from '../../data/departments'
-import { SLIDES, isSlideOpen, type NavGroup } from '../../data/slides'
+import { SLIDES, isSlideOpen, type SlideMeta } from '../../data/slides'
 import { FAMILY } from '../Element/Element'
 import { useDeck } from '../SlideController/DeckContext'
 import { DEPARTMENT_ICON } from '../ui/icons'
@@ -12,7 +12,13 @@ import './Nav.css'
 /** Departments that are open on the site; with one, the menu links to it directly. */
 const OPEN_DEPTS = DEPARTMENTS.filter((d) => isSlideOpen(d.id))
 
-const ALL_ITEMS: { key: NavGroup; label: string; target: string }[] = [
+export interface NavItem {
+  key: string
+  label: string
+  target: string
+}
+
+const ALL_ITEMS: NavItem[] = [
   { key: 'platform', label: 'Platform', target: 'context' },
   { key: 'employees', label: 'AI Employees', target: 'employees' },
   {
@@ -37,9 +43,20 @@ const DROPDOWN = OPEN_DEPTS.length > 1
  * departments open in a dropdown on desktop and in a full-screen sheet on phones.
  * While a menu is open the deck ignores scroll and swipe gestures.
  */
-export function TopNav() {
+interface TopNavProps {
+  /** The blocks of this page (the landing's by default). */
+  slides?: SlideMeta[]
+  /** The menu's sections. */
+  items?: NavItem[]
+  /** The white button on the right. */
+  cta?: { label: string; href: string }
+  /** When set, the logo leads to this page instead of the first block. */
+  home?: string
+}
+
+export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open Platform', href: PLATFORM_URL }, home }: TopNavProps) {
   const { index, goTo } = useDeck()
-  const current = SLIDES[index]
+  const current = slides[index]
   const [ddOpen, setDdOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -114,9 +131,10 @@ export function TopNav() {
     <header className="nav">
       <a
         className="nav__brand"
-        href="#hero"
+        href={home ?? '#hero'}
         aria-label="Neuronium — home"
         onClick={(e) => {
+          if (home) return
           e.preventDefault()
           jump('hero')
         }}
@@ -127,7 +145,7 @@ export function TopNav() {
       </a>
 
       <div className="nav__menu" ref={menuRef} role="navigation" aria-label="Main">
-        {ITEMS.map((item) =>
+        {items.map((item) =>
           item.key === 'departments' && DROPDOWN ? (
             <div key={item.key} className="nav__dd" ref={ddRef}>
               <button
@@ -188,8 +206,8 @@ export function TopNav() {
         <BrandIcon brand="github" size={15} />
         <span>Open source</span>
       </a>
-      <a className="nav__cta" href={PLATFORM_URL}>
-        Open Platform
+      <a className="nav__cta" href={cta.href}>
+        {cta.label}
         <ArrowUpRight size={14} strokeWidth={1.8} aria-hidden="true" />
       </a>
 
@@ -207,7 +225,7 @@ export function TopNav() {
       {sheetOpen && (
         <div id="nav-sheet" className="nav__sheet" role="dialog" aria-modal="true" aria-label="Menu">
           <nav className="nav__sheet-main" aria-label="Main">
-            {ITEMS.filter((it) => it.key !== 'departments' || !DROPDOWN).map((item, k) => (
+            {items.filter((it) => it.key !== 'departments' || !DROPDOWN).map((item, k) => (
               <button
                 key={item.key}
                 type="button"
@@ -238,8 +256,8 @@ export function TopNav() {
               )
             })}
           </div>
-          <a className="btn btn--primary nav__sheet-cta" href={PLATFORM_URL}>
-            Open Platform
+          <a className="btn btn--primary nav__sheet-cta" href={cta.href}>
+            {cta.label}
             <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
           </a>
         </div>

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
-import { QUESTIONS as FAQ } from '../../data/faq'
+import { QUESTIONS } from '../../data/faq'
 import './Faq.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 
 /** Questions that open in place — one at a time; opening one closes the others. */
-export function FaqSlide({ shown }: SlideProps) {
+export function FaqSlide({ shown, questions: FAQ = QUESTIONS }: SlideProps & { questions?: { q: string; a: string }[] }) {
   // nothing is open at first
   const [open, setOpen] = useState(-1)
   const buttons = useRef<(HTMLButtonElement | null)[]>([])

@@ -362,9 +362,12 @@ const waitFor = async (fn, ms = 4500) => {
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.lead?.title ?? first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === (first.lead?.title ?? first.name) && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
         if (d.id === 'management' && first.n === 1) {
           const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), `${BASE}knowledge-management/`, d.id)
-          await page.waitForSelector('.kr-sheet', { timeout: 20000 }).catch(() => {})
-          const kmPage = await page.evaluate(() => ({ h1: document.querySelector('h1')?.textContent.replace(/\s+/g, ' ').trim(), report: document.querySelector('.kr-sheet .kr-title')?.textContent.trim() }))
-          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens: AI Knowledge Management, with the report generator writing a report by itself', /AI Knowledge Management/.test(kmPage.h1 ?? '') && !!kmPage.report, JSON.stringify(kmPage))
+          await sleep(1500)
+          const kmPage = await page.evaluate(() => ({ h1: [...document.querySelectorAll('.kd-h1 .mask')].map((m) => m.textContent.trim()).join(' '), blocks: document.querySelectorAll('.slide').length }))
+          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks > 10, JSON.stringify(kmPage))
+          await page.keyboard.press('PageDown')
+          const report = await page.waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 20000 }).then((e) => e.textContent()).catch(() => '')
+          await step(page, 'desktop', 'Turns to the next block there', 'The report generator writes a report by itself: the four stages, then the document', !!report, report)
           await out.back()
         }
       } else

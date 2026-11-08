@@ -99,21 +99,29 @@ shows the value); nothing in this project serves them.
 ## The AI Knowledge Management page
 
 `/knowledge-management/` is a page of its own (a second Vite entry: `knowledge-management/index.html` → `src/km/`),
-written from the feature's description (NR Management · M5). It scrolls as an ordinary page over the same light field,
-which moves with its sections:
+written from the feature's description (NR Management · M5). It is a deck like the landing — the same full-screen
+blocks, gestures, transitions, light field, menu and progress line (`src/components/Deck`) — with its own blocks
+(`src/km/slides.ts`):
 
-- **The report generator, live.** A request types itself into the bar and is sent; four stages run (*Understanding
-  the request → Walking the company graph — N records → Calculating → Composing the report*); then the report slides up:
-  title, who it was prepared for, the summary, key figures that count up, progress bars that grow against the expected
-  mark, findings with their status (*Calculated · Confirmed · Hypothesis*) and citations, limitations and sources.
-  The templates play their reports; a request in Russian gets a Russian report; a missing module is an honest gap.
-- **How it works** (GraphRAG in five steps), **three principles**, **questions → reports**, **the company knowledge
-  graph** (it draws itself, then questions walk it), **the ontology** (27 domains, 156 entity types, 25 modules — point
-  at a domain to see its types), **access** (“Viewing as” changes the answer), **honest gaps**, and **the modules still
-  to connect**. The bar at the end opens Knowledge Management with the question (`?q=`).
+1. **AI Knowledge Management** — the name, the line, and the bar (example requests type themselves, then “Try it
+   yourself”; a request opens Knowledge Management with it).
+2. **The report generator, live** — a request is sent, four stages run (*Understanding the request → Walking the
+   company graph — N records → Calculating → Composing the report*), and the report slides up: title, summary,
+   figures that count up, bars that grow against the expected mark, findings with their status and citations,
+   limitations, sources. Templates play their reports; a request in Russian gets a Russian report; a missing module is
+   an honest gap.
+3. **How it works** (GraphRAG in five steps) · 4. **Three principles** · 5. **Questions → reports** ·
+6. **The company knowledge graph** (it draws itself, then questions walk it) · 7. **The ontology** (27 domains,
+   156 entity types, 25 modules) · 8. **Access** (“Viewing as” changes the answer) · 9. **Honesty** ·
+10. **It grows with Neuronium** (1 of 25 modules).
+11. **Use cases** — its own: Monday review, a goal slipping, paying executors, stand-up, who does what, before a
+    decision. 12. **Pricing** — the same block as on the landing. 13. **FAQ** — its own. 14. **Ask your company** —
+    its own end, with the bar and the foot.
 
-The example reports use the product's demo workspace (its goals, tasks and people are samples). Static hosts serve the
-page at `/knowledge-management/` with no extra rule.
+The menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, with “Open Knowledge Management”
+(the product) on the right; the logo leads back to the landing. The example reports use the product's demo
+workspace (its goals, tasks and people are samples). Static hosts serve the page at `/knowledge-management/` with no
+extra rule.
 
 ## Write to us
 
@@ -287,7 +295,8 @@ src/
     slides.ts                     block order, menu groups and light composition per block
     release.ts                    what is open on the site right now (staged release)
     ready.ts                      the open AI employees, for the FAQ
-  km/                             the AI Knowledge Management page: content, the live report generator, the knowledge graph
+  components/Deck/                the deck itself (blocks, gestures, light, menu) — used by both pages
+  km/                             the AI Knowledge Management page: its blocks, content, the live report generator, the graph
   config/links.ts                 where the buttons and bars lead, the social links, the contact endpoint
 api/contact.js                    the widget's messages → support@neuronium.ai (Vercel Function, Resend)
 scripts/                          validate-data, validate-api, validate-browser, simulate-user
