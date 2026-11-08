@@ -6,3 +6,6 @@ dist
 .env.*
 !.env.example
 /validation/
+
+# local preview server output
+preview.log

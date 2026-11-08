@@ -1,0 +1,198 @@
+/* =========================================================
+   Knowledge Management on its own: no window, only the search.
+   The bar at the bottom types a question; above it the
+   answer streams in and three sources arrive.
+   ========================================================= */
+.kq {
+  --c1: #a071ff;
+  --c2: #e06ad8;
+  --c3: #ff8a33;
+  /* the answer starts this long after the question is sent */
+  --start: 640ms;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 3vh, 30px);
+  width: min(100%, 640px);
+  margin-inline: auto;
+}
+
+/* nothing is answered before the question is sent — nor while it is the visitor's turn */
+.kq.is-live:not(.is-sent) .kq-answer,
+.kq.is-live:not(.is-sent) .kq-sources,
+.kq.is-quiet .kq-answer,
+.kq.is-quiet .kq-sources {
+  visibility: hidden;
+}
+
+/* ---------- the answer ---------- */
+.kq-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 8px;
+}
+
+.kq-km.sym {
+  flex-shrink: 0;
+  min-width: 30px;
+  height: 30px;
+  margin-top: 0.1em;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.kq.is-sent .kq-km {
+  animation: kq-rise 500ms var(--ease-out) calc(var(--start) - 120ms) backwards;
+}
+
+.kq-text {
+  font-size: clamp(17px, 1.5vw, 22px);
+  font-weight: 420;
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.kq-w {
+  display: inline-block;
+}
+
+.kq.is-sent .kq-w {
+  animation: kq-word 420ms var(--ease-out) calc(var(--start) + var(--i) * 30ms) backwards;
+}
+
+@keyframes kq-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.18em);
+  }
+}
+
+/* ---------- the sources: what the answer was found in — an icon and a name ---------- */
+.kq-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.kq-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kq-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  height: 36px;
+  padding: 0 15px 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.kq-src > svg {
+  flex-shrink: 0;
+  color: color-mix(in oklab, var(--cc) 70%, #fff);
+}
+
+.kq-src__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13.5px;
+  font-weight: 480;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.kq.is-sent .kq-src {
+  animation: kq-src 600ms var(--ease-out) calc(var(--start) + 620ms + var(--k) * 150ms) backwards;
+}
+
+@keyframes kq-src {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+/* ---------- the round ends: the answer and the question step back for the next one;
+   the bar itself stays, so it can be clicked at any moment ---------- */
+.kq.is-live:not(.is-quiet) .kq-answer,
+.kq.is-live:not(.is-quiet) .prompt__q {
+  animation: kq-out 420ms ease 7560ms forwards;
+}
+
+@keyframes kq-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes kq-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---------- smaller windows ---------- */
+@media (max-width: 860px) {
+  .kq {
+    gap: 14px;
+  }
+  .kq-answer {
+    gap: 11px;
+    padding: 0 4px;
+  }
+  .kq-km.sym {
+    min-width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+  .kq-text {
+    font-size: 15.5px;
+  }
+  .kq-body {
+    gap: 10px;
+  }
+  .kq-sources {
+    gap: 6px;
+  }
+  .kq-src {
+    height: 32px;
+    padding: 0 12px 0 10px;
+  }
+  .kq-src__title {
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .kq-text {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .kq-src {
+    height: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kq,
+  .kq * {
+    animation: none !important;
+  }
+}

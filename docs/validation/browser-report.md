@@ -1,48 +1,70 @@
 # Neuronium landing — browser validation
 
-Run: 2026-10-27T20:44:09.153Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
+Run: 2026-11-08T19:28:54.859Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
 
-**36 / 36 checks passed.**
+**58 / 58 checks passed.**
 
 | | Check | Detail |
 |---|---|---|
-| ✅ | Continuous light background renders with WebGL (single persistent canvas) | {"canvas":true,"ready":true,"fallback":false} |
-| ✅ | Mouse wheel: one notch moves exactly one slide |  |
-| ✅ | Trackpad inertia: one long gesture moves exactly one slide |  |
-| ✅ | Background persists across slides (canvas not re-created) |  |
-| ✅ | Keyboard: End / Home / ArrowDown / ArrowUp | 11,0,1,0 |
-| ✅ | Hero CTA "Explore Neuronium" opens the architecture |  |
-| ✅ | Architecture: AI Governance (Policy, Access, Oversight, Control) is inside the Neuronium block |  |
-| ✅ | Architecture: AI Business = AI Identity | AI Knowledge Graph | AI Superagent |  |
-| ✅ | Architecture: AI-Native is above AI-First |  |
-| ✅ | Architecture: AI-First grid is 2×5 in the approved order (Management first tile) | [["Management","HR","Marketing","SMM","Sales"],["Support","Analytics","Design","Development","Engineering"]] |
-| ✅ | Architecture: one slim line AI Agents · AI Workflows · AI Skills |  |
-| ✅ | AI Employees: 10 tiles in order, Management selected by default |  |
-| ✅ | AI Employees: click and arrow keys change the responsibility panel | after ArrowRight: Marketing |
-| ✅ | AI Employees: arrow keys inside the grid do not change the slide |  |
-| ✅ | Catalog: periodic table holds all 100 elements, 10 per AI Employee, in order | 100 elements |
-| ✅ | Catalog: every element has a unique symbol; Nr is element 0 |  |
-| ✅ | Catalog search: finds by tool name, shows an empty state, searches across categories | apollo→Audience Discovery; "management"→14 |
-| ✅ | Catalog: arrow keys move through the table and update the detail | Competitor Analysis |
-| ✅ | Catalog: choosing a category selects its first element |  |
-| ✅ | Configuration: AI-Native hides the 10-employee grid |  |
-| ✅ | Configuration: AI-First composes employees into live JSON |  |
-| ✅ | Inner scroll: the JSON preview scrolls without changing the slide | scrollTop 855 |
-| ✅ | "Get Early Access" links point to a real destination (no fake sign-up) | mailto:admin@andre.technology?subject=Neuronium%20Early%20Access |
-| ✅ | Final slide: "Turn your Idea into Reality" with an idea input; empty input is caught; submit hands off honestly | Your email app should open with the idea. If it doesn’t, write to admin@andre.technology. |
-| ✅ | Final CTA "Explore Capabilities" opens the catalog |  |
-| ✅ | Top bar: transparent, Nr logo only (no slide counter, no theme switch) | {"topbarChildren":1,"logo":true,"counter":false,"bg":"rgba(0, 0, 0, 0)"} |
-| ✅ | Deep link: reload keeps the current slide |  |
-| ✅ | Touch: swipe up → next slide, swipe down → previous slide | 1, 0 |
+| ✅ | Continuous light background renders with WebGL (single persistent canvas) | {"canvas":true,"ready":true} |
+| ✅ | No gradient bleeds at the edges: every gradient under a border spans that border | none |
+| ✅ | Hero: NEURONIUM, then “Run AI Business with AI Operating System” (no full stop) and the input bar under it | Run AI Business with AI Operating System |
+| ✅ | Hero: letters are not clipped by their reveal mask |  |
+| ✅ | Hero: NEURONIUM fills its column exactly at 1280, 1920, 2560 and 1440 px wide | 1280:fits · 1920:fits · 2560:fits · 1440:fits |
+| ✅ | Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (Platform · Management · Cases · Pricing · FAQ · Contacts), “Open source” (GitHub) next to “Open AI OS” (the platform) | {"logo":"Nr","logoTile":false,"items":["Platform","Management","Cases","Pricing","FAQ","Contacts"],"cta":"Open AI OS","ctaHref":"https://platform.neuronium.ai/","oss":["Open source","https://github.com/andre-kuzminykh",true],"bg":"rgba(0, 0, 0, 0)","counter":false} |
+| ✅ | Menu: jumps to sections; with one department open, “Management” links straight to it (no dropdown) | {"active":"Management","dropdown":0} |
+| ✅ | Staged release: only the open blocks are on the page (hero · context · management · cases · pricing · faq · start); closed ones are left out and links to them do nothing | 7 blocks · 11 closed · #employees ignored |
+| ✅ | Mouse wheel: one notch moves exactly one block |  |
+| ✅ | Trackpad inertia: one long gesture moves exactly one block |  |
+| ✅ | Background persists across blocks (canvas not re-created) |  |
+| ✅ | Keyboard: End / Home / ArrowDown / ArrowUp | 6,0,1,0 |
+| ✅ | AI Superagent: a brain of 12 tools that shows none at rest; three commands are typed into the bar below it, each sends the agent its own way and its tools appear on it, and together they reach every tool | Find new leads and book demos: Apollo, Sheets, Gmail, Calendar · Sum up today’s calls for the team: Meet, Docs, Slack, Telegram · Collect feedback and ship the fix: WhatsApp, Drive, Code, APIs · icons at rest: 0 |
+| ✅ | AI Superagent: the title “AI Superagent works in your business context”, no extra copy | AI Superagent works in your business context About Platform  |
+| ✅ | Departments: 1 open block(s) with only their open AI employees (1); one interface at a time, each AI employee lights up its own part — and one AI employee alone leads its block with its name, what it does and its element | Management: Km |
+| ✅ | Management · Knowledge Management (1 · Km) on its own: no window, just the search bar at the bottom — a question is typed and answered above it, with the three things it was found in (an icon and a name each), then the next question | What did we agree on pilot pricing? → Why is the Cyprus AI market review at risk? · {"sources":3,"plain":true,"cites":0,"answer":144,"frame":0,"lead":0} |
+| ✅ | Pricing: Own model $19 first, then Solo and Team on the Medium model ($99 with 500 AI Workforce hours; $490 with 5 000 and a shared workspace — crossed out on Own model and Solo), with Start Free Trial (to the platform, with the plan and level), and Scale “Contact us” with Contact sales — no other copy; every button white | Own model $19/ month · Start Free Trial → https://platform.neuronium.ai/?plan=own · rgb(248, 247, 250) \| Solo $99/ month · Start Free Trial → https://platform.neuronium.ai/?plan=solo · rgb(248, 247, 250) \| Team $490/ month · Start Free Trial → https://platform.neuronium.ai/?plan=team · rgb(248, 247, 250) \| Scale Contact us · Contact sales → BUTTON · rgb(248, 247, 250) |
+| ✅ | Pricing: inside Solo and Team a model level is chosen — a switch of a mark and a word for each level, with no multipliers; Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model | Solo Low $59/month · Solo High $190/month · Team Low $290/month · Team High $990/month |
+| ✅ | Pricing: “Contact sales” on Scale opens the “Write to us” widget, about the Scale plan, with the caret in the email field | {"open":true,"subject":"Scale plan","focus":"email"} |
+| ✅ | FAQ: no question is open at first |  |
+| ✅ | FAQ: answers open in place, one at a time — opening one closes the others | You do. Access is set per person, team or role, and Knowledg |
+| ✅ | FAQ: answers for today — it names what is ready now — and leaves out questions about closed blocks | 10 questions · Yes, in early access. Ready today: Knowledge Management. New AI employees are added one by |
+| ✅ | Final: “Run Your AI Business”, “with Neuronium” smaller below, then just the input bar (“Describe your business task”, no Get Early Access); sending opens the platform, with the written task carried over (?task=) | https://platform.neuronium.ai/ · https://platform.neuronium.ai/?task=An%20AI%20concierge%20for%20boutique%20hotels |
+| ✅ | Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology) with “Neuronium® 2026” (the current year) beside it, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget) | {"by":"","tm":"Neuronium® 2026","logo":{"loaded":true,"h":20},"social":["https://www.linkedin.com/in/andre-kuzminykh/","https://x.com/andre_dataist","https://www.instagram.com/andre_dataist","https://www.tiktok.com/@andre_dataist","https://www.youtube.com/@andre_dataist","https://github.com/andre-kuzminykh"],"legal":["https://andre.technology/terms/","https://andre.technology/privacy/"]} |
+| ✅ | Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → https://platform.neuronium.ai/; “About Knowledge Management” under its line, above the Km element → its page, /knowledge-management/ | {"platform":{"text":"About Platform","href":"https://platform.neuronium.ai/","seen":true,"bg":"rgba(0, 0, 0, 0)"},"km":{"text":"About Knowledge Management","href":"/knowledge-management/","seen":true,"bg":"rgba(0, 0, 0, 0)","order":true}} |
+| ✅ | Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes) | {"flows":true,"held":[[-212,-3030],[-212,-2979]],"cases":9,"index":9,"search":"today’s → 1"} |
+| ✅ | Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task | {"tryHero":true,"invite":"Try it yourself","taken":{"own":true,"demo":0,"way":0,"placeholder":"Give the AI Superagent a task"}} |
+| ✅ | Write to us: a button in the bottom-right corner opens a card (email, subject, optional message; “We reply by email”); it asks for what is missing, holds the block still, sends to /api/contact, says where the reply goes — and offers a plain email if sending fails; Escape closes it | {"opened":{"dialog":true,"title":"Write to us","sub":"We reply by email.","fields":"Your email\|Subject\|Message optional","focus":"email"},"noEmail":"Add the email we should reply to.","stayed":true,"sent":"Sent. We’ll reply to anna@example.com.","failed":"Couldn’t send it right now. Write to support@neuro","posted":2} |
+| ✅ | Final: no “Explore AI Employees” link while the periodic table is closed |  |
+| ✅ | Deep link: reload keeps the current block (#management) |  |
+| ✅ | Touch: swipe up → next block, swipe down → previous block | 1, 0 |
+| ✅ | Phone menu: opens full screen, blocks swipes while open, jumps to a section (Contacts) |  |
 | ✅ | Reduced motion: content is fully visible without motion; background stays as a still overlap |  |
-| ✅ | Layout 1440x900-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | all slides fit without inner scroll |
-| ✅ | Layout 1280x800-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | inner scroll used on slide(s) 10 |
-| ✅ | Layout 1024x768-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | inner scroll used on slide(s) 9 |
-| ✅ | Layout 768x1024-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | inner scroll used on slide(s) 10 |
-| ✅ | Layout 390x844-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | inner scroll used on slide(s) 9, 11 |
-| ✅ | Layout 375x667-dark: 12 slides reached by keyboard, no horizontal overflow, progress in sync | inner scroll used on slide(s) 9 |
+| ✅ | Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open AI OS” as on the landing, and the logo leads back to the landing | {"h1":"AI Knowledge Management","blocks":6,"items":"How it works\|Use cases\|Pricing\|FAQ\|Contacts","cta":["Open AI OS","https://platform.neuronium.ai/"],"home":"/","bar":true,"extras":0} |
+| ✅ | Knowledge Management page: “How it works” is the one block that shows a report being made, with no small print — the question is typed into the bar (Ask); the words that matter light up (Understand); the company graph appears and the question walks it, a spark running along each link it takes, no labels or legend (Search); the sum is done in one line, 33% − 60% = −27 pp (Count); and the report is composed over the bar — ring against plan, figures, findings with statuses, limitations (Report) | {"typing":true,"askLit":"Ask","understand":{"marks":"Why\|Cyprus AI market review\|at risk","chips":0,"lit":"Understand"},"search":{"lit":"Cyprus AI market review\|Draft the article\|Proofread & publish\|Collect market sources","spark":3,"labels":0,"step":"Search"},"count":{"line":"33% − 60% =","result":"−27 pp","step":"Count"},"report":{"title":"Root-cause report — Cyprus AI market review","ring":"33 33%","figs":"−27pp 4 7","parts":"Findings\|Limitations\|Sources","badges":"Calculated\|Confirmed","above":true,"step":"Report","steps":"Ask\|Understand\|Search\|Count\|Report"}} |
+| ✅ | Knowledge Management page: its use cases are the landing’s Cases block with only Knowledge Management’s cases; “All Knowledge Management cases” opens every case filtered by it, and the filter can be cleared | {"title":"Use cases","cards":["Answers with sources, from Drive and Meet","A Monday review in one report","Why a goal slips, and what is still open","What we owe each executor, per currency","Work in progress, for the daily stand-up","Who owns what, across the board","No effect claimed without measurements"],"all":"All Knowledge Management cases7","ix":{"title":"Knowledge Management cases 7","on":"Knowledge Management","cards":7},"everyCase":9} |
+| ✅ | Knowledge Management page: the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=) | {"plans":"Own model\|Solo\|Team\|Scale","faq":9,"title":"Ask your company","foot":6,"legal":2,"more":0,"landed":1} |
+| ✅ | Layout 1920x1080-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout 1440x900-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout 1440x760-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: cases ×0.97, faq ×0.95 |
+| ✅ | Layout 1366x657-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: faq ×0.89 |
+| ✅ | Layout 1280x800-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout 1024x768-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: faq ×0.98 |
+| ✅ | Layout 768x1024-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout 390x844-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: pricing ×0.86 |
+| ✅ | Layout 375x667-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: pricing ×0.82 |
+| ✅ | Layout 360x640-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: cases ×0.98, pricing ×0.78, faq ×0.98 |
+| ✅ | Layout Knowledge Management 1920x1080-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout Knowledge Management 1440x900-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout Knowledge Management 1440x760-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: cases ×0.97 |
+| ✅ | Layout Knowledge Management 1366x657-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: faq ×0.98 |
+| ✅ | Layout Knowledge Management 1280x800-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout Knowledge Management 1024x768-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout Knowledge Management 768x1024-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | every block fits at full size |
+| ✅ | Layout Knowledge Management 390x844-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: pricing ×0.86 |
+| ✅ | Layout Knowledge Management 375x667-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: pricing ×0.82 |
+| ✅ | Layout Knowledge Management 360x640-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: cases ×0.98, pricing ×0.78 |
 | ✅ | No JavaScript errors in any run |  |
 
-Indicative frame rate in headless software rendering: 39 fps (real GPUs run the light field at display refresh rate).
+Indicative frame rate in headless software rendering: 42 fps (real GPUs run the light field at display refresh rate).
 
-Screenshots: `validation/screenshots/<viewport>-<theme>/NN-<slide>.jpg`.
+Screenshots: [desktop](../screenshots/desktop-1440x900), [phone](../screenshots/phone-390x844), [contact sheets for all seven viewports](../screenshots/sheets).

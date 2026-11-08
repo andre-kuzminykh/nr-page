@@ -1,6 +1,5 @@
 import {
   Blocks,
-  Bot,
   ChartNoAxesColumn,
   CodeXml,
   Compass,
@@ -11,15 +10,14 @@ import {
   PenTool,
   ServerCog,
   Telescope,
-  UserRound,
   Users,
   Workflow,
   type LucideIcon,
 } from 'lucide-react'
-import type { EmployeeId } from '../../data/employees'
 import type { ExecutionUnit } from '../../data/architecture'
+import type { DepartmentId } from '../../data/departments'
 
-export const EMPLOYEE_ICON: Record<EmployeeId, LucideIcon> = {
+export const DEPARTMENT_ICON: Record<DepartmentId, LucideIcon> = {
   management: Compass,
   hr: Users,
   marketing: Telescope,
@@ -37,6 +35,3 @@ export const EXECUTION_ICON: Record<ExecutionUnit['id'], LucideIcon> = {
   workflows: Workflow,
   skills: Blocks,
 }
-
-/** AI-Native → robot, AI-First → person. */
-export const TYPE_ICON = { robot: Bot, person: UserRound } as const

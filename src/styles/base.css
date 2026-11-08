@@ -145,28 +145,25 @@ svg {
   outline: none;
   opacity: 0;
   visibility: hidden;
-  transform: translate3d(0, 4.5vh, 0) scale(0.992);
-  filter: blur(8px);
+  transform: translate3d(0, 2.2vh, 0) scale(0.996);
+  /* leaving is quick and quiet; arriving is slower and settles — no full-screen blur */
   transition:
-    opacity 640ms var(--ease-out),
-    transform var(--dur-slide) var(--ease-out),
-    filter 640ms var(--ease-out),
-    visibility 0s linear var(--dur-slide);
+    opacity 260ms cubic-bezier(0.4, 0, 1, 1),
+    transform 320ms cubic-bezier(0.4, 0, 1, 1),
+    visibility 0s linear 320ms;
 }
 
 .slide[data-state='before'] {
-  transform: translate3d(0, -4.5vh, 0) scale(0.985);
+  transform: translate3d(0, -2.2vh, 0) scale(0.996);
 }
 
 .slide[data-state='active'] {
   opacity: 1;
   visibility: visible;
   transform: none;
-  filter: none;
   transition:
-    opacity 760ms var(--ease-out) 90ms,
-    transform var(--dur-slide) var(--ease-out) 40ms,
-    filter 700ms var(--ease-out) 60ms,
+    opacity 520ms var(--ease-out) 140ms,
+    transform var(--dur-slide) var(--ease-out) 120ms,
     visibility 0s;
 }
 
@@ -176,31 +173,78 @@ svg {
   flex-shrink: 0;
 }
 
+/* A block never scrolls inside. When its content is taller than the window, the whole block is
+   drawn smaller (--fit, set by useFitToHeight) — its clearance under the menu, its sides and its
+   column stay the size they are on screen, so only the content shrinks. */
 .slide__frame {
+  --fit: 1;
   position: relative;
   width: 100%;
-  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  max-width: calc((var(--frame-max) + 2 * var(--gutter)) / var(--fit));
   height: 100%;
   margin: 0 auto;
-  padding: calc(var(--topbar-h) + env(safe-area-inset-top, 0px) + clamp(4px, 2.4vh, 30px)) var(--gutter)
-    calc(clamp(26px, 5vh, 56px) + env(safe-area-inset-bottom, 0px));
+  padding: calc((var(--topbar-h) + env(safe-area-inset-top, 0px) + clamp(4px, 2.4vh, 30px)) / var(--fit))
+    calc(var(--gutter) / var(--fit)) calc((clamp(26px, 5vh, 56px) + env(safe-area-inset-bottom, 0px)) / var(--fit));
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-strong) transparent;
+  overflow: hidden;
+  zoom: var(--fit);
+}
+
+/* ---------- a quiet link: no background, a line draws under it and the arrow moves on hover ---------- */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  /* as wide as its words, in a flex column or a grid alike, so the line under it is too */
+  align-self: flex-start;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 0;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: rgb(255 255 255 / 0.86);
+  text-decoration: none;
+  background: linear-gradient(90deg, #a071ff, #e06ad8 50%, #ff8a33) 0 100% / 0 1.5px no-repeat;
+  transition:
+    background-size 500ms var(--ease-out),
+    color 300ms ease;
+}
+
+.more svg {
+  flex-shrink: 0;
+  transition: transform 400ms var(--ease-out);
+}
+
+.more:hover,
+.more:focus-visible {
+  color: #fff;
+  background-size: 100% 1.5px;
+}
+
+.more:hover svg,
+.more:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+/* a link that stays on the site moves straight ahead */
+.more:hover svg.lucide-arrow-right,
+.more:focus-visible svg.lucide-arrow-right {
+  transform: translateX(3px);
+}
+
+.more:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 /* ---------- reveal on arrival (no scroll-to-reveal; everything arrives on its own) ---------- */
 .rv {
   opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.rv--blur {
-  filter: blur(8px);
+  transform: translate3d(0, 12px, 0);
 }
 
 .rv--x {
@@ -233,9 +277,8 @@ svg {
   filter: none;
   transition:
     opacity var(--dur-reveal) var(--ease-out),
-    transform calc(var(--dur-reveal) + 200ms) var(--ease-out),
-    filter var(--dur-reveal) var(--ease-out);
-  transition-delay: calc(var(--d, 0) * 1ms + 160ms);
+    transform var(--dur-reveal) var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms + 200ms);
 }
 
 /* line mask reveal for display type */
@@ -253,8 +296,8 @@ svg {
 
 [data-shown] .mask > span {
   transform: none;
-  transition: transform 1150ms var(--ease-out);
-  transition-delay: calc(var(--d, 0) * 1ms + 160ms);
+  transition: transform 860ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--d, 0) * 1ms + 200ms);
 }
 
 /* ---------- typography ---------- */
@@ -349,11 +392,10 @@ svg {
   height: 52px;
   padding: 0 26px 0 28px;
   border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 560;
+  letter-spacing: -0.012em;
   text-decoration: none;
   white-space: nowrap;
   transition:

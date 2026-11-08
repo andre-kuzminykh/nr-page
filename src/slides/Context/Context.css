@@ -1,0 +1,162 @@
+.ctx {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 56px);
+}
+
+.ctx__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, 3vh, 30px);
+}
+
+.ctx__title {
+  font-size: clamp(28px, min(3.7vw, 6.2vh), 60px);
+}
+
+.ctx__title .mask {
+  white-space: nowrap;
+}
+
+.ctx__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.6vh, 28px);
+  min-width: 0;
+}
+
+.ctx__brain {
+  min-width: 0;
+}
+
+/* commands are typed below the brain */
+.ctx__prompt {
+  width: min(100%, 580px);
+  margin-inline: auto;
+}
+
+/* ---------- the brain ---------- */
+.cb {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(58vh, 560px);
+  overflow: visible;
+}
+
+.cb-e {
+  stroke: url(#cbL);
+  stroke-opacity: 0.42;
+  stroke-width: 1;
+  opacity: 0;
+}
+
+.cb-v {
+  opacity: 0;
+}
+
+.cb.is-run .cb-e {
+  animation: cb-in 0.7s ease var(--d) both;
+}
+
+.cb.is-run .cb-v {
+  animation:
+    cb-dot 0.45s ease var(--d) both,
+    cb-tw var(--tw) ease-in-out calc(var(--d) + 1.4s) infinite;
+}
+
+.cb.is-still .cb-e {
+  opacity: 1;
+}
+
+.cb.is-still .cb-v {
+  opacity: 0.8;
+}
+
+@keyframes cb-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cb-dot {
+  to {
+    opacity: 0.8;
+  }
+}
+
+@keyframes cb-tw {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.45;
+  }
+}
+
+/* the name of a tool shows when the agent arrives and slowly goes dark; the icon stays */
+.cb-lab {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: #0b0910;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+  pointer-events: none;
+}
+
+.cb-n.is-named .cb-lab {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s ease,
+    transform 0.5s var(--ease-out);
+}
+
+.cb-n--core .cb-lab {
+  fill: #e9dcff;
+}
+
+@media (max-width: 860px) {
+  .ctx {
+    grid-template-columns: 1fr;
+    align-content: start;
+    align-content: safe center;
+    gap: clamp(18px, 4vh, 40px);
+  }
+  .ctx__title {
+    font-size: clamp(27px, 7vw, 44px);
+  }
+  .ctx__title .mask {
+    white-space: normal;
+  }
+  .ctx__head {
+    gap: 14px;
+  }
+
+  .cb {
+    max-height: none;
+  }
+  .cb-e {
+    stroke-width: 1.8;
+    stroke-opacity: 0.55;
+  }
+  .cb-lab {
+    font-size: 15px;
+  }
+}

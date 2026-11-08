@@ -1,0 +1,400 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  /* same column as the blocks, so the logo lines up with the content on wide screens */
+  max-width: calc(var(--frame-max) + 2 * var(--gutter));
+  margin: 0 auto;
+  /* the logo, the menu in the very middle, the buttons: the sides share what is left equally, so
+     the menu sits at the centre of the page whenever there is room (and moves over when there is not) */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  --nav-btn: 40px;
+  height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
+  pointer-events: none;
+}
+
+.nav > * {
+  pointer-events: auto;
+}
+
+.nav__brand {
+  grid-column: 1;
+  justify-self: start;
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 2px;
+  border-radius: 6px;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+/* The logo is the two letters only — no tile behind them. */
+.nav__logo {
+  font-family: var(--font-sans);
+  font-size: clamp(24px, 3.3vh, 29px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  transition: opacity 300ms var(--ease-out);
+}
+
+.nav__brand:hover .nav__logo {
+  opacity: 0.78;
+}
+
+.nav__brand:focus-visible {
+  outline: 1.5px solid #fff;
+  outline-offset: 4px;
+}
+
+/* ---------- desktop menu ---------- */
+.nav__menu {
+  grid-column: 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Open source, the product button (and the burger on smaller screens), at the right */
+.nav__end {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 480;
+  letter-spacing: -0.005em;
+  color: rgb(var(--fg-rgb) / 0.68);
+  white-space: nowrap;
+  transition: color 300ms, background-color 300ms;
+}
+
+.nav__item:hover {
+  color: var(--fg);
+  background: rgb(var(--fg-rgb) / 0.06);
+}
+
+.nav__item.is-active {
+  color: var(--fg);
+}
+
+.nav__chev {
+  transition: transform 300ms var(--ease-out);
+}
+
+.nav__item[aria-expanded='true'] .nav__chev {
+  transform: rotate(180deg);
+}
+
+.nav__ink {
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  height: 1.5px;
+  width: calc(var(--w, 0px) - 26px);
+  border-radius: 2px;
+  background: var(--grad);
+  transform: translateX(calc(var(--x, 0px) + 13px));
+  transition:
+    transform 600ms var(--ease-out),
+    width 600ms var(--ease-out),
+    opacity 300ms;
+  pointer-events: none;
+}
+
+.nav__dd {
+  position: relative;
+}
+
+.nav__panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  width: 620px;
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(14 12 21 / 0.9);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow: 0 40px 90px -40px rgb(0 0 0 / 0.9);
+  transform: translateX(-50%);
+  animation: nav-drop 380ms var(--ease-out);
+}
+
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px) scale(0.98);
+  }
+}
+
+.nav__dept {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: left;
+  transition: background-color 250ms;
+  animation: k-in 420ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 22ms);
+}
+
+.nav__dept:hover,
+.nav__dept:focus-visible {
+  background: rgb(255 255 255 / 0.06);
+}
+
+.nav__dept.is-current {
+  background: color-mix(in oklab, var(--fam) 12%, transparent);
+}
+
+.nav__dept svg {
+  grid-row: 1 / span 2;
+  color: var(--fam);
+}
+
+.nav__dept-name {
+  font-size: 13.5px;
+  font-weight: 540;
+}
+
+.nav__dept-line {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: var(--nav-btn);
+  padding: 0 16px 0 18px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: box-shadow 400ms var(--ease-out), transform 300ms var(--ease-out);
+}
+
+.nav__cta:hover {
+  box-shadow:
+    -10px 8px 30px -12px rgb(139 85 246 / 0.9),
+    10px 8px 30px -12px rgb(249 137 75 / 0.85);
+}
+
+.nav__cta:active {
+  transform: scale(0.98);
+}
+
+/* the code is open: a quiet pill next to Open Platform */
+.nav__oss {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: var(--nav-btn);
+  padding: 0 16px 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.24);
+  background: rgb(11 10 15 / 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--fg);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 300ms, background-color 300ms;
+}
+
+.nav__oss:hover,
+.nav__oss:focus-visible {
+  border-color: rgb(255 255 255 / 0.4);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.nav__burger {
+  position: relative;
+  z-index: 2;
+  display: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: rgb(11 10 15 / 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--fg);
+}
+
+/* ---------- phone sheet ---------- */
+.nav__sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: calc(var(--topbar-h) + env(safe-area-inset-top, 0px) + 12px) var(--gutter)
+    calc(28px + env(safe-area-inset-bottom, 0px));
+  background: rgb(11 10 15 / 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow-y: auto;
+  animation: nav-sheet 420ms var(--ease-out);
+}
+
+@keyframes nav-sheet {
+  from {
+    opacity: 0;
+  }
+}
+
+.nav__sheet-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav__sheet-item {
+  padding: 6px 0;
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  text-align: left;
+  color: rgb(var(--fg-rgb) / 0.75);
+  animation: k-in 520ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 50ms + 60ms);
+}
+
+.nav__sheet-item.is-active {
+  color: var(--fg);
+}
+
+.nav__sheet-label {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.nav__sheet-depts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.nav__sheet-dept {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  font-size: 14px;
+  text-align: left;
+  animation: k-in 520ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 30ms + 60ms);
+}
+
+.nav__sheet-dept svg {
+  color: var(--fam);
+}
+
+.nav__sheet-dept.is-current {
+  border-color: color-mix(in oklab, var(--fam) 60%, transparent);
+}
+
+.nav__sheet-cta {
+  margin-top: auto;
+}
+
+@media (max-width: 1180px) {
+  .nav__item {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .nav__ink {
+    width: calc(var(--w, 0px) - 20px);
+    transform: translateX(calc(var(--x, 0px) + 10px));
+  }
+}
+
+@media (max-width: 1023px) {
+  .nav__menu {
+    display: none;
+  }
+  .nav__burger {
+    display: grid;
+  }
+  /* Open source, the product button and the burger sit together on the right, all one height */
+  .nav {
+    --nav-btn: 36px;
+  }
+  .nav__end {
+    gap: 8px;
+  }
+  .nav__oss {
+    padding: 0 13px 0 11px;
+    font-size: 13px;
+  }
+  .nav__cta {
+    padding: 0 12px 0 14px;
+    font-size: 13px;
+  }
+}
+
+/* phones: Open source is its mark alone, so Open Platform always fits beside it */
+@media (max-width: 640px) {
+  .nav__oss {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .nav__oss > span {
+    display: none;
+  }
+}

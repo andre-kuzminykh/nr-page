@@ -1,0 +1,350 @@
+/* =========================================================
+   Write to us: a quiet button in the bottom-right corner,
+   and a small card above it. Glass, a gradient hairline,
+   three fields and one white button.
+   ========================================================= */
+.cw {
+  --cw-edge: linear-gradient(140deg, rgb(160 113 255 / 0.85), rgb(224 106 216 / 0.55) 50%, rgb(255 138 51 / 0.75));
+  position: fixed;
+  right: calc(18px + env(safe-area-inset-right, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.cw > * {
+  pointer-events: auto;
+}
+
+/* ---------- the button ---------- */
+.cw__launch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 46px;
+  min-width: 46px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgb(17 13 26 / 0.82), rgb(17 13 26 / 0.82)) padding-box,
+    var(--cw-edge) border-box;
+  box-shadow: 0 18px 50px -22px rgb(160 113 255 / 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--fg);
+  transition:
+    gap 420ms var(--ease-out),
+    box-shadow 300ms ease,
+    transform 200ms ease;
+}
+
+.cw__launch svg {
+  flex-shrink: 0;
+}
+
+/* on hover it says what it is */
+.cw__label {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 540;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transition:
+    max-width 420ms var(--ease-out),
+    opacity 300ms ease;
+}
+
+@media (hover: hover) {
+  .cw:not(.is-open) .cw__launch:hover,
+  .cw:not(.is-open) .cw__launch:focus-visible {
+    gap: 10px;
+  }
+  .cw:not(.is-open) .cw__launch:hover .cw__label,
+  .cw:not(.is-open) .cw__launch:focus-visible .cw__label {
+    max-width: 120px;
+    opacity: 1;
+  }
+}
+
+.cw__launch:active {
+  transform: scale(0.96);
+}
+
+.cw__launch:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- the card ---------- */
+.cw__card {
+  width: min(360px, calc(100vw - 36px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  padding: 20px 20px 18px;
+  border: 1px solid transparent;
+  border-radius: 22px;
+  /* opaque: what is behind never shows through the fields */
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 40%) padding-box,
+    linear-gradient(rgb(14 12 21 / 0.95), rgb(14 12 21 / 0.95)) padding-box,
+    linear-gradient(140deg, #8a62f0, #c25cb8 50%, #e07a3a) border-box;
+  box-shadow:
+    0 40px 100px -40px rgb(0 0 0 / 0.9),
+    0 30px 80px -40px rgb(160 113 255 / 0.55);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  transform-origin: 100% 100%;
+  animation: cw-in 380ms var(--ease-out);
+}
+
+@keyframes cw-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+.cw__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cw__title {
+  font-size: 19px;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.cw__sub {
+  margin-top: 3px;
+  font-size: 13.5px;
+  color: rgb(255 255 255 / 0.58);
+}
+
+.cw__x {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px -8px 0 0;
+  border-radius: 50%;
+  color: rgb(255 255 255 / 0.6);
+  transition: background-color 200ms, color 200ms;
+}
+
+.cw__x:hover,
+.cw__x:focus-visible {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--fg);
+}
+
+.cw__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cw__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cw__field > span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.55);
+}
+
+.cw__field em {
+  font-style: normal;
+  color: rgb(255 255 255 / 0.32);
+}
+
+.cw__field input,
+.cw__field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 12px;
+  outline: none;
+  background: rgb(255 255 255 / 0.04);
+  /* 16px keeps phones from zooming into the field */
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--fg);
+  caret-color: #e06ad8;
+  transition:
+    border-color 200ms,
+    background-color 200ms,
+    box-shadow 200ms;
+}
+
+.cw__field textarea {
+  height: 78px;
+  resize: none;
+}
+
+.cw__field input::placeholder,
+.cw__field textarea::placeholder {
+  color: rgb(255 255 255 / 0.32);
+}
+
+.cw__field input:focus,
+.cw__field textarea:focus {
+  border-color: rgb(224 106 216 / 0.7);
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: 0 0 0 4px rgb(214 60 245 / 0.14);
+}
+
+.cw__field.is-bad input {
+  border-color: var(--orange);
+}
+
+.cw__trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cw__status {
+  min-height: 1.2em;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--orange-hi);
+}
+
+.cw__status a {
+  color: var(--fg);
+}
+
+.cw__send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 14.5px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  transition:
+    box-shadow 300ms ease,
+    transform 200ms ease,
+    opacity 200ms;
+}
+
+.cw__send:hover {
+  box-shadow:
+    -12px 10px 36px -14px rgb(139 85 246 / 0.85),
+    12px 10px 36px -14px rgb(249 137 75 / 0.8);
+}
+
+.cw__send:active {
+  transform: scale(0.98);
+}
+
+.cw__send:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.cw__send:focus-visible,
+.cw__again:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---------- sent ---------- */
+.cw__done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.cw__done strong {
+  font-weight: 560;
+  color: var(--fg);
+  word-break: break-all;
+}
+
+.cw__tick {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--grad);
+  color: #fff;
+  animation: cw-tick 520ms var(--ease-out);
+}
+
+@keyframes cw-tick {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+.cw__again {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.6);
+  border-bottom: 1px solid rgb(255 255 255 / 0.25);
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 600px) {
+  .cw {
+    right: calc(14px + env(safe-area-inset-right, 0px));
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+  .cw__launch {
+    height: 42px;
+    min-width: 42px;
+    padding: 0 12px;
+  }
+  .cw__card {
+    width: calc(100vw - 28px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    padding: 18px 16px 16px;
+  }
+}
+
+@media (max-height: 640px) {
+  .cw__field textarea {
+    height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw *,
+  .cw__card {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type NavSource = 'wheel' | 'key' | 'touch' | 'ui'
 
 /** Time a transition owns the screen; input arriving meanwhile cannot start another one. */
-export const TRANSITION_MS = 820
+export const TRANSITION_MS = 700
 const WHEEL_GAP_MS = 170
 const WHEEL_THRESHOLD = 28
 const SWIPE_THRESHOLD = 46
@@ -85,14 +85,22 @@ export function useSlideController(count: number, initial: number) {
     let lastInner = 0
     let gesture = { consumed: false, acc: 0, inner: false }
 
+    const navOpen = () => {
+      const ds = document.documentElement.dataset
+      return ds.navOpen === 'true' || ds.contactOpen === 'true' || ds.overlayOpen === 'true'
+    }
+
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) return // pinch-zoom
+      if (e.ctrlKey || navOpen()) return // pinch-zoom, or a menu is open
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1
       const dy = e.deltaY * unit
       const dx = e.deltaX * unit
       if (Math.abs(dx) > Math.abs(dy)) return // horizontal scrolling belongs to the content
       const dir: 1 | -1 = dy > 0 ? 1 : -1
-      const now = performance.now()
+      // Time the gesture by when each event happened, not when it is handled: if the page is busy
+      // for a moment, a queued inertia tail must not look like a pause followed by a new swipe.
+      const handled = performance.now()
+      const now = e.timeStamp > 0 && e.timeStamp <= handled + 1000 ? e.timeStamp : handled
       const abs = Math.abs(dy)
       const gap = now - lastWheel
       lastWheel = now
@@ -124,7 +132,7 @@ export function useSlideController(count: number, initial: number) {
 
     // ---------- keyboard ----------
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey) return
+      if (e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey || navOpen()) return
       const active = document.activeElement
       if (isEditable(active)) return
       if (active?.closest('[data-own-keys]') && e.key.startsWith('Arrow')) return
@@ -180,7 +188,7 @@ export function useSlideController(count: number, initial: number) {
     } | null = null
 
     const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) {
+      if (e.touches.length !== 1 || navOpen()) {
         touch = null
         return
       }

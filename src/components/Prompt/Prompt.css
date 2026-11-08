@@ -1,0 +1,286 @@
+/* The one input bar: a floating pill with a gradient edge. A demo types itself into it and is
+   sent; then it invites the visitor; any time, the visitor can click in and write their own. */
+.prompt {
+  --c1: #a071ff;
+  --c2: #e06ad8;
+  --c3: #ff8a33;
+  --pl: 26px;
+  --pr: 10px;
+  --gap: 14px;
+  --go: clamp(38px, 5.2vh, 46px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  height: clamp(56px, 7.6vh, 68px);
+  padding: 0 var(--pr) 0 var(--pl);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgb(17 13 26 / 0.86), rgb(17 13 26 / 0.86)) padding-box,
+    linear-gradient(100deg, rgb(160 113 255 / 0.95), rgb(224 106 216 / 0.7) 55%, rgb(255 138 51 / 0.85)) border-box;
+  box-shadow:
+    0 30px 80px -34px rgb(160 113 255 / 0.75),
+    0 0 0 7px rgb(160 113 255 / 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: clamp(15px, 1.3vw, 19px);
+  letter-spacing: -0.01em;
+  cursor: text;
+  transition: box-shadow 300ms ease;
+}
+
+.prompt:focus-within {
+  box-shadow:
+    0 30px 80px -34px rgb(160 113 255 / 0.85),
+    0 0 0 5px rgb(214 60 245 / 0.2);
+}
+
+.prompt__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--fg);
+  caret-color: var(--c2);
+}
+
+.prompt__input::placeholder {
+  color: rgb(255 255 255 / 0.5);
+}
+
+/* the demo's text and the invitation lie over the empty input; clicks go through to it */
+.prompt__q,
+.prompt__try {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pl);
+  right: calc(var(--pr) + var(--go) + var(--gap));
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.prompt__q {
+  --fam: var(--c1);
+  color: var(--fg);
+}
+
+.prompt__q > .type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the demo is over: “Try it yourself”, with a caret waiting */
+.prompt__try {
+  gap: 3px;
+}
+
+/* one light passes over the words as they appear, then they rest */
+.prompt__try > span {
+  background: linear-gradient(100deg, rgb(255 255 255 / 0.62) 0%, rgb(255 255 255 / 0.62) 40%, #f3d6ff 50%, #ffd9c2 56%, rgb(255 255 255 / 0.62) 66%);
+  background-size: 300% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: prompt-sheen 1.6s ease-in-out 200ms both;
+}
+
+.prompt__caret {
+  width: 2px;
+  height: 1.15em;
+  border-radius: 1px;
+  background: linear-gradient(var(--c1), var(--c3));
+  animation: prompt-blink 1.05s steps(1) infinite;
+}
+
+/* the invitation glows softly: a separate layer whose opacity alone changes (cheap to animate) */
+.prompt::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow:
+    0 30px 90px -30px rgb(224 106 216 / 0.8),
+    0 0 0 9px rgb(224 106 216 / 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+
+.prompt.is-try::after {
+  animation: prompt-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes prompt-sheen {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@keyframes prompt-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes prompt-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------- the send button ---------- */
+.prompt__go {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--go);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.07);
+  color: rgb(255 255 255 / 0.45);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 300ms var(--ease-out), color 300ms;
+}
+
+.prompt__go::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--grad);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.prompt__go svg {
+  position: relative;
+}
+
+.prompt__go:active {
+  transform: scale(0.92);
+}
+
+.prompt__go:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ready to send whenever the demo is not typing */
+.prompt:not(.is-demo) .prompt__go,
+.prompt.is-demo.is-still .prompt__go {
+  color: #fff;
+}
+
+.prompt:not(.is-demo) .prompt__go::before,
+.prompt.is-demo.is-still .prompt__go::before {
+  opacity: 1;
+}
+
+/* sent: the button lights and is pressed */
+.prompt.is-sent .prompt__go {
+  color: #fff;
+  animation: prompt-press 520ms var(--ease-out) both;
+}
+
+.prompt.is-sent .prompt__go::before {
+  animation: prompt-on 360ms ease both;
+}
+
+@keyframes prompt-press {
+  0% {
+    color: rgb(255 255 255 / 0.45);
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(0.84);
+  }
+  100% {
+    color: #fff;
+    transform: scale(1);
+  }
+}
+
+@keyframes prompt-on {
+  to {
+    opacity: 1;
+  }
+}
+
+/* the request runs along the lower edge */
+.prompt__scan {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--c1), var(--c2), var(--c3), transparent) no-repeat;
+  background-size: 45% 100%;
+  opacity: 0;
+}
+
+.prompt.is-sent .prompt__scan {
+  animation: prompt-scan 760ms ease-in-out 80ms both;
+}
+
+@keyframes prompt-scan {
+  0% {
+    opacity: 0;
+    background-position: -60% 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 160% 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .prompt {
+    --pl: 20px;
+    --pr: 6px;
+    --gap: 11px;
+    --go: 38px;
+    height: 50px;
+    /* 16px keeps phones from zooming into the field */
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .prompt {
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt,
+  .prompt * {
+    animation: none !important;
+  }
+}

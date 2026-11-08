@@ -1,0 +1,181 @@
+.faq {
+  --fam: #f2449a;
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: clamp(28px, 4vw, 72px);
+}
+
+.faq__title {
+  font-size: clamp(30px, min(4.2vw, 6.6vh), 66px);
+}
+
+.faq__list {
+  min-width: 0;
+  border-top: 1px solid var(--line);
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq__h {
+  font: inherit;
+}
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: clamp(11px, 1.9vh, 18px) 4px;
+  font-size: clamp(15px, 1.3vw, 19px);
+  font-weight: 480;
+  letter-spacing: -0.012em;
+  text-align: left;
+  color: rgb(var(--fg-rgb) / 0.8);
+  transition: color 300ms;
+}
+
+.faq__q:hover,
+.faq__item.is-open .faq__q {
+  color: var(--fg);
+}
+
+.faq__q:focus-visible {
+  outline: 1.5px solid #fff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.faq__q-n {
+  flex-shrink: 0;
+  width: 18px;
+  font-size: 10.5px;
+  color: var(--muted);
+  transition: color 300ms;
+}
+
+.faq__item.is-open .faq__q-n {
+  color: color-mix(in oklab, var(--fam) 70%, #fff);
+}
+
+.faq__q-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* plus that turns into a minus */
+.faq__sign {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.faq__sign::before,
+.faq__sign::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 450ms var(--ease-out);
+}
+
+.faq__sign::after {
+  transform: rotate(90deg);
+}
+
+.faq__item.is-open .faq__sign::after {
+  transform: rotate(0deg);
+}
+
+.faq__item.is-open .faq__sign {
+  color: var(--fam);
+}
+
+/* the answer opens in place; the open one closes as another opens */
+.faq__a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 520ms var(--ease-out);
+}
+
+.faq__item.is-open .faq__a {
+  grid-template-rows: 1fr;
+}
+
+.faq__a > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.faq__a p {
+  max-width: 44rem;
+  padding: 0 34px clamp(14px, 2.2vh, 22px) 38px;
+  font-size: clamp(14.5px, 1.15vw, 17px);
+  line-height: 1.6;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 500ms var(--ease-out);
+}
+
+.faq__item.is-open .faq__a p {
+  opacity: 1;
+  transform: none;
+  transition-delay: 120ms;
+}
+
+@media (max-width: 860px) {
+  .faq {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 16px;
+  }
+  .faq__title {
+    font-size: clamp(27px, 7vw, 44px);
+  }
+  .faq__q {
+    gap: 12px;
+    padding: 10px 2px;
+    font-size: 14.5px;
+  }
+  .faq__a p {
+    padding: 0 8px 12px 30px;
+    font-size: 13.5px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 720px) {
+  .faq__q {
+    padding: 7px 2px;
+    font-size: 13.5px;
+  }
+  .faq__a p {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq__a,
+  .faq__a p,
+  .faq__sign::after {
+    transition: none;
+  }
+}
+
+/* where the gutter is narrower than the “Write to us” button, the questions stop above it */
+@media (max-width: 1279px) {
+  .slide__frame.faq {
+    padding-bottom: calc((76px + env(safe-area-inset-bottom, 0px)) / var(--fit));
+  }
+}

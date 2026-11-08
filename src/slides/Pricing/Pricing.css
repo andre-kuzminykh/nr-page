@@ -1,0 +1,443 @@
+.pr {
+  justify-content: center;
+  gap: clamp(22px, 4.4vh, 48px);
+}
+
+.pr__title {
+  font-size: clamp(34px, min(5vw, 8vh), 84px);
+}
+
+.pr__plans {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 18px);
+}
+
+.pr-plan {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* the words on a card stay on one line; sizes follow the card's width */
+  container-type: inline-size;
+  padding: clamp(20px, 3vh, 30px) clamp(18px, 1.9vw, 28px);
+  border-radius: 22px;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.045), transparent 45%) border-box no-repeat,
+    rgb(14 12 21 / 0.78);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.pr-plan.is-featured {
+  border-color: transparent;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 45%) padding-box,
+    linear-gradient(rgb(14 12 21 / 0.88), rgb(14 12 21 / 0.88)) padding-box,
+    var(--grad) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 40px 100px -40px rgb(214 60 245 / 0.65);
+}
+
+.pr-plan__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pr-plan.is-featured .pr-plan__name {
+  color: #fff;
+}
+
+.pr-plan__price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  /* as tall as a price, so “Contact us” keeps the cards' lines level */
+  min-height: clamp(40px, min(4.4vw, 7.4vh), 72px);
+  margin-top: clamp(18px, 3.2vh, 34px);
+  white-space: nowrap;
+}
+
+.pr-plan__cur {
+  align-self: flex-start;
+  margin-top: 0.35em;
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.7);
+}
+
+.pr-plan__num {
+  font-size: clamp(40px, min(4.4vw, 7.4vh), 72px);
+  font-weight: 520;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  color: #fff;
+}
+
+.pr-plan__price .pr-plan__num:not(.pr-plan__num--word) {
+  display: inline-block;
+  animation: pr-roll 520ms var(--ease-out);
+}
+
+/* a new price rolls in when another model level is picked */
+@keyframes pr-roll {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(0.28em);
+  }
+}
+
+.pr-plan__num--word {
+  /* “Contact us” as large as the card allows, never larger than the prices */
+  font-size: min(20.5cqi, clamp(40px, min(4.4vw, 7.4vh), 72px));
+  letter-spacing: -0.045em;
+}
+
+.pr-plan__per {
+  margin-left: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.pr-plan__line {
+  margin-top: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: min(16px, 6.6cqi);
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.74);
+}
+
+/* ---------- the model level: Own model · Low · Medium · High ---------- */
+/* the model level: a switch of a mark and a word */
+.pr-level {
+  margin-top: clamp(16px, 2.6vh, 24px);
+}
+
+.pr-level.is-blank {
+  visibility: hidden;
+  height: 42px;
+}
+
+.pr-tiers {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  height: 42px;
+  padding: 3px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.035);
+}
+
+/* the chosen level: a light that glides under it */
+.pr-tiers__ink {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--n));
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 520ms var(--ease-out);
+}
+
+.pr-plan.is-featured .pr-tiers__ink {
+  background: linear-gradient(100deg, rgb(160 113 255 / 0.55), rgb(224 106 216 / 0.45), rgb(255 138 51 / 0.5));
+  box-shadow: none;
+}
+
+.pr-tiers__opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgb(255 255 255 / 0.62);
+  transition: color 300ms ease;
+}
+
+/* the level's meter: lit bars in the word's colour, the rest faint */
+.pr-meter {
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+.pr-meter rect {
+  fill: currentColor;
+  opacity: 0.22;
+  transition: opacity 300ms ease;
+}
+
+.pr-meter rect.is-lit {
+  opacity: 0.85;
+}
+
+.pr-tiers__opt.is-on .pr-meter rect.is-lit {
+  opacity: 1;
+}
+
+.pr-tiers__opt:hover,
+.pr-tiers__opt.is-on {
+  color: #fff;
+}
+
+.pr-tiers__opt:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+/* a card too narrow for mark and word keeps the word */
+@container (max-width: 250px) {
+  .pr-meter {
+    display: none;
+  }
+}
+
+.pr-plan__list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: clamp(14px, 2.4vh, 22px) 0 0;
+  padding: clamp(14px, 2.4vh, 22px) 0 0;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  list-style: none;
+}
+
+.pr-plan__list li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  white-space: nowrap;
+  font-size: min(15px, 7.4cqi);
+  color: var(--fg);
+}
+
+.pr-plan__list svg {
+  flex-shrink: 0;
+  color: #c084fc;
+}
+
+/* what the plan does not have: crossed, and quieter */
+.pr-plan__list li.is-off {
+  color: rgb(255 255 255 / 0.38);
+}
+
+.pr-plan__list li.is-off svg {
+  color: rgb(255 255 255 / 0.32);
+}
+
+/* the button sits at the foot of every card, however much is above it */
+.pr-plan > :nth-last-child(2) {
+  margin-bottom: clamp(22px, 4vh, 40px);
+}
+
+/* every plan's button is white, the highlighted plan's too: one clear action per card */
+.pr-plan__cta {
+  width: 100%;
+  height: 50px;
+  margin-top: auto;
+  gap: 10px;
+  padding: 0 18px;
+  border: 0;
+  background: var(--fg);
+  color: var(--bg);
+  cursor: pointer;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.pr-plan__cta svg {
+  flex-shrink: 0;
+}
+
+.pr-plan__cta:hover {
+  box-shadow:
+    -14px 12px 44px -16px rgb(139 85 246 / 0.85),
+    14px 12px 44px -16px rgb(249 137 75 / 0.8);
+}
+
+.pr-plan__cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* narrower columns: the buttons' words get tighter */
+@media (max-width: 1100px) and (min-width: 861px) {
+  .pr-tiers__opt {
+    font-size: 12.5px;
+  }
+  .pr-plan__cta {
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 13px;
+    letter-spacing: -0.015em;
+  }
+  .pr-plan__cta svg {
+    width: 13px;
+    height: 13px;
+  }
+  .pr-plan__num {
+    font-size: clamp(30px, 4vw, 44px);
+  }
+  .pr-plan__price {
+    min-height: clamp(30px, 4vw, 44px);
+  }
+  .pr-plan__num.pr-plan__num--word {
+    font-size: min(20.5cqi, clamp(30px, 4vw, 44px));
+  }
+  .pr-plan__per {
+    font-size: 12px;
+  }
+}
+
+/* phones and upright tablets: one plan per row — name and line on the left, the price on the right,
+   then the model level, what it includes and the button */
+@media (max-width: 860px) {
+  /* the last plan's button stays clear of the “Write to us” button */
+  .slide__frame.pr {
+    padding-bottom: calc((68px + env(safe-area-inset-bottom, 0px)) / var(--fit));
+  }
+  .pr {
+    justify-content: center;
+    justify-content: safe center;
+    gap: 14px;
+  }
+  .pr__title {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+  .pr__plans {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .pr-plan {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name price'
+      'line price'
+      'tiers tiers'
+      'list list'
+      'cta cta';
+    align-items: center;
+    column-gap: 12px;
+    padding: 13px 14px;
+    border-radius: 16px;
+  }
+  .pr-plan__name {
+    grid-area: name;
+  }
+  .pr-plan__price {
+    grid-area: price;
+    min-height: 0;
+    margin: 0;
+  }
+  .pr-plan__num {
+    font-size: 30px;
+  }
+  .pr-plan__cur {
+    font-size: 15px;
+  }
+  .pr-plan__per {
+    font-size: 11.5px;
+  }
+  .pr-plan__line {
+    grid-area: line;
+    margin-top: 3px;
+    font-size: min(13px, 4.1cqi);
+  }
+  .pr-plan > :nth-last-child(2) {
+    margin-bottom: 0;
+  }
+  .pr-plan__num--word {
+    font-size: 27px;
+  }
+  .pr-level {
+    grid-area: tiers;
+    margin-top: 9px;
+  }
+  .pr-level.is-blank {
+    display: none;
+  }
+  .pr-tiers {
+    height: 34px;
+  }
+  .pr-tiers__opt {
+    gap: 5px;
+    font-size: min(13px, 3.8cqi);
+  }
+  /* what it includes: a row, wrapping between whole items */
+  .pr-plan__list {
+    grid-area: list;
+    flex-flow: row wrap;
+    gap: 2px 9px;
+    margin-top: 7px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .pr-plan__list li {
+    gap: 4px;
+    font-size: min(12px, 3.3cqi);
+  }
+  .pr-plan__list svg {
+    width: 0.9em;
+    height: 0.9em;
+  }
+  .pr-plan__cta {
+    grid-area: cta;
+    height: 38px;
+    margin-top: 10px;
+    font-size: 10px;
+  }
+}
+
+/* short or narrow phones: everything a little tighter */
+@media (max-width: 860px) and (max-height: 720px), (max-width: 380px) {
+  .pr {
+    gap: 10px;
+  }
+  .pr__title {
+    font-size: 28px;
+  }
+  .pr__plans {
+    gap: 6px;
+  }
+  .pr-plan {
+    padding: 7px 12px;
+  }
+  .pr-plan__num {
+    font-size: 24px;
+  }
+  .pr-plan__num--word {
+    font-size: 23px;
+  }
+  .pr-plan__list {
+    gap: 0 8px;
+    margin-top: 4px;
+  }
+  .pr-level {
+    margin-top: 6px;
+  }
+  .pr-tiers {
+    height: 28px;
+  }
+  .pr-plan__cta {
+    height: 29px;
+    margin-top: 6px;
+  }
+}
