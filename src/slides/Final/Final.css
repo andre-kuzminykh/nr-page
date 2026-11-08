@@ -86,7 +86,6 @@
 .fin__tm {
   display: inline-flex;
   align-items: flex-start;
-  gap: 1px;
   padding-left: 14px;
   border-left: 1px solid rgb(255 255 255 / 0.16);
   font-family: var(--font-sans);
@@ -98,10 +97,10 @@
 }
 
 .fin__tm sup {
+  margin: 1px 5px 0 0;
   font-size: 9px;
   font-weight: 500;
   line-height: 1;
-  margin-top: 1px;
   color: rgb(255 255 255 / 0.6);
 }
 

@@ -10,6 +10,8 @@ import './Final.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 const ext = { target: '_blank', rel: 'noreferrer' } as const
+/** The year beside the name at the foot (the current one). */
+const YEAR = new Date().getFullYear()
 
 /**
  * The last block: try it yourself — the business task goes into the bar and opens the platform with it.
@@ -55,7 +57,7 @@ export function FinalSlide(_: SlideProps) {
             <img src={aitLogo} alt="Andre AI Technologies" width={186} height={96} />
           </a>
           <span className="fin__tm">
-            Neuronium<sup>®</sup>
+            Neuronium<sup>®</sup> {YEAR}
           </span>
         </div>
 

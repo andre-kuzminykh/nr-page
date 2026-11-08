@@ -13,6 +13,8 @@ import './km.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
 const ext = { target: '_blank', rel: 'noreferrer' } as const
+/** The year beside the name at the foot (the current one). */
+const YEAR = new Date().getFullYear()
 
 /** A block's title: its lines rise through their masks, as on the landing. */
 function Title({ lines, className = '' }: { lines: string[]; className?: string }) {
@@ -129,7 +131,7 @@ export function KmEnd(_: SlideProps) {
             <img src={aitLogo} alt="Andre AI Technologies" width={186} height={96} />
           </a>
           <span className="fin__tm">
-            Neuronium<sup>®</sup>
+            Neuronium<sup>®</sup> {YEAR}
           </span>
         </div>
         <ul className="fin__social" aria-label="Neuronium elsewhere">
