@@ -10,14 +10,6 @@
   min-width: 0;
 }
 
-.kd-kicker {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #c9a6ff;
-}
-
 .kd-title {
   font-size: clamp(30px, min(4.2vw, 7vh), 64px);
 }
@@ -32,11 +24,6 @@
   line-height: 1.5;
   color: rgb(255 255 255 / 0.72);
   text-wrap: pretty;
-}
-
-.kd-note {
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.55);
 }
 
 /* ---------- 01 · the name ---------- */
@@ -66,10 +53,6 @@
   width: min(680px, 100%);
 }
 
-.kd-more {
-  margin-top: -4px;
-}
-
 /* ---------- 02 · the report generator, 03 · how it works: a side column and a stage ---------- */
 .kd--how {
   display: grid;
@@ -94,11 +77,6 @@
 .kd-end__title {
   /* “Ask your company” on one line, as large as the column allows */
   font-size: min(clamp(34px, 13vh, 132px), calc(100cqi / 8.4));
-}
-
-.kd-end__more {
-  align-self: center;
-  margin-top: clamp(14px, 2.4vh, 24px);
 }
 
 /* the document */
@@ -470,45 +448,60 @@
    How it works: the steps light as they happen; the graph, then the answer, over the bar
    ========================================================= */
 .kh-steps {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.6vh, 14px);
+  gap: clamp(6px, 1.2vh, 12px);
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 18px;
   list-style: none;
 }
 
-.kh-steps li {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  font-size: clamp(17px, 1.5vw, 22px);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  color: rgb(255 255 255 / 0.32);
-  transition: color 400ms ease;
+/* a hairline beside the steps; the current one is marked on it */
+.kh-steps::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 1px;
+  background: rgb(255 255 255 / 0.12);
 }
 
-.kh-steps li span {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: rgb(255 255 255 / 0.3);
+.kh-steps li {
+  position: relative;
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 0.26);
+  transition: color 500ms ease;
+}
+
+.kh-steps li::before {
+  content: '';
+  position: absolute;
+  top: 0.2em;
+  bottom: 0.2em;
+  left: -18px;
+  width: 2px;
+  margin-left: -0.5px;
+  border-radius: 2px;
+  background: linear-gradient(#a071ff, #e06ad8 55%, #ff8a33);
+  transform: scaleY(0);
+  transition: transform 500ms var(--ease-out);
 }
 
 .kh-steps li.is-done {
-  color: rgb(255 255 255 / 0.62);
+  color: rgb(255 255 255 / 0.5);
 }
 
 .kh-steps li.is-now {
   color: #fff;
 }
 
-.kh-steps li.is-now span {
-  background: linear-gradient(90deg, #c9a8ff, #ffc08f);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.kh-steps li.is-now::before {
+  transform: none;
 }
 
 .kh {
@@ -540,8 +533,7 @@
   opacity: 1;
 }
 
-
-/* step 2 · understand: the question, large; each recognised word lights and says what it is */
+/* step 2 · understand: the question, large; the rest fades and the words that matter light up */
 .kh-q {
   position: absolute;
   inset: 0;
@@ -551,84 +543,50 @@
 }
 
 .kh-q__text {
-  max-width: 18em;
-  font-size: clamp(26px, 2.6vw, 40px);
-  font-weight: 500;
-  line-height: 1.7;
-  letter-spacing: -0.03em;
+  max-width: 15em;
+  font-size: clamp(30px, 3.2vw, 50px);
+  font-weight: 520;
+  line-height: 1.22;
+  letter-spacing: -0.04em;
   text-align: center;
-  color: rgb(255 255 255 / 0.55);
-  animation: kr-part 500ms var(--ease-out) both;
   text-wrap: balance;
 }
 
-.kh-mark {
-  position: relative;
-  display: inline-block;
-}
-
-.kh-mark__w {
+.kh-q__rest {
   color: #fff;
-  background: linear-gradient(90deg, rgb(160 113 255 / 0.4), rgb(224 106 216 / 0.34), rgb(255 138 51 / 0.36)) 0 88% / 0 0.36em no-repeat;
-  animation: kh-mark 520ms var(--ease-out) both;
-  animation-delay: calc(350ms + var(--k) * 380ms);
+  animation: kh-fade 900ms var(--ease-out) 300ms forwards;
 }
 
-@keyframes kh-mark {
+@keyframes kh-fade {
   to {
-    background-size: 100% 0.36em;
+    color: rgb(255 255 255 / 0.22);
   }
 }
 
-.kh-mark__as {
-  position: absolute;
-  top: calc(100% - 0.28em);
-  left: 50%;
-  translate: -50% 0;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.1);
-  border: 1px solid rgb(255 255 255 / 0.16);
-  white-space: nowrap;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: 0;
-  color: #f1dcff;
-  animation: kh-chip 420ms var(--ease-out) both;
-  animation-delay: calc(560ms + var(--k) * 380ms);
+.kh-mark {
+  padding: 0;
+  background: linear-gradient(100deg, #fff 0%, #fff 30%, #d7b6ff 45%, #f3a6e6 60%, #ffc08f 80%) 100% 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: kh-light 900ms var(--ease-out) both;
+  animation-delay: calc(500ms + var(--k) * 420ms);
 }
 
-@keyframes kh-chip {
+@keyframes kh-light {
   from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.9);
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 35% 0;
   }
 }
 
-/* step 3 · search the graph: the records counted as the walk goes */
-.kh-walked {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.6);
-  animation: kr-part 400ms var(--ease-out) both;
+.kh-q__text {
+  animation: kr-part 500ms var(--ease-out) both;
 }
 
-.kh-walked b {
-  font-size: clamp(28px, 2.6vw, 38px);
-  font-weight: 560;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
-}
-
-/* step 4 · count: what was found, a line, what it comes to */
+/* step 4 · count: the two numbers, then what they come to */
 .kh-calc {
   position: absolute;
   inset: 0;
@@ -637,90 +595,63 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(14px, 2.4vh, 24px);
-}
-
-.kh-calc__items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: clamp(20px, 4vw, 64px);
-}
-
-.kh-calc__item,
-.kh-calc__result {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.kh-calc__item {
-  animation: kr-part 480ms var(--ease-out) both;
-  animation-delay: calc(var(--k) * 260ms);
-}
-
-.kh-calc__item b {
-  font-size: clamp(30px, 3vw, 46px);
-  font-weight: 540;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-}
-
-.kh-calc__item span,
-.kh-calc__result span {
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.55);
+  gap: clamp(6px, 1.4vh, 14px);
 }
 
 .kh-calc__line {
-  width: min(360px, 70%);
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, #a071ff, #e06ad8, #ff8a33, transparent);
-  transform: scaleX(0);
-  animation: kh-line 600ms var(--ease-out) 700ms forwards;
+  display: flex;
+  align-items: baseline;
+  gap: 0.36em;
+  font-size: clamp(30px, 3.2vw, 50px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: rgb(255 255 255 / 0.62);
 }
 
-@keyframes kh-line {
-  to {
-    transform: none;
-  }
+.kh-calc__line > * {
+  animation: kr-part 520ms var(--ease-out) both;
+  animation-delay: calc(var(--k) * 220ms);
+}
+
+.kh-calc__line i {
+  font-style: normal;
+  color: rgb(255 255 255 / 0.32);
 }
 
 .kh-calc__result {
-  animation: kh-result 620ms var(--ease-out) 1100ms both;
+  font-size: clamp(64px, 7vw, 112px);
+  font-weight: 560;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(100deg, #fff 15%, #f2c9ff 55%, #ffc08f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: kh-result 760ms var(--ease-out) 950ms both;
 }
 
 @keyframes kh-result {
   from {
     opacity: 0;
-    transform: scale(0.86);
-    filter: blur(6px);
+    transform: translateY(14px) scale(0.94);
   }
 }
 
-.kh-calc__result b {
-  font-size: clamp(48px, 5vw, 80px);
-  font-weight: 560;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
-  background: linear-gradient(100deg, #fff 20%, #f2c9ff 60%, #ffc08f);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* while counting, the walked graph stays faintly behind */
+/* while counting, the walked graph is gone but for a trace */
 .kh.is-count .kh-graph {
-  opacity: 0.05;
+  opacity: 0;
 }
 
 /* step 5 · the report: composed part by part over the bar */
 .kh .kr-sheet {
   position: relative;
   z-index: 1;
+}
+
+.kh .kr-sources {
+  display: none;
 }
 
 /* the graph: names only, joined by lines; the walk lights up — always inside the stage */
@@ -752,9 +683,26 @@
 }
 
 .kg-e.is-lit {
-  stroke: #e9a0ff;
-  stroke-width: 2.2;
-  filter: drop-shadow(0 0 6px rgb(224 106 216 / 0.8));
+  stroke: #e3a2ff;
+  stroke-width: 2;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 6px rgb(224 106 216 / 0.75));
+}
+
+.kg-spark {
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.14 1.2;
+  stroke-dashoffset: 0.14;
+  filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgb(224 106 216 / 0.9));
+  animation: kg-spark 1400ms var(--ease-in-out) infinite;
+}
+
+@keyframes kg-spark {
+  to {
+    stroke-dashoffset: -1.06;
+  }
 }
 
 .kg-n {
@@ -845,11 +793,28 @@
   }
   .kh-steps {
     flex-flow: row wrap;
-    gap: 6px 16px;
+    gap: 4px 16px;
+    padding: 0;
+  }
+  .kh-steps::before {
+    display: none;
   }
   .kh-steps li {
-    gap: 7px;
-    font-size: 15px;
+    font-size: 16px;
+  }
+  .kh-steps li::before {
+    top: auto;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 2px;
+    margin: 0;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, #a071ff, #e06ad8 55%, #ff8a33);
+  }
+  .kh-steps li.is-now::before {
+    transform: none;
   }
   .kh-stage {
     min-height: clamp(300px, 50vh, 480px);
@@ -884,15 +849,14 @@
   .kd-h1 {
     font-size: min(clamp(44px, 12vw, 80px), calc(100cqi / 6.2));
   }
-  .kd-side .kd-kicker {
-    display: none;
-  }
   .kh-q__text {
-    font-size: 24px;
-    line-height: 2.25;
+    font-size: 28px;
   }
-  .kh-mark__as {
-    font-size: 11.5px;
+  .kh-calc__line {
+    font-size: 26px;
+  }
+  .kh-calc__result {
+    font-size: 56px;
   }
   .kr-sheet {
     padding: 18px;

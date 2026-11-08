@@ -44,11 +44,11 @@ export interface Scenario {
   sources: string[]
   /** labels of the report's parts, in the language of the request */
   words: { findings: string; limits: string; sources: string; expected: string }
-  /** How it works plays it step by step: what it recognises in the words, the records it walks, what it counts */
+  /** How it works plays it step by step: the words it recognises, the records it walks, the sum it does */
   how?: {
-    marks: { text: string; as: string }[]
+    marks: string[]
     walk: string[]
-    calc: { items: { v: string; l: string }[]; result: { v: string; l: string } }
+    calc: { a: string; op: '−' | '+'; b: string; result: string }
   }
 }
 
@@ -78,13 +78,9 @@ export const SCENARIOS: Scenario[] = [
     sources: ['Goal · Cyprus AI market review · progress', 'Rule · goal verdict', 'Task · Draft the article', 'Task · Proofread & publish'],
     words: EN,
     how: {
-      marks: [
-        { text: 'Why', as: 'Root cause' },
-        { text: 'Cyprus AI market review', as: 'Goal' },
-        { text: 'at risk', as: 'Verdict' },
-      ],
+      marks: ['Why', 'Cyprus AI market review', 'at risk'],
       walk: ['cyprus', 'draft', 'proof', 'sources'],
-      calc: { items: [{ v: '33%', l: 'done' }, { v: '60%', l: 'expected by now' }], result: { v: '−27 pp', l: 'at risk' } },
+      calc: { a: '33%', op: '−', b: '60%', result: '−27 pp' },
     },
   },
   {
@@ -113,14 +109,6 @@ export const SCENARIOS: Scenario[] = [
     limits: ['Not connected yet: team pulse (HR), market share, profit, bugs, uptime. Their modules come later.'],
     sources: ['Goals · all', 'Tasks · by status', 'People · workspace'],
     words: EN,
-    how: {
-      marks: [
-        { text: 'Company', as: 'Whole workspace' },
-        { text: 'overview report', as: 'Company report' },
-      ],
-      walk: ['launch', 'cyprus', 'demo', 'draft', 'proof', 'sources', 'am', 'mk', 'ls'],
-      calc: { items: [{ v: '3', l: 'goals' }, { v: '19%', l: 'average progress' }], result: { v: '2', l: 'goals off plan' } },
-    },
   },
   {
     id: 'sum',
@@ -179,13 +167,9 @@ export const SCENARIOS: Scenario[] = [
     sources: ['Accrual · 300.00 EUR', 'Booking · Lena Stone'],
     words: EN,
     how: {
-      marks: [
-        { text: 'How much', as: 'Sum' },
-        { text: 'owe', as: 'Accruals' },
-        { text: 'Lena Stone', as: 'Person' },
-      ],
+      marks: ['How much', 'owe', 'Lena Stone'],
       walk: ['ls', 'book', 'acc'],
-      calc: { items: [{ v: '300.00 EUR', l: 'to pay' }, { v: '0.00 EUR', l: 'paid' }], result: { v: '300.00 EUR', l: 'owed' } },
+      calc: { a: '300.00', op: '−', b: '0.00', result: '300.00 EUR' },
     },
   },
 ]

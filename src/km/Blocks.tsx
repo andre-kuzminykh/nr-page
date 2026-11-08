@@ -1,11 +1,10 @@
-import { ArrowDown, ArrowUpRight } from 'lucide-react'
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type CSSProperties } from 'react'
 import aitLogo from '../assets/ait-logo.png'
 import { BrandIcon } from '../components/Brand/BrandIcon'
 import { Prompt } from '../components/Prompt/Prompt'
 import { useDemo } from '../components/Prompt/useDemo'
 import { useDeck, type SlideProps } from '../components/SlideController/DeckContext'
-import { COMPANY_URL, KM_URL, PRIVACY_URL, SOCIAL, TERMS_URL, kmHref } from '../config/links'
+import { COMPANY_URL, PRIVACY_URL, SOCIAL, TERMS_URL, kmHref } from '../config/links'
 import '../slides/Final/Final.css'
 import { SCENARIOS } from './content'
 import { HOW_STEPS, HowDemo } from './HowDemo'
@@ -29,23 +28,15 @@ function Title({ lines, className = '' }: { lines: string[]; className?: string 
   )
 }
 
-function Kicker({ children }: { children: ReactNode }) {
-  return (
-    <p className="kd-kicker rv" style={d(0)}>
-      {children}
-    </p>
-  )
-}
 
 /* ---------- 01 · the name, and the bar ---------- */
 export function KmOverview({ active, shown }: SlideProps) {
-  const { reducedMotion, goTo } = useDeck()
+  const { reducedMotion } = useDeck()
   const live = active && !reducedMotion
   const asks = SCENARIOS.map((s) => s.query)
   const demo = useDemo(asks.length, { live, shown, after: 1400 })
   return (
     <div className="slide__frame kd kd--overview">
-      <Kicker>Neuronium · AI employee</Kicker>
       <h1 className="kd-h1">
         {['AI Knowledge', 'Management'].map((line, k) => (
           <span key={k} className="mask" style={d(80 + k * 90)}>
@@ -67,13 +58,6 @@ export function KmOverview({ active, shown }: SlideProps) {
           delay={demo.k === 0 ? 1600 : 500}
         />
       </div>
-      <p className="kd-note rv" style={d(640)}>
-        Ask in English or Russian; the report comes back in the same language.
-      </p>
-      <button type="button" className="more kd-more rv" style={d(760)} onClick={() => goTo('how')}>
-        See a report being written
-        <ArrowDown size={16} strokeWidth={1.8} aria-hidden="true" />
-      </button>
     </div>
   )
 }
@@ -85,12 +69,10 @@ export function KmHow({ active, shown }: SlideProps) {
   return (
     <div className="slide__frame kd kd--how">
       <div className="kd-side">
-        <Kicker>How it works</Kicker>
         <Title lines={['From a question', 'to a report']} />
-        <ol className="kh-steps rv" style={d(300)}>
+        <ol className="kh-steps rv" style={d(300)} aria-label="How it works">
           {HOW_STEPS.map((x, i) => (
             <li key={x} className={i === step ? 'is-now' : i < step ? 'is-done' : ''}>
-              <span>{String(i + 1).padStart(2, '0')}</span>
               {x}
             </li>
           ))}
@@ -119,10 +101,6 @@ export function KmEnd(_: SlideProps) {
         <div className="fin__bar rv" style={d(480)}>
           <Prompt label="Ask Knowledge Management" placeholder="Why is a goal at risk? How much do we owe?" href={kmHref} live={false} goEmpty />
         </div>
-        <a className="more kd-end__more rv" style={d(600)} href={KM_URL}>
-          Open Knowledge Management
-          <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-        </a>
       </div>
 
       <footer className="fin__foot rv rv--fade" style={d(800)}>

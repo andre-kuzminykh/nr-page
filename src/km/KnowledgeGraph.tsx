@@ -51,7 +51,14 @@ function Layout({ narrow, lit, on }: { narrow: boolean; lit: string[]; on: boole
       {EDGES.map((e, i) => {
         const [x1, y1] = pos(byId[e[0]])
         const [x2, y2] = pos(byId[e[1]])
-        return <line key={i} className={`kg-e ${litEdge(e) ? 'is-lit' : ''}`} style={{ '--i': i } as CSSProperties} x1={x1} y1={y1} x2={x2} y2={y2} pathLength={1} />
+        const lit = litEdge(e)
+        return (
+          <g key={i}>
+            <line className={`kg-e ${lit ? 'is-lit' : ''}`} style={{ '--i': i } as CSSProperties} x1={x1} y1={y1} x2={x2} y2={y2} pathLength={1} />
+            {/* a spark runs along a lit link, from the record found to the next */}
+            {lit && <line className="kg-spark" x1={x2} y1={y2} x2={x1} y2={y1} pathLength={1} />}
+          </g>
+        )
       })}
       {NODES.map((n, i) => {
         const [x, y] = pos(n)

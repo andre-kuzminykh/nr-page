@@ -1126,13 +1126,14 @@ async function kmPagePass(browser) {
     cta: [document.querySelector('.nav__cta')?.textContent.trim(), document.querySelector('.nav__cta')?.getAttribute('href')],
     home: document.querySelector('.nav__brand')?.getAttribute('href'),
     bar: !!document.querySelector('.kd-hero-bar form.prompt .prompt__input'),
+    extras: document.querySelectorAll('.kd--overview .kd-kicker, .kd--overview .kd-note, .kd--overview .more').length,
   }))
   await page.keyboard.press('PageDown')
   await sleep(1300)
   const turned = await activeIndex(page)
   check(
     'Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open AI OS” as on the landing, and the logo leads back to the landing',
-    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open AI OS' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
+    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open AI OS' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && top.extras === 0 && turned === 1,
     JSON.stringify(top),
   )
   // how it works: one block — a question is typed into the bar, then each step plays its own animation, and the report is composed
@@ -1154,7 +1155,8 @@ async function kmPagePass(browser) {
     .then(async () => {
       await sleep(1500)
       return page.evaluate(() => ({
-        marks: [...document.querySelectorAll('.slide[data-state="active"] .kh-mark')].map((m) => `${m.querySelector('.kh-mark__w').textContent}=${m.querySelector('.kh-mark__as').textContent}`).join('|'),
+        marks: [...document.querySelectorAll('.slide[data-state="active"] .kh-mark')].map((m) => m.textContent).join('|'),
+        chips: document.querySelectorAll('.slide[data-state="active"] .kh-mark__as, .slide[data-state="active"] .kh-walked, .slide[data-state="active"] .kd-kicker').length,
         lit: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
       }))
     })
@@ -1164,7 +1166,7 @@ async function kmPagePass(browser) {
     .then(() =>
       page.evaluate(() => ({
         lit: [...document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-n.is-lit text')].map((t) => t.textContent.trim()).join('|'),
-        records: document.querySelector('.slide[data-state="active"] .kh-walked b')?.textContent.trim(),
+        spark: document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-spark').length,
         labels: document.querySelectorAll('.slide[data-state="active"] .kg-e text, .slide[data-state="active"] .kg-n__t, .kp-graph__legend').length,
         step: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
       })),
@@ -1175,8 +1177,8 @@ async function kmPagePass(browser) {
     .then(async () => {
       await sleep(1900)
       return page.evaluate(() => ({
-        items: [...document.querySelectorAll('.slide[data-state="active"] .kh-calc__item')].map((x) => [...x.children].map((c) => c.textContent.trim()).join(' ')).join('|'),
-        result: [...(document.querySelector('.slide[data-state="active"] .kh-calc__result')?.children ?? [])].map((c) => c.textContent.trim()).join(' '),
+        line: [...(document.querySelector('.slide[data-state="active"] .kh-calc__line')?.children ?? [])].map((c) => c.textContent.trim()).join(' '),
+        result: document.querySelector('.slide[data-state="active"] .kh-calc__result')?.textContent.trim(),
         step: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
       }))
     })
@@ -1203,13 +1205,13 @@ async function kmPagePass(browser) {
     })
     .catch(() => null)
   check(
-    'Knowledge Management page: “How it works” is the one block that shows a report being made — the question is typed into the bar (01 Ask); its words are recognised (02 Understand); the company graph appears and the question walks it, records counted, with no link labels or legend (03 Search the graph); what was found is counted (04 Count); and the report is composed over the bar — ring against plan, figures, findings with statuses, limitations, sources (05 Compose the report)',
-    typing && askLit === '01Ask' &&
-      understand?.marks === 'Why=Root cause|Cyprus AI market review=Goal|at risk=Verdict' && understand.lit === '02Understand' &&
-      search?.lit === 'Cyprus AI market review|Draft the article|Proofread & publish|Collect market sources' && Number(search.records) > 0 && search.labels === 0 && search.step === '03Search the graph' &&
-      count?.items === '33% done|60% expected by now' && count.result === '−27 pp at risk' && count.step === '04Count' &&
-      report?.title === 'Root-cause report — Cyprus AI market review' && report.ring === '33 33%' && report.figs === '−27pp 4 7' && report.parts === 'Findings|Limitations|Sources' && report.badges === 'Calculated|Confirmed' && report.above && report.step === '05Compose the report' &&
-      report.steps === '01Ask|02Understand|03Search the graph|04Count|05Compose the report' && !KM_SLIDES.some((x) => ['report', 'access', 'graph', 'rules'].includes(x.id)),
+    'Knowledge Management page: “How it works” is the one block that shows a report being made, with no small print — the question is typed into the bar (Ask); the words that matter light up (Understand); the company graph appears and the question walks it, a spark running along each link it takes, no labels or legend (Search); the sum is done in one line, 33% − 60% = −27 pp (Count); and the report is composed over the bar — ring against plan, figures, findings with statuses, limitations (Report)',
+    typing && askLit === 'Ask' &&
+      understand?.marks === 'Why|Cyprus AI market review|at risk' && understand.chips === 0 && understand.lit === 'Understand' &&
+      search?.lit === 'Cyprus AI market review|Draft the article|Proofread & publish|Collect market sources' && search.spark === 3 && search.labels === 0 && search.step === 'Search' &&
+      count?.line === '33% − 60% =' && count.result === '−27 pp' && count.step === 'Count' &&
+      report?.title === 'Root-cause report — Cyprus AI market review' && report.ring === '33 33%' && report.figs === '−27pp 4 7' && report.parts === 'Findings|Limitations|Sources' && report.badges === 'Calculated|Confirmed' && report.above && report.step === 'Report' &&
+      report.steps === 'Ask|Understand|Search|Count|Report' && !KM_SLIDES.some((x) => ['report', 'access', 'graph', 'rules'].includes(x.id)),
     JSON.stringify({ typing, askLit, understand, search, count, report }),
   )
   // its use cases: the landing's Cases, only Knowledge Management's; “All” opens every case filtered by it
@@ -1249,14 +1251,14 @@ async function kmPagePass(browser) {
   await go('start')
   const end = await page.evaluate(() => {
     const s = document.querySelector('.slide[data-state="active"]')
-    return { title: s.querySelector('.fin__title')?.textContent.trim(), foot: s.querySelectorAll('.fin__social a').length, legal: s.querySelectorAll('.fin__legal a').length }
+    return { title: s.querySelector('.fin__title')?.textContent.trim(), foot: s.querySelectorAll('.fin__social a').length, legal: s.querySelectorAll('.fin__legal a').length, more: s.querySelectorAll('.more').length }
   })
   const bar = page.locator('.slide[data-state="active"] .prompt__input')
   await bar.fill('Who owns pricing?')
   await Promise.all([page.waitForURL((u) => u.href.startsWith(KM), { timeout: 6000 }).catch(() => {}), bar.press('Enter')])
   check(
     'Knowledge Management page: the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)',
-    plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 9 && faq.qs.includes('What is an AI Workforce hour?') && end.title === 'Ask your company' && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
+    plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 9 && faq.qs.includes('What is an AI Workforce hour?') && end.title === 'Ask your company' && end.more === 0 && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
     JSON.stringify({ plans, faq: faq.qs.length, ...end, landed: landed.length }),
   )
   await ctx.close()
