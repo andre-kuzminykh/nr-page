@@ -1,6 +1,6 @@
 # Simulated user walkthrough
 
-Run: 2026-11-08T18:35:24.728Z · http://127.0.0.1:4173/
+Run: 2026-11-08T19:39:55.055Z · http://127.0.0.1:4173/
 
 **47 / 47 steps behaved as expected.** JavaScript errors: 0.
 
@@ -23,7 +23,7 @@ Run: 2026-11-08T18:35:24.728Z · http://127.0.0.1:4173/
 | 15 | desktop | Clicks element 1 (Km) | AI Knowledge Management is the title; its element is picked and the line under it counts down to the next answer | ✅ {"hot":false,"title":"AI Knowledge Management","picked":"Knowledge Management","load":1} | [015-desktop.jpg](walkthrough/015-desktop.jpg) |
 | 16 | desktop | Clicks “About Knowledge Management” under its line | Its own page opens, a deck like the landing: AI Knowledge Management | ✅ {"h1":"AI Knowledge Management","blocks":6} | [016-desktop.jpg](walkthrough/016-desktop.jpg) |
 | 17 | desktop | Turns to the next block there | How it works: a question is typed, understood, searched in the graph and counted, then its report is composed | ✅ Root-cause report — Cyprus AI market review | [017-desktop.jpg](walkthrough/017-desktop.jpg) |
-| 18 | desktop | Opens Platform and watches | A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear | ✅ {"cmd":"Find new leads and book demos","sent":true,"on":["Sheets","Apollo"],"rest":10,"icons":3,"way":12} | [018-desktop.jpg](walkthrough/018-desktop.jpg) |
+| 18 | desktop | Opens Platform and watches | A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear | ✅ {"cmd":"Find new leads and book demos","sent":true,"on":["Sheets","Apollo"],"rest":10,"icons":2,"way":12} | [018-desktop.jpg](walkthrough/018-desktop.jpg) |
 | 19 | desktop | Clicks “About Platform” under the title | The platform opens (https://platform.neuronium.ai/) | ✅ https://platform.neuronium.ai/ | [019-desktop.jpg](walkthrough/019-desktop.jpg) |
 | 20 | desktop | Opens Cases from the menu | Two rows of pictures with titles flow by, one each way | ✅ Answers with sources, from Drive and Meet \| From today’s calls to the team’s tasks \| From new leads to booked demos \| A Monday review in one report \| Why a goal slips, and what is still open \| What we owe each executor, per currency \| Work in progress, for the daily stand-up \| Who owns what, across the board \| No effect claimed without measurements | [020-desktop.jpg](walkthrough/020-desktop.jpg) |
 | 21 | desktop | Points at a case | Its row holds still, the case lifts and says “Soon” (no article yet) | ✅ {"held":"paused","go":"Soon"} | [021-desktop.jpg](walkthrough/021-desktop.jpg) |
