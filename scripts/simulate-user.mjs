@@ -364,7 +364,7 @@ const waitFor = async (fn, ms = 4500) => {
           const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), `${BASE}knowledge-management/`, d.id)
           await sleep(1500)
           const kmPage = await page.evaluate(() => ({ h1: [...document.querySelectorAll('.kd-h1 .mask')].map((m) => m.textContent.trim()).join(' '), blocks: document.querySelectorAll('.slide').length }))
-          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks >= 8, JSON.stringify(kmPage))
+          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks >= 6, JSON.stringify(kmPage))
           await page.keyboard.press('PageDown')
           const report = await page.waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 20000 }).then((e) => e.textContent()).catch(() => '')
           await step(page, 'desktop', 'Turns to the next block there', 'How it works: a question is typed, understood, searched in the graph and counted, then its report is composed', !!report, report)

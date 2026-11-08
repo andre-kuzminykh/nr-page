@@ -86,9 +86,9 @@
       "detail": "Own model $19/ month · Start Free Trial → https://platform.neuronium.ai/?plan=own · rgb(248, 247, 250) | Solo $99/ month · Start Free Trial → https://platform.neuronium.ai/?plan=solo · rgb(248, 247, 250) | Team $490/ month · Start Free Trial → https://platform.neuronium.ai/?plan=team · rgb(248, 247, 250) | Scale Contact us · Contact sales → BUTTON · rgb(248, 247, 250)"
     },
     {
-      "name": "Pricing: inside Solo and Team a model level is chosen — each with its mark and how many times Low’s AI Workforce it gives (×1, ×1.7, ×3.3); Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model",
+      "name": "Pricing: inside Solo and Team a model level is chosen — a switch of a mark and a word for each level, with no multipliers; Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model",
       "ok": true,
-      "detail": "Low ×1|Medium ×1.7|High ×3.3 · Solo Low $59/month · Solo High $190/month · Team Low $290/month · Team High $990/month"
+      "detail": "Solo Low $59/month · Solo High $190/month · Team Low $290/month · Team High $990/month"
     },
     {
       "name": "Pricing: “Contact sales” on Scale opens the “Write to us” widget, about the Scale plan, with the caret in the email field",
@@ -128,7 +128,7 @@
     {
       "name": "Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes)",
       "ok": true,
-      "detail": "{\"flows\":true,\"held\":[[-214,-4115],[-214,-4066]],\"cases\":3,\"index\":3,\"search\":\"today’s → 1\"}"
+      "detail": "{\"flows\":true,\"held\":[[-212,-3028],[-212,-2982]],\"cases\":9,\"index\":9,\"search\":\"today’s → 1\"}"
     },
     {
       "name": "Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task",
@@ -168,27 +168,17 @@
     {
       "name": "Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open Platform” as on the landing, and the logo leads back to the landing",
       "ok": true,
-      "detail": "{\"h1\":\"AI Knowledge Management\",\"blocks\":8,\"items\":\"Report|How it works|Use cases|Pricing|FAQ|Contacts\",\"cta\":[\"Open Platform\",\"https://platform.neuronium.ai/\"],\"home\":\"/\",\"bar\":true}"
+      "detail": "{\"h1\":\"AI Knowledge Management\",\"blocks\":6,\"items\":\"How it works|Use cases|Pricing|FAQ|Contacts\",\"cta\":[\"Open Platform\",\"https://platform.neuronium.ai/\"],\"home\":\"/\",\"bar\":true}"
     },
     {
-      "name": "Knowledge Management page: the report generator, the report above its bar — it opens on a finished report (a ring grown to 33% against 60% expected, figures counted up, findings with their statuses, limitations, sources; no templates or small print), then the next request is typed and runs the four stages and its report arrives with bars grown against plan",
+      "name": "Knowledge Management page: “How it works” is the one block that shows a report being made — the question is typed into the bar (01 Ask); its words are recognised (02 Understand); the company graph appears and the question walks it, records counted, with no link labels or legend (03 Search the graph); what was found is counted (04 Count); and the report is composed over the bar — ring against plan, figures, findings with statuses, limitations, sources (05 Compose the report)",
       "ok": true,
-      "detail": "{\"stages\":4,\"title\":\"Root-cause report — Cyprus AI market review\",\"figs\":[\"−27pp\",\"4\",\"7\"],\"ring\":\"33 33%\",\"parts\":\"Findings|Limitations|Sources\",\"badges\":\"Calculated|Confirmed\",\"query\":\"Why is the Cyprus AI market review at risk?\",\"barBelow\":true,\"small\":0,\"second\":{\"title\":\"Company report — Neuronium\",\"bars\":2,\"grown\":25,\"v\":25}}"
-    },
-    {
-      "name": "Knowledge Management page: “How it works” is one block — a question is typed into the bar, the company graph appears over it and the question walks it (no labels on links, no legend), then the answer rises over the bar with its figure and sources, while 01 Ask · 02 Search the graph · 03 Count · 04 Answer light in turn; the graph and principles blocks are gone",
-      "ok": true,
-      "detail": "{\"lit\":\"Lena Stone|Booking|300.00 EUR\",\"labels\":0,\"steps\":\"01Ask|02Search the graph|03Count|04Answer\",\"v\":\"300.00EUR\",\"src\":3,\"now\":\"04Answer\",\"above\":true}"
-    },
-    {
-      "name": "Knowledge Management page: “Viewing as” changes the answer",
-      "ok": true,
-      "detail": "{\"delivery\":\"No amount: money records are outside wha\",\"operator\":\"Sum of 1 accrual record linked to Lena S\"}"
+      "detail": "{\"typing\":true,\"askLit\":\"01Ask\",\"understand\":{\"marks\":\"Why=Root cause|Cyprus AI market review=Goal|at risk=Verdict\",\"lit\":\"02Understand\"},\"search\":{\"lit\":\"Cyprus AI market review|Draft the article|Proofread & publish|Collect market sources\",\"records\":\"45\",\"labels\":0,\"step\":\"03Search the graph\"},\"count\":{\"items\":\"33% done|60% expected by now\",\"result\":\"−27 pp at risk\",\"step\":\"04Count\"},\"report\":{\"title\":\"Root-cause report — Cyprus AI market review\",\"ring\":\"33 33%\",\"figs\":\"−27pp 4 7\",\"parts\":\"Findings|Limitations|Sources\",\"badges\":\"Calculated|Confirmed\",\"above\":true,\"step\":\"05Compose the report\",\"steps\":\"01Ask|02Understand|03Search the graph|04Count|05Compose the report\"}}"
     },
     {
       "name": "Knowledge Management page: its use cases are the landing’s Cases block with only Knowledge Management’s cases; “All Knowledge Management cases” opens every case filtered by it, and the filter can be cleared",
       "ok": true,
-      "detail": "{\"title\":\"Use cases\",\"cards\":[\"Answers with sources, from Drive and Meet\"],\"all\":\"All Knowledge Management cases1\",\"ix\":{\"title\":\"Knowledge Management cases 1\",\"on\":\"Knowledge Management\",\"cards\":1},\"everyCase\":3}"
+      "detail": "{\"title\":\"Use cases\",\"cards\":[\"Answers with sources, from Drive and Meet\",\"A Monday review in one report\",\"Why a goal slips, and what is still open\",\"What we owe each executor, per currency\",\"Work in progress, for the daily stand-up\",\"Who owns what, across the board\",\"No effect claimed without measurements\"],\"all\":\"All Knowledge Management cases7\",\"ix\":{\"title\":\"Knowledge Management cases 7\",\"on\":\"Knowledge Management\",\"cards\":7},\"everyCase\":9}"
     },
     {
       "name": "Knowledge Management page: the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)",
@@ -246,54 +236,54 @@
       "detail": "drawn smaller to fit: cases ×0.98, pricing ×0.82, faq ×0.98"
     },
     {
-      "name": "Layout Knowledge Management 1920x1080-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1920x1080-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "every block fits at full size"
     },
     {
-      "name": "Layout Knowledge Management 1440x900-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1440x900-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "every block fits at full size"
     },
     {
-      "name": "Layout Knowledge Management 1440x760-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1440x760-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "every block fits at full size"
+      "detail": "drawn smaller to fit: cases ×0.97"
     },
     {
-      "name": "Layout Knowledge Management 1366x657-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1366x657-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "drawn smaller to fit: faq ×0.98"
     },
     {
-      "name": "Layout Knowledge Management 1280x800-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1280x800-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "every block fits at full size"
     },
     {
-      "name": "Layout Knowledge Management 1024x768-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 1024x768-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "every block fits at full size"
     },
     {
-      "name": "Layout Knowledge Management 768x1024-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 768x1024-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
       "detail": "every block fits at full size"
     },
     {
-      "name": "Layout Knowledge Management 390x844-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 390x844-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: report ×0.91, pricing ×0.91"
+      "detail": "drawn smaller to fit: pricing ×0.91"
     },
     {
-      "name": "Layout Knowledge Management 375x667-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 375x667-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: report ×0.93, access ×0.89, pricing ×0.87"
+      "detail": "drawn smaller to fit: pricing ×0.87"
     },
     {
-      "name": "Layout Knowledge Management 360x640-dark: 8 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
+      "name": "Layout Knowledge Management 360x640-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: report ×0.89, access ×0.85, pricing ×0.82"
+      "detail": "drawn smaller to fit: cases ×0.98, pricing ×0.82"
     },
     {
       "name": "No JavaScript errors in any run",
@@ -1372,7 +1362,7 @@
       "viewport": "1920x1080",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1387,7 +1377,7 @@
       "viewport": "1920x1080",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1402,7 +1392,7 @@
       "viewport": "1920x1080",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1417,7 +1407,7 @@
       "viewport": "1920x1080",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1432,36 +1422,6 @@
       "viewport": "1920x1080",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1920x1080",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1920x1080",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -1470,7 +1430,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -1492,7 +1452,7 @@
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1507,7 +1467,7 @@
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1522,7 +1482,7 @@
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1537,7 +1497,7 @@
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1552,36 +1512,6 @@
       "viewport": "1440x900",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1440x900",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1440x900",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -1590,7 +1520,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -1612,7 +1542,7 @@
       "viewport": "1440x760",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1627,12 +1557,12 @@
       "viewport": "1440x760",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
-      "frameOverflowY": 0,
+      "frameOverflowY": 1,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9684,
       "cut": 0,
       "offenders": [],
       "progress": 3
@@ -1642,7 +1572,7 @@
       "viewport": "1440x760",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1657,7 +1587,7 @@
       "viewport": "1440x760",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1672,36 +1602,6 @@
       "viewport": "1440x760",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1440x760",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1440x760",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -1710,7 +1610,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -1732,7 +1632,7 @@
       "viewport": "1366x657",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1747,7 +1647,7 @@
       "viewport": "1366x657",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1762,7 +1662,7 @@
       "viewport": "1366x657",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1777,12 +1677,12 @@
       "viewport": "1366x657",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9787,
       "cut": 0,
       "offenders": [],
       "progress": 5
@@ -1792,36 +1692,6 @@
       "viewport": "1366x657",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1366x657",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 0.9792,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1366x657",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -1830,7 +1700,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -1852,7 +1722,7 @@
       "viewport": "1280x800",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1867,7 +1737,7 @@
       "viewport": "1280x800",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1882,7 +1752,7 @@
       "viewport": "1280x800",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1897,7 +1767,7 @@
       "viewport": "1280x800",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1912,36 +1782,6 @@
       "viewport": "1280x800",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1280x800",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1280x800",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -1950,7 +1790,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -1972,7 +1812,7 @@
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -1987,7 +1827,7 @@
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2002,7 +1842,7 @@
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2017,7 +1857,7 @@
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2032,36 +1872,6 @@
       "viewport": "1024x768",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "1024x768",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "1024x768",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -2070,7 +1880,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -2092,7 +1902,7 @@
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2107,7 +1917,7 @@
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2122,7 +1932,7 @@
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2137,7 +1947,7 @@
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2152,36 +1962,6 @@
       "viewport": "768x1024",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "768x1024",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "768x1024",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -2190,7 +1970,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -2212,12 +1992,12 @@
       "viewport": "390x844",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.9093,
+      "fit": 1,
       "cut": 0,
       "offenders": [],
       "progress": 2
@@ -2227,7 +2007,7 @@
       "viewport": "390x844",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2242,36 +2022,6 @@
       "viewport": "390x844",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 4
-    },
-    {
-      "page": "km",
-      "viewport": "390x844",
-      "theme": "dark",
-      "slide": 5,
-      "id": "cases",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 5
-    },
-    {
-      "page": "km",
-      "viewport": "390x844",
-      "theme": "dark",
-      "slide": 6,
       "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
@@ -2280,13 +2030,13 @@
       "fit": 0.9127,
       "cut": 0,
       "offenders": [],
-      "progress": 6
+      "progress": 4
     },
     {
       "page": "km",
       "viewport": "390x844",
       "theme": "dark",
-      "slide": 7,
+      "slide": 5,
       "id": "faq",
       "reached": true,
       "docOverflowX": 0,
@@ -2295,13 +2045,13 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 7
+      "progress": 5
     },
     {
       "page": "km",
       "viewport": "390x844",
       "theme": "dark",
-      "slide": 8,
+      "slide": 6,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -2310,7 +2060,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -2332,12 +2082,12 @@
       "viewport": "375x667",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.9345,
+      "fit": 1,
       "cut": 0,
       "offenders": [],
       "progress": 2
@@ -2347,7 +2097,7 @@
       "viewport": "375x667",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2362,36 +2112,6 @@
       "viewport": "375x667",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 0.8919,
-      "cut": 0,
-      "offenders": [],
-      "progress": 4
-    },
-    {
-      "page": "km",
-      "viewport": "375x667",
-      "theme": "dark",
-      "slide": 5,
-      "id": "cases",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 5
-    },
-    {
-      "page": "km",
-      "viewport": "375x667",
-      "theme": "dark",
-      "slide": 6,
       "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
@@ -2400,13 +2120,13 @@
       "fit": 0.8706,
       "cut": 0,
       "offenders": [],
-      "progress": 6
+      "progress": 4
     },
     {
       "page": "km",
       "viewport": "375x667",
       "theme": "dark",
-      "slide": 7,
+      "slide": 5,
       "id": "faq",
       "reached": true,
       "docOverflowX": 0,
@@ -2415,13 +2135,13 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 7
+      "progress": 5
     },
     {
       "page": "km",
       "viewport": "375x667",
       "theme": "dark",
-      "slide": 8,
+      "slide": 6,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -2430,7 +2150,7 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     },
     {
       "page": "km",
@@ -2452,12 +2172,12 @@
       "viewport": "360x640",
       "theme": "dark",
       "slide": 2,
-      "id": "report",
+      "id": "how",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.8928,
+      "fit": 1,
       "cut": 0,
       "offenders": [],
       "progress": 2
@@ -2467,12 +2187,12 @@
       "viewport": "360x640",
       "theme": "dark",
       "slide": 3,
-      "id": "how",
+      "id": "cases",
       "reached": true,
       "docOverflowX": 0,
-      "frameOverflowY": 0,
+      "frameOverflowY": 1,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9811,
       "cut": 0,
       "offenders": [],
       "progress": 3
@@ -2482,12 +2202,12 @@
       "viewport": "360x640",
       "theme": "dark",
       "slide": 4,
-      "id": "access",
+      "id": "pricing",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.855,
+      "fit": 0.8235,
       "cut": 0,
       "offenders": [],
       "progress": 4
@@ -2497,7 +2217,7 @@
       "viewport": "360x640",
       "theme": "dark",
       "slide": 5,
-      "id": "cases",
+      "id": "faq",
       "reached": true,
       "docOverflowX": 0,
       "frameOverflowY": 0,
@@ -2512,36 +2232,6 @@
       "viewport": "360x640",
       "theme": "dark",
       "slide": 6,
-      "id": "pricing",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 0.8235,
-      "cut": 0,
-      "offenders": [],
-      "progress": 6
-    },
-    {
-      "page": "km",
-      "viewport": "360x640",
-      "theme": "dark",
-      "slide": 7,
-      "id": "faq",
-      "reached": true,
-      "docOverflowX": 0,
-      "frameOverflowY": 0,
-      "scrolls": false,
-      "fit": 1,
-      "cut": 0,
-      "offenders": [],
-      "progress": 7
-    },
-    {
-      "page": "km",
-      "viewport": "360x640",
-      "theme": "dark",
-      "slide": 8,
       "id": "start",
       "reached": true,
       "docOverflowX": 0,
@@ -2550,11 +2240,11 @@
       "fit": 1,
       "cut": 0,
       "offenders": [],
-      "progress": 8
+      "progress": 6
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-08T13:47:41.399Z",
+  "startedAt": "2026-11-08T14:47:43.964Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 54
+  "fps": 53
 }
