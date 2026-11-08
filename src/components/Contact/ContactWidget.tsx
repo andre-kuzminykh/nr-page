@@ -4,7 +4,7 @@ import { CONTACT_ENDPOINT, SUPPORT_EMAIL } from '../../config/links'
 import { onOpenContact } from '../../lib/events'
 import './Contact.css'
 
-type Status = 'idle' | 'sending' | 'sent' | 'error'
+type Status = 'idle' | 'sending' | 'sent' | 'handed' | 'error'
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /**
@@ -78,11 +78,18 @@ export function ContactWidget() {
     e.preventDefault()
     setTried(true)
     if (!emailOk || !subjectOk || status === 'sending') return
+    // a host with no server: the visitor's own mail app sends it, written and addressed
+    if (CONTACT_ENDPOINT === 'mailto') {
+      const body = [message.trim(), `Reply to: ${email.trim()}`].filter(Boolean).join('\n\n')
+      window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject.trim())}&body=${encodeURIComponent(body)}`
+      setStatus('handed')
+      return
+    }
     setStatus('sending')
     try {
       const res = await fetch(CONTACT_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email: email.trim(), subject: subject.trim(), message: message.trim(), website: trap }),
       })
       if (!res.ok) throw new Error(String(res.status))
@@ -111,7 +118,19 @@ export function ContactWidget() {
             </button>
           </div>
 
-          {status === 'sent' ? (
+          {status === 'handed' ? (
+            <div className="cw__done" role="status">
+              <span className="cw__tick" aria-hidden="true">
+                <Check size={18} strokeWidth={2.2} />
+              </span>
+              <p>
+                Your mail app has it ready, to <strong>{SUPPORT_EMAIL}</strong>. Press Send there, and we’ll reply to <strong>{email.trim()}</strong>.
+              </p>
+              <button type="button" className="cw__again" onClick={() => setStatus('idle')}>
+                Back
+              </button>
+            </div>
+          ) : status === 'sent' ? (
             <div className="cw__done" role="status">
               <span className="cw__tick" aria-hidden="true">
                 <Check size={18} strokeWidth={2.2} />

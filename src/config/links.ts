@@ -15,7 +15,11 @@ export const HOME_URL: string = env.VITE_HOME_URL || '/'
 export const KM_ABOUT_URL: string = env.VITE_KM_ABOUT_URL || '/knowledge-management/'
 
 export const SUPPORT_EMAIL = 'support@neuronium.ai'
-/** The contact widget posts here ({ email, subject, message }); api/contact.js sends it to support by email. */
+/**
+ * The contact widget posts here ({ email, subject, message }); api/contact.js sends it to support by email.
+ * Any form service that takes JSON works too (e.g. a Formspree address). `mailto` — for hosts that serve files
+ * only, such as GitHub Pages — hands the message to the visitor's mail app instead.
+ */
 export const CONTACT_ENDPOINT: string = env.VITE_CONTACT_ENDPOINT || '/api/contact'
 /** A question asked on the landing opens Knowledge Management with it (`?q=`); empty → just KM. */
 export const kmHref = (q: string) => {
