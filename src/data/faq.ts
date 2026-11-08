@@ -1,5 +1,6 @@
 import type { AIEmployee } from './departments.ts'
 import { READY, readyList } from './ready.ts'
+import { WORKFORCE_HOUR } from './pricing.ts'
 import { ALL_EMPLOYEES_OPEN } from './release.ts'
 import { isSlideOpen } from './slides.ts'
 
@@ -69,6 +70,10 @@ export const FAQ: Question[] = [
   {
     q: 'What are Low, Medium and High?',
     a: 'The level of the AI model Solo or Team runs on, picked inside the plan. Higher levels come with more AI Workforce hours. With Own model you connect your AI provider’s key instead, and that provider bills you for the AI usage.',
+  },
+  {
+    q: 'What is an AI Workforce hour?',
+    a: `${WORKFORCE_HOUR} Solo comes with 300, 500 or 1\u00a0000 of them, Team with 3\u00a0000, 5\u00a0000 or 10\u00a0000, depending on the model level.`,
   },
 ]
 

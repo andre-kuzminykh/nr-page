@@ -2,7 +2,7 @@ import { Check, MessageCircle, Sparkles } from 'lucide-react'
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
-import { PLANS, TIERS, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
+import { PLANS, TIERS, WORKFORCE_HOUR, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
 import { openContact } from '../../lib/events'
 import './Pricing.css'
 
@@ -75,7 +75,7 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
 
       <ul className="pr-plan__list">
         {includesAt(p, tier).map((item) => (
-          <li key={item}>
+          <li key={item} title={/AI Workforce hours$/.test(item) ? `One AI Workforce hour: ${WORKFORCE_HOUR.toLowerCase()}` : undefined}>
             <Check size={14} strokeWidth={2.2} aria-hidden="true" />
             {item}
           </li>

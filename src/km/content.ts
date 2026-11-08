@@ -4,6 +4,8 @@
  * product's demo workspace (its goals, tasks and people are samples).
  */
 
+import { WORKFORCE_HOUR } from '../data/pricing'
+
 export type Tone = 'ok' | 'warn' | 'bad' | 'plain'
 export type Status = 'Calculated' | 'Confirmed' | 'Hypothesis'
 
@@ -209,5 +211,9 @@ export const KM_FAQ: { q: string; a: string }[] = [
   {
     q: 'How much does it cost?',
     a: 'It comes with every plan: Own model at $19 a month, Solo from $59, Team from $290, each with a free trial. For more than 10 people, Scale is priced with you.',
+  },
+  {
+    q: 'What is an AI Workforce hour?',
+    a: `${WORKFORCE_HOUR} Solo comes with 300, 500 or 1\u00a0000 of them, Team with 3\u00a0000, 5\u00a0000 or 10\u00a0000, depending on the model level.`,
   },
 ]

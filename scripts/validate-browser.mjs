@@ -774,7 +774,7 @@ async function functionalPass(browser) {
       const ready = OPEN_DEPTS.flatMap((dpt) => dpt.members)
       check(
         'FAQ: answers for today — it names what is ready now — and leaves out questions about closed blocks',
-        (ready.length > 4 ? today.a.includes(`${ready.length} AI employees`) : ready.every((x) => today.a.includes(x.name))) && (has('custom') || !today.qs.some((q) => /create my own/i.test(q))),
+        (ready.length > 4 ? today.a.includes(`${ready.length} AI employees`) : ready.every((x) => today.a.includes(x.name))) && (has('custom') || !today.qs.some((q) => /create my own/i.test(q))) && (!has('pricing') || today.qs.includes('What is an AI Workforce hour?')),
         `${today.qs.length} questions · ${today.a.slice(0, 90)}`,
       )
     }
@@ -1193,8 +1193,8 @@ async function kmPagePass(browser) {
   await bar.fill('Who owns pricing?')
   await Promise.all([page.waitForURL((u) => u.href.startsWith(KM), { timeout: 6000 }).catch(() => {}), bar.press('Enter')])
   check(
-    'Knowledge Management page: its own use cases, the same pricing as the landing, its own FAQ (nothing open at first), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)',
-    uses === 6 && plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 8 && end.title === 'Ask your company' && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
+    'Knowledge Management page: its own use cases, the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)',
+    uses === 6 && plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 9 && faq.qs.includes('What is an AI Workforce hour?') && end.title === 'Ask your company' && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
     JSON.stringify({ uses, plans, faq: faq.qs.length, ...end, landed: landed.length }),
   )
   await ctx.close()

@@ -78,6 +78,9 @@ export const tiersOf = (p: Plan): Tier[] => TIERS.map((t) => t.id).filter((t) =>
 const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0')
 
 /** What a plan includes at a level: its own items, then the model and its hours of AI Workforce. */
+/** What one AI Workforce hour is, in the product owner's words (the FAQ and the pricing list say it). */
+export const WORKFORCE_HOUR = 'About one hour of work by one person.'
+
 export const includesAt = (p: Plan, tier?: Tier): string[] => {
   if (!tier) return p.includes
   const hours = p.hours?.[tier]
