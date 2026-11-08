@@ -1,6 +1,6 @@
 # Simulated user walkthrough
 
-Run: 2026-11-08T17:58:27.115Z · http://127.0.0.1:4173/
+Run: 2026-11-08T18:35:24.728Z · http://127.0.0.1:4173/
 
 **47 / 47 steps behaved as expected.** JavaScript errors: 0.
 
@@ -37,7 +37,7 @@ Run: 2026-11-08T17:58:27.115Z · http://127.0.0.1:4173/
 | 29 | desktop | Opens “Is it available today?”, then presses ↓ | The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block | ✅ Yes, in early access. Ready today: Knowledge Manag · ↓ What does the AI Superagent do? | [029-desktop.jpg](walkthrough/029-desktop.jpg) |
 | 30 | desktop | Clicks “Contacts” in the menu | The last block, “Run Your AI Business”, with just the input bar; at its foot: the AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy | ✅ {"by":"","logo":true,"social":["LinkedIn","X","Instagram","TikTok","YouTube","GitHub"],"legal":["Terms of Use","Privacy Policy"]} | [030-desktop.jpg](walkthrough/030-desktop.jpg) |
 | 31 | desktop | Types a business task and presses Enter | The platform opens with the task carried over (?task=…) | ✅ https://platform.neuronium.ai/?task=A%20marketplace%20where%20AI%20agents%20nego | [031-desktop.jpg](walkthrough/031-desktop.jpg) |
-| 32 | desktop | Clicks “Open Platform” in the top menu | The platform opens (https://platform.neuronium.ai/) | ✅ https://platform.neuronium.ai/ | [032-desktop.jpg](walkthrough/032-desktop.jpg) |
+| 32 | desktop | Clicks “Open AI OS” in the top menu | The platform opens (https://platform.neuronium.ai/) | ✅ https://platform.neuronium.ai/ | [032-desktop.jpg](walkthrough/032-desktop.jpg) |
 | 33 | desktop | Looks for a way to the AI employees table | There is none while the table is closed — no dead link | ✅  | [033-desktop.jpg](walkthrough/033-desktop.jpg) |
 | 34 | phone | Opens the site on a phone | The tagline still fits on one line | ✅ {"one":true,"right":352.5625,"vw":390} | [034-phone.jpg](walkthrough/034-phone.jpg) |
 | 35 | phone | Swipes up to block 2 | AI Superagent in your business within 3 swipes, no sideways scroll | ✅ 1 swipe(s), inner overflow 0px | [035-phone.jpg](walkthrough/035-phone.jpg) |
