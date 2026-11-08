@@ -108,7 +108,7 @@
     {
       "name": "FAQ: answers for today — it names what is ready now — and leaves out questions about closed blocks",
       "ok": true,
-      "detail": "9 questions · Yes, in early access. Ready today: Knowledge Management. New AI employees are added one by"
+      "detail": "10 questions · Yes, in early access. Ready today: Knowledge Management. New AI employees are added one by"
     },
     {
       "name": "Final: “Run Your AI Business”, “with Neuronium” smaller below, then just the input bar (“Describe your business task”, no Get Early Access); sending opens the platform, with the written task carried over (?task=)",
@@ -128,7 +128,7 @@
     {
       "name": "Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes)",
       "ok": true,
-      "detail": "{\"flows\":true,\"held\":[[-217,-4112],[-217,-4062]],\"cases\":3,\"index\":3,\"search\":\"today’s → 1\"}"
+      "detail": "{\"flows\":true,\"held\":[[-212,-4117],[-212,-4067]],\"cases\":3,\"index\":3,\"search\":\"today’s → 1\"}"
     },
     {
       "name": "Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task",
@@ -181,9 +181,9 @@
       "detail": "{\"gap\":{\"figs\":0,\"limit\":\"Profit & margin records come from the Finance module, which is not connected yet. No number is made up in its place.\"},\"delivery\":\"No amount: money records are outside wha\",\"operator\":\"Sum of 1 accrual record linked to Lena S\"}"
     },
     {
-      "name": "Knowledge Management page: its own use cases, the same pricing as the landing, its own FAQ (nothing open at first), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)",
+      "name": "Knowledge Management page: its own use cases, the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)",
       "ok": true,
-      "detail": "{\"uses\":6,\"plans\":\"Own model|Solo|Team|Scale\",\"faq\":8,\"title\":\"Ask your company\",\"foot\":6,\"legal\":2,\"landed\":1}"
+      "detail": "{\"uses\":6,\"plans\":\"Own model|Solo|Team|Scale\",\"faq\":9,\"title\":\"Ask your company\",\"foot\":6,\"legal\":2,\"landed\":1}"
     },
     {
       "name": "Layout 1920x1080-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
@@ -198,12 +198,12 @@
     {
       "name": "Layout 1440x760-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: cases ×0.97"
+      "detail": "drawn smaller to fit: cases ×0.97, faq ×0.95"
     },
     {
       "name": "Layout 1366x657-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: pricing ×0.99, faq ×0.98"
+      "detail": "drawn smaller to fit: pricing ×0.99, faq ×0.89"
     },
     {
       "name": "Layout 1280x800-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
@@ -213,7 +213,7 @@
     {
       "name": "Layout 1024x768-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "every block fits at full size"
+      "detail": "drawn smaller to fit: faq ×0.98"
     },
     {
       "name": "Layout 768x1024-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
@@ -233,7 +233,7 @@
     {
       "name": "Layout 360x640-dark: 7 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: cases ×0.98, pricing ×0.80"
+      "detail": "drawn smaller to fit: cases ×0.98, pricing ×0.80, faq ×0.98"
     },
     {
       "name": "Layout Knowledge Management 1920x1080-dark: 10 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
@@ -253,7 +253,7 @@
     {
       "name": "Layout Knowledge Management 1366x657-dark: 10 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
       "ok": true,
-      "detail": "drawn smaller to fit: report ×0.87, pricing ×0.99"
+      "detail": "drawn smaller to fit: report ×0.87, pricing ×0.99, faq ×0.98"
     },
     {
       "name": "Layout Knowledge Management 1280x800-dark: 10 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync",
@@ -587,7 +587,7 @@
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9499,
       "cut": 0,
       "offenders": [],
       "progress": 6
@@ -692,7 +692,7 @@
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.9783,
+      "fit": 0.8938,
       "cut": 0,
       "offenders": [],
       "progress": 6
@@ -902,7 +902,7 @@
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9802,
       "cut": 0,
       "offenders": [],
       "progress": 6
@@ -1320,9 +1320,9 @@
       "id": "faq",
       "reached": true,
       "docOverflowX": 0,
-      "frameOverflowY": 0,
+      "frameOverflowY": 1,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9836,
       "cut": 0,
       "offenders": [],
       "progress": 6
@@ -1922,7 +1922,7 @@
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 1,
+      "fit": 0.9792,
       "cut": 0,
       "offenders": [],
       "progress": 9
@@ -2844,7 +2844,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-08T01:51:13.018Z",
+  "startedAt": "2026-11-08T12:05:02.814Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 48
+  "fps": 52
 }
