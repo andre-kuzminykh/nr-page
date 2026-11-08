@@ -503,10 +503,15 @@ const waitFor = async (fn, ms = 4500) => {
       open: document.querySelectorAll('.slide[data-state="active"] .faq__q[aria-expanded="true"]').length,
       text: document.querySelector('.slide[data-state="active"] .faq__item.is-open .faq__a')?.textContent ?? '',
     }))
+    // the question after it in the list, whatever the order
+    const after = await page.evaluate(() => {
+      const qs = [...document.querySelectorAll('.slide[data-state="active"] .faq__q-text')].map((q) => q.textContent.trim())
+      return qs[qs.findIndex((q) => /Is it available today/.test(q)) + 1] ?? ''
+    })
     await page.keyboard.press('ArrowDown')
     await sleep(300)
     const nextQ = await page.evaluate(() => document.activeElement?.textContent)
-    await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && /How much does it cost/.test(nextQ || '') && (await idx(page)) === at('faq'), faqA.text.slice(0, 70))
+    await step(page, 'desktop', 'Opens “Is it available today?”, then presses ↓', 'The answer opens in place and the other one closes (early access); ↓ moves to the next question, not the next block', faqA.open === 1 && /early access/i.test(faqA.text) && !!after && (nextQ || '').includes(after) && (await idx(page)) === at('faq'), `${faqA.text.slice(0, 50)} · ↓ ${after}`)
   }
 
   // Final: Contacts, the task, and the way to the platform
