@@ -116,9 +116,9 @@
       "detail": "https://platform.neuronium.ai/ · https://platform.neuronium.ai/?task=An%20AI%20concierge%20for%20boutique%20hotels"
     },
     {
-      "name": "Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget)",
+      "name": "Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology) with “Neuronium®” beside it, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget)",
       "ok": true,
-      "detail": "{\"by\":\"\",\"logo\":{\"loaded\":true,\"h\":20},\"social\":[\"https://www.linkedin.com/in/andre-kuzminykh/\",\"https://x.com/andre_dataist\",\"https://www.instagram.com/andre_dataist\",\"https://www.tiktok.com/@andre_dataist\",\"https://www.youtube.com/@andre_dataist\",\"https://github.com/andre-kuzminykh\"],\"legal\":[\"https://andre.technology/terms/\",\"https://andre.technology/privacy/\"]}"
+      "detail": "{\"by\":\"\",\"tm\":\"Neuronium®\",\"logo\":{\"loaded\":true,\"h\":20},\"social\":[\"https://www.linkedin.com/in/andre-kuzminykh/\",\"https://x.com/andre_dataist\",\"https://www.instagram.com/andre_dataist\",\"https://www.tiktok.com/@andre_dataist\",\"https://www.youtube.com/@andre_dataist\",\"https://github.com/andre-kuzminykh\"],\"legal\":[\"https://andre.technology/terms/\",\"https://andre.technology/privacy/\"]}"
     },
     {
       "name": "Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → https://platform.neuronium.ai/; “About Knowledge Management” under its line, above the Km element → its page, /knowledge-management/",
@@ -128,7 +128,7 @@
     {
       "name": "Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes)",
       "ok": true,
-      "detail": "{\"flows\":true,\"held\":[[-212,-3028],[-212,-2982]],\"cases\":9,\"index\":9,\"search\":\"today’s → 1\"}"
+      "detail": "{\"flows\":true,\"held\":[[-211,-3030],[-211,-2980]],\"cases\":9,\"index\":9,\"search\":\"today’s → 1\"}"
     },
     {
       "name": "Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task",
@@ -585,9 +585,9 @@
       "id": "faq",
       "reached": true,
       "docOverflowX": 0,
-      "frameOverflowY": 0,
+      "frameOverflowY": 1,
       "scrolls": false,
-      "fit": 0.9499,
+      "fit": 0.9495,
       "cut": 0,
       "offenders": [],
       "progress": 6
@@ -1682,7 +1682,7 @@
       "docOverflowX": 0,
       "frameOverflowY": 0,
       "scrolls": false,
-      "fit": 0.9787,
+      "fit": 0.9792,
       "cut": 0,
       "offenders": [],
       "progress": 5
@@ -2244,7 +2244,7 @@
     }
   ],
   "errors": [],
-  "startedAt": "2026-11-08T14:47:43.964Z",
+  "startedAt": "2026-11-08T17:47:13.652Z",
   "base": "http://127.0.0.1:4173/",
-  "fps": 53
+  "fps": 38
 }

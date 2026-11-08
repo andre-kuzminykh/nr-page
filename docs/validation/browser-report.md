@@ -1,6 +1,6 @@
 # Neuronium landing — browser validation
 
-Run: 2026-11-08T14:47:43.964Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
+Run: 2026-11-08T17:47:13.652Z · http://127.0.0.1:4173/ · Chromium (headless, software WebGL)
 
 **58 / 58 checks passed.**
 
@@ -29,9 +29,9 @@ Run: 2026-11-08T14:47:43.964Z · http://127.0.0.1:4173/ · Chromium (headless, s
 | ✅ | FAQ: answers open in place, one at a time — opening one closes the others | You do. Access is set per person, team or role, and Knowledg |
 | ✅ | FAQ: answers for today — it names what is ready now — and leaves out questions about closed blocks | 10 questions · Yes, in early access. Ready today: Knowledge Management. New AI employees are added one by |
 | ✅ | Final: “Run Your AI Business”, “with Neuronium” smaller below, then just the input bar (“Describe your business task”, no Get Early Access); sending opens the platform, with the written task carried over (?task=) | https://platform.neuronium.ai/ · https://platform.neuronium.ai/?task=An%20AI%20concierge%20for%20boutique%20hotels |
-| ✅ | Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget) | {"by":"","logo":{"loaded":true,"h":20},"social":["https://www.linkedin.com/in/andre-kuzminykh/","https://x.com/andre_dataist","https://www.instagram.com/andre_dataist","https://www.tiktok.com/@andre_dataist","https://www.youtube.com/@andre_dataist","https://github.com/andre-kuzminykh"],"legal":["https://andre.technology/terms/","https://andre.technology/privacy/"]} |
+| ✅ | Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology) with “Neuronium®” beside it, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget) | {"by":"","tm":"Neuronium®","logo":{"loaded":true,"h":20},"social":["https://www.linkedin.com/in/andre-kuzminykh/","https://x.com/andre_dataist","https://www.instagram.com/andre_dataist","https://www.tiktok.com/@andre_dataist","https://www.youtube.com/@andre_dataist","https://github.com/andre-kuzminykh"],"legal":["https://andre.technology/terms/","https://andre.technology/privacy/"]} |
 | ✅ | Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → https://platform.neuronium.ai/; “About Knowledge Management” under its line, above the Km element → its page, /knowledge-management/ | {"platform":{"text":"About Platform","href":"https://platform.neuronium.ai/","seen":true,"bg":"rgba(0, 0, 0, 0)"},"km":{"text":"About Knowledge Management","href":"/knowledge-management/","seen":true,"bg":"rgba(0, 0, 0, 0)","order":true}} |
-| ✅ | Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes) | {"flows":true,"held":[[-212,-3028],[-212,-2982]],"cases":9,"index":9,"search":"today’s → 1"} |
+| ✅ | Cases: after Management in the menu, two rows of pictures with titles flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; “All cases”, a quiet link under the rows, opens every case with a search (empty state, the block holds still, Escape closes) | {"flows":true,"held":[[-211,-3030],[-211,-2980]],"cases":9,"index":9,"search":"today’s → 1"} |
 | ✅ | Input bar: the hero types example tasks, then says “Try it yourself”; clicking into the Superagent bar stops its demo (no way runs) and it waits for the visitor’s task | {"tryHero":true,"invite":"Try it yourself","taken":{"own":true,"demo":0,"way":0,"placeholder":"Give the AI Superagent a task"}} |
 | ✅ | Write to us: a button in the bottom-right corner opens a card (email, subject, optional message; “We reply by email”); it asks for what is missing, holds the block still, sends to /api/contact, says where the reply goes — and offers a plain email if sending fails; Escape closes it | {"opened":{"dialog":true,"title":"Write to us","sub":"We reply by email.","fields":"Your email\|Subject\|Message optional","focus":"email"},"noEmail":"Add the email we should reply to.","stayed":true,"sent":"Sent. We’ll reply to anna@example.com.","failed":"Couldn’t send it right now. Write to support@neuro","posted":2} |
 | ✅ | Final: no “Explore AI Employees” link while the periodic table is closed |  |
@@ -65,6 +65,6 @@ Run: 2026-11-08T14:47:43.964Z · http://127.0.0.1:4173/ · Chromium (headless, s
 | ✅ | Layout Knowledge Management 360x640-dark: 6 blocks reached by keyboard; none scrolls inside or is cut (too tall a block is drawn smaller); no horizontal overflow, cut headlines or panel titles, nothing under the widget, progress in sync | drawn smaller to fit: cases ×0.98, pricing ×0.82 |
 | ✅ | No JavaScript errors in any run |  |
 
-Indicative frame rate in headless software rendering: 53 fps (real GPUs run the light field at display refresh rate).
+Indicative frame rate in headless software rendering: 38 fps (real GPUs run the light field at display refresh rate).
 
 Screenshots: [desktop](../screenshots/desktop-1440x900), [phone](../screenshots/phone-390x844), [contact sheets for all seven viewports](../screenshots/sheets).
