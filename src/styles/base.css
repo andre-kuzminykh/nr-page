@@ -196,7 +196,11 @@ svg {
   display: inline-flex;
   align-items: center;
   gap: 9px;
+  /* as wide as its words, in a flex column or a grid alike, so the line under it is too */
   align-self: flex-start;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
   padding: 6px 0;
   font-size: 15px;
   font-weight: 500;

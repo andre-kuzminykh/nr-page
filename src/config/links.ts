@@ -40,7 +40,7 @@ export const SALES_URL: string = env.VITE_SALES_URL || ''
 
 /** Created by Andre AI Technologies; its terms and privacy policy cover the site. */
 export const COMPANY_URL = 'https://andre.technology/'
-/** Neuronium is open source: the top menu says so, next to Open Platform. */
+/** Neuronium is open source: the top menu says so, next to Open AI OS. */
 export const GITHUB_URL = 'https://github.com/andre-kuzminykh'
 export const TERMS_URL: string = env.VITE_TERMS_URL || 'https://andre.technology/terms/'
 export const PRIVACY_URL: string = env.VITE_PRIVACY_URL || 'https://andre.technology/privacy/'

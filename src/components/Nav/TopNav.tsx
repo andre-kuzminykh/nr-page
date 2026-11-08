@@ -54,7 +54,7 @@ interface TopNavProps {
   home?: string
 }
 
-export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open Platform', href: PLATFORM_URL }, home }: TopNavProps) {
+export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open AI OS', href: PLATFORM_URL }, home }: TopNavProps) {
   const { index, goTo } = useDeck()
   const current = slides[index]
   const [ddOpen, setDdOpen] = useState(false)

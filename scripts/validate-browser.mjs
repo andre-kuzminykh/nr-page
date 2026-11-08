@@ -302,8 +302,8 @@ async function functionalPass(browser) {
     counter: !!document.querySelector('.topbar__counter, .slide-index, .theme-switch'),
   }))
   check(
-    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), “Open source” (GitHub) next to “Open Platform”`,
-    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && nav.cta === 'Open Platform' && nav.ctaHref === PLATFORM && nav.oss[0] === 'Open source' && nav.oss[1] === GITHUB && nav.oss[2] && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
+    `Top menu: transparent, logo is the two letters Nr (no tile), only the open sections (${NAV.map(([l]) => l).join(' · ')}), “Open source” (GitHub) next to “Open AI OS” (the platform)`,
+    nav.logo === 'Nr' && !nav.logoTile && nav.items.join('|') === NAV.map(([l]) => l).join('|') && nav.cta === 'Open AI OS' && nav.ctaHref === PLATFORM && nav.oss[0] === 'Open source' && nav.oss[1] === GITHUB && nav.oss[2] && /rgba\(0, 0, 0, 0\)|transparent/.test(nav.bg) && !nav.counter,
     JSON.stringify(nav),
   )
   if (OPEN_DEPTS.length > 1) {
@@ -1131,8 +1131,8 @@ async function kmPagePass(browser) {
   await sleep(1300)
   const turned = await activeIndex(page)
   check(
-    'Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open Platform” as on the landing, and the logo leads back to the landing',
-    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Platform' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
+    'Knowledge Management page: a deck like the landing — its own blocks, one gesture per block; the menu reads Report · How it works · Graph · Use cases · Pricing · FAQ · Contacts, its button is “Open AI OS” as on the landing, and the logo leads back to the landing',
+    top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open AI OS' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
     JSON.stringify(top),
   )
   // how it works: one block — a question is typed into the bar, then each step plays its own animation, and the report is composed

@@ -36,7 +36,7 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 
 | Button | Leads to | Variable |
 |---|---|---|
-| “Open Platform” in the top menu of both pages, at every screen size (and in the phone menu); the menu itself sits in the middle of the page | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “Open AI OS” in the top menu of both pages, at every screen size (and in the phone menu); the menu itself sits in the middle of the page | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | “Open source”, next to it | `https://github.com/andre-kuzminykh` | `GITHUB_URL` in `links.ts` |
 | The bar on the hero and on the AI Superagent block, and the bar on the last block | `https://platform.neuronium.ai/?task=<the task>`; empty on the last block → the platform | `VITE_PLATFORM_URL` |
 | “About Platform” under the AI Superagent title | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
@@ -117,7 +117,7 @@ blocks, gestures, transitions, light field, menu and progress line (`src/compone
    Knowledge Management cases” opens every case, filtered by it. 4. **Pricing** — the same block as on the
    landing. 5. **FAQ** — its own. 6. **Ask your company** — its own end, with the bar and the foot.
 
-The menu reads How it works · Use cases · Pricing · FAQ · Contacts, with Open source and “Open Platform”
+The menu reads How it works · Use cases · Pricing · FAQ · Contacts, with Open source and “Open AI OS”
 on the right, as on the landing; the logo leads back to the landing. The example reports use the product's demo
 workspace (its goals, tasks and people are samples). Static hosts serve the page at `/knowledge-management/` with no
 extra rule.
@@ -206,7 +206,7 @@ Latest results for the staged release (production build, headless Chromium with 
 - **Browser**: **58 / 58 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
   - No block scrolls inside or is cut (a block too tall for a window is drawn smaller); no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, no JavaScript errors — on the landing and on the AI Knowledge Management page.
   - The AI Knowledge Management page: How it works step by step (typed into the bar; words recognised; the graph walked and the records counted, no labels or legend; the count; the report composed over the bar — ring, figures, statuses, limitations, sources), its seven use cases and All cases filtered by Knowledge Management, the shared pricing, its FAQ and its end.
-  - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open Platform; links to closed blocks do nothing.
+  - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open AI OS; links to closed blocks do nothing.
   - The input bar: the hero types its examples, then “Try it yourself”; clicking into the Superagent bar stops its demo and waits for the visitor's task.
   - Cases: two rows flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; All cases opens every case with a search.
   - Write to us: it asks for what is missing, holds the block still, sends to the endpoint, says where the reply goes, offers a plain email when sending fails, and closes on Escape.

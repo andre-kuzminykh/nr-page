@@ -545,7 +545,7 @@ const waitFor = async (fn, ms = 4500) => {
   }
   {
     const out = await leave(page, () => page.locator('.nav__cta').click(), PLATFORM, 'start')
-    await step(page, 'desktop', 'Clicks “Open Platform” in the top menu', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
+    await step(page, 'desktop', 'Clicks “Open AI OS” in the top menu', `The platform opens (${PLATFORM})`, out.url === PLATFORM, out.url)
     await out.back()
   }
   if (has('employees')) {
