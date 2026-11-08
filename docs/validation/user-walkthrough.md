@@ -1,6 +1,6 @@
 # Simulated user walkthrough
 
-Run: 2026-11-08T12:16:47.057Z · http://127.0.0.1:4173/
+Run: 2026-11-08T13:58:54.211Z · http://127.0.0.1:4173/
 
 **47 / 47 steps behaved as expected.** JavaScript errors: 0.
 
@@ -21,7 +21,7 @@ Run: 2026-11-08T12:16:47.057Z · http://127.0.0.1:4173/
 | 13 | desktop | Opens Management from the menu | Lands on Management; only its open AI employees are there (1 · Km) | ✅ AI Knowledge Management · menu: Management | [013-desktop.jpg](walkthrough/013-desktop.jpg) |
 | 14 | desktop | Watches Knowledge Management (1 · Km) | A question is typed into the search bar at the bottom and answered above it, with the three things it was found in — then the next question | ✅ What did we agree on pilot pricing? → Why is the Cyprus AI market review at risk? | [014-desktop.jpg](walkthrough/014-desktop.jpg) |
 | 15 | desktop | Clicks element 1 (Km) | AI Knowledge Management is the title; its element is picked and the line under it counts down to the next answer | ✅ {"hot":false,"title":"AI Knowledge Management","picked":"Knowledge Management","load":1} | [015-desktop.jpg](walkthrough/015-desktop.jpg) |
-| 16 | desktop | Clicks “About Knowledge Management” under its line | Its own page opens, a deck like the landing: AI Knowledge Management | ✅ {"h1":"AI Knowledge Management","blocks":10} | [016-desktop.jpg](walkthrough/016-desktop.jpg) |
+| 16 | desktop | Clicks “About Knowledge Management” under its line | Its own page opens, a deck like the landing: AI Knowledge Management | ✅ {"h1":"AI Knowledge Management","blocks":8} | [016-desktop.jpg](walkthrough/016-desktop.jpg) |
 | 17 | desktop | Turns to the next block there | The report generator is there with a finished report, then writes the next one by itself | ✅ Root-cause report — Cyprus AI market review | [017-desktop.jpg](walkthrough/017-desktop.jpg) |
 | 18 | desktop | Opens Platform and watches | A command is typed below the brain and sent; the Superagent runs its way and only the tools it needs appear | ✅ {"cmd":"Find new leads and book demos","sent":true,"on":["Sheets","Apollo"],"rest":10,"icons":2,"way":12} | [018-desktop.jpg](walkthrough/018-desktop.jpg) |
 | 19 | desktop | Clicks “About Platform” under the title | The platform opens (https://platform.neuronium.ai/) | ✅ https://platform.neuronium.ai/ | [019-desktop.jpg](walkthrough/019-desktop.jpg) |

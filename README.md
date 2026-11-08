@@ -206,7 +206,7 @@ Latest results for the staged release (production build, headless Chromium with 
 
 - **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
 - **Contact function**: `validate:api` passes — method, missing key, bad input, the bot trap, Reply-To and failures of the email provider.
-- **Browser**: **58 / 58 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
+- **Browser**: **60 / 60 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
   - No block scrolls inside or is cut (a block too tall for a window is drawn smaller); no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, no JavaScript errors — on the landing and on the AI Knowledge Management page.
   - The AI Knowledge Management page: its report generator (the report over its bar; it opens on a finished report — ring, figures counted, statuses — then the stages of the next request and its bars against plan), How it works (the graph appears and is walked, then the answer rises over the bar), viewers, its filtered use cases and All cases filtered by it, the shared pricing, its FAQ and its end.
   - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open Platform; links to closed blocks do nothing.
