@@ -42,7 +42,6 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 | “About Platform” under the AI Superagent title | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | The bar in Knowledge Management | `https://management.neuronium.ai/km?q=<the question>` | `VITE_KM_URL` |
 | “About Knowledge Management” under its line | its own page, `/knowledge-management/` | `VITE_KM_ABOUT_URL` |
-| “Open Knowledge Management” at the end of that page | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
 | “Start Free Trial” on Own model, Solo and Team | `https://platform.neuronium.ai/?plan=own`, `?plan=<solo|team>&model=<low|medium|high>` | `VITE_PLATFORM_URL` |
 | “Contact sales” on Scale | the “Write to us” widget, about the Scale plan (or a sales page, if set) | `VITE_SALES_URL` |
 | Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
