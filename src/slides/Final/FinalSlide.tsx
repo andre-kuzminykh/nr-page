@@ -50,9 +50,14 @@ export function FinalSlide(_: SlideProps) {
       </div>
 
       <footer className="fin__foot rv rv--fade" style={d(800)}>
-        <a className="fin__by" href={COMPANY_URL} {...ext}>
-          <img src={aitLogo} alt="Andre AI Technologies" width={186} height={96} />
-        </a>
+        <div className="fin__brand">
+          <a className="fin__by" href={COMPANY_URL} {...ext}>
+            <img src={aitLogo} alt="Andre AI Technologies" width={186} height={96} />
+          </a>
+          <span className="fin__tm">
+            Neuronium<sup>®</sup>
+          </span>
+        </div>
 
         <ul className="fin__social" aria-label="Neuronium elsewhere">
           {SOCIAL.map((s) => (

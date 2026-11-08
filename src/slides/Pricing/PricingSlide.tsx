@@ -1,4 +1,4 @@
-import { Check, MessageCircle, SignalHigh, SignalLow, SignalMedium, Sparkles, type LucideIcon } from 'lucide-react'
+import { Check, MessageCircle, Sparkles } from 'lucide-react'
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
@@ -7,8 +7,19 @@ import { openContact } from '../../lib/events'
 import './Pricing.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
-/** Each model level's mark: the bars of a signal, one more per level. */
-const TIER_ICON: Record<Tier, LucideIcon> = { low: SignalLow, medium: SignalMedium, high: SignalHigh }
+/**
+ * A model level's mark: three bars of a meter, one lit for Low, two for Medium, all three for High.
+ * The unlit bars stay faintly drawn, so every mark has the same width and sits right by its word.
+ */
+function Level({ n }: { n: number }) {
+  return (
+    <svg className="pr-meter" width="13" height="12" viewBox="0 0 13 12" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <rect key={i} className={i < n ? 'is-lit' : ''} x={i * 5} y={8 - i * 4} width="3" height={4 + i * 4} rx="1" />
+      ))}
+    </svg>
+  )
+}
 
 /** A plan: its name, its price at the chosen model level, who it is for, the levels, what it includes, one button. */
 function PlanCard({ p, k }: { p: Plan; k: number }) {
@@ -57,7 +68,6 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
           >
             <span className="pr-tiers__ink" aria-hidden="true" />
             {tiers.map((t) => {
-              const Icon = TIER_ICON[t]
               const label = TIERS.find((x) => x.id === t)!.label
               return (
                 <button
@@ -70,7 +80,7 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
                   className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
                   onClick={() => setTier(t)}
                 >
-                  <Icon size={16} strokeWidth={2.4} aria-hidden="true" />
+                  <Level n={tiers.indexOf(t) + 1} />
                   <span className="pr-tiers__l">{label}</span>
                 </button>
               )

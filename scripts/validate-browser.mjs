@@ -832,6 +832,7 @@ async function functionalPass(browser) {
       last: Number(s.dataset.slide) === document.querySelectorAll('.slide').length - 1,
       title: s.querySelector('.fin__title')?.textContent.trim(),
       by: foot?.querySelector('.fin__by')?.textContent.trim(),
+      tm: foot?.querySelector('.fin__by + .fin__tm')?.textContent.trim(),
       text: foot?.innerText ?? '',
       mail: foot?.querySelectorAll('a[href^="mailto:"]').length ?? -1,
       byHref: foot?.querySelector('.fin__by')?.getAttribute('href'),
@@ -856,13 +857,13 @@ async function functionalPass(browser) {
     ['Privacy Policy', /^https:\/\/.+\/privacy\/?$/],
   ]
   check(
-    'Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology), LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget)',
+    'Contacts: last in the menu, after FAQ — it opens the final block, whose foot has the orange AIT logo (andre.technology) with “Neuronium®” beside it, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use and Privacy Policy; no “Created by”, no support address (that is the widget)',
     NAV.at(-1)[0] === 'Contacts' && ct.last && ct.title === 'Run Your AI Business' && ct.active === 'Contacts' && ct.blocks === SLIDES.length &&
-      ct.by === '' && !/Created by/i.test(ct.text) && ct.mail === 0 && /andre\.technology/.test(ct.byHref) && ct.logo?.loaded && ct.logo.h >= 14 &&
+      ct.by === '' && ct.tm === 'Neuronium®' && !/Created by/i.test(ct.text) && ct.mail === 0 && /andre\.technology/.test(ct.byHref) && ct.logo?.loaded && ct.logo.h >= 14 &&
       ct.social.length === socialWant.length && socialWant.every(([l, re], k) => ct.social[k][0] === l && re.test(ct.social[k][1]) && ct.social[k][2]) &&
       ct.legal.length === legalWant.length && legalWant.every(([l, h], k) => ct.legal[k][0] === l && (typeof h === 'string' ? ct.legal[k][1] === h : h.test(ct.legal[k][1]))) &&
       ct.newTab,
-    JSON.stringify({ by: ct.by, logo: ct.logo, social: ct.social.map((x) => x[1]), legal: ct.legal.map((x) => x[1]) }),
+    JSON.stringify({ by: ct.by, tm: ct.tm, logo: ct.logo, social: ct.social.map((x) => x[1]), legal: ct.legal.map((x) => x[1]) }),
   )
   // The way out to the products: Platform (block 2) and Knowledge Management (its block)
   const outs = {}

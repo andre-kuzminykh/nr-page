@@ -160,7 +160,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
   border-radius: 999px;
   white-space: nowrap;
@@ -171,19 +171,28 @@
   transition: color 300ms ease;
 }
 
-.pr-tiers__opt svg {
+/* the level's meter: lit bars in the word's colour, the rest faint */
+.pr-meter {
   flex-shrink: 0;
-  margin-top: -2px;
-  color: rgb(255 255 255 / 0.55);
-  transition: color 300ms ease;
+  margin-top: -1px;
+}
+
+.pr-meter rect {
+  fill: currentColor;
+  opacity: 0.22;
+  transition: opacity 300ms ease;
+}
+
+.pr-meter rect.is-lit {
+  opacity: 0.85;
+}
+
+.pr-tiers__opt.is-on .pr-meter rect.is-lit {
+  opacity: 1;
 }
 
 .pr-tiers__opt:hover,
 .pr-tiers__opt.is-on {
-  color: #fff;
-}
-
-.pr-tiers__opt.is-on svg {
   color: #fff;
 }
 
@@ -194,7 +203,7 @@
 
 /* a card too narrow for mark and word keeps the word */
 @container (max-width: 250px) {
-  .pr-tiers__opt svg {
+  .pr-meter {
     display: none;
   }
 }

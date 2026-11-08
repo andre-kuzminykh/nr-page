@@ -69,11 +69,40 @@
   color: var(--fg);
 }
 
-.fin__by {
+/* the maker's mark, and the product's name as a trademark beside it */
+.fin__brand {
   justify-self: start;
   display: inline-flex;
   align-items: center;
+  gap: 14px;
+}
+
+.fin__by {
+  display: inline-flex;
+  align-items: center;
   padding: 4px 0;
+}
+
+.fin__tm {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 1px;
+  padding-left: 14px;
+  border-left: 1px solid rgb(255 255 255 / 0.16);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: 20px;
+  color: rgb(255 255 255 / 0.86);
+}
+
+.fin__tm sup {
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: 1px;
+  color: rgb(255 255 255 / 0.6);
 }
 
 .fin__by img {
@@ -130,7 +159,7 @@
     justify-items: center;
     gap: 10px;
   }
-  .fin__by,
+  .fin__brand,
   .fin__legal {
     justify-self: center;
   }
