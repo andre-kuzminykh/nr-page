@@ -7,9 +7,8 @@ import { useDemo } from '../components/Prompt/useDemo'
 import { useDeck, type SlideProps } from '../components/SlideController/DeckContext'
 import { COMPANY_URL, KM_URL, PRIVACY_URL, SOCIAL, TERMS_URL, kmHref } from '../config/links'
 import '../slides/Final/Final.css'
-import { SCENARIOS, VIEWERS } from './content'
+import { SCENARIOS } from './content'
 import { HOW_STEPS, HowDemo } from './HowDemo'
-import { ReportDemo } from './ReportDemo'
 import './km.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
@@ -69,7 +68,7 @@ export function KmOverview({ active, shown }: SlideProps) {
       <p className="kd-note rv" style={d(640)}>
         Ask in English or Russian; the report comes back in the same language.
       </p>
-      <button type="button" className="more kd-more rv" style={d(760)} onClick={() => goTo('report')}>
+      <button type="button" className="more kd-more rv" style={d(760)} onClick={() => goTo('how')}>
         See a report being written
         <ArrowDown size={16} strokeWidth={1.8} aria-hidden="true" />
       </button>
@@ -77,23 +76,7 @@ export function KmOverview({ active, shown }: SlideProps) {
   )
 }
 
-/* ---------- 02 · the report generator ---------- */
-export function KmReport({ active, shown }: SlideProps) {
-  const { reducedMotion } = useDeck()
-  return (
-    <div className="slide__frame kd kd--report">
-      <div className="kd-side">
-        <Kicker>The report generator</Kicker>
-        <Title lines={['Ask a question.', 'Get a report.']} />
-      </div>
-      <div className="kd-report__demo rv" style={d(200)}>
-        {shown && <ReportDemo live={active && !reducedMotion} />}
-      </div>
-    </div>
-  )
-}
-
-/* ---------- 03 · how it works: ask, the graph is searched, the answer ---------- */
+/* ---------- 02 · how it works: a report made step by step ---------- */
 export function KmHow({ active, shown }: SlideProps) {
   const { reducedMotion } = useDeck()
   const [step, setStep] = useState(-1)
@@ -101,7 +84,7 @@ export function KmHow({ active, shown }: SlideProps) {
     <div className="slide__frame kd kd--how">
       <div className="kd-side">
         <Kicker>How it works</Kicker>
-        <Title lines={['From a question', 'to the answer']} />
+        <Title lines={['From a question', 'to a report']} />
         <ol className="kh-steps rv" style={d(300)}>
           {HOW_STEPS.map((x, i) => (
             <li key={x} className={i === step ? 'is-now' : i < step ? 'is-done' : ''}>
@@ -118,39 +101,7 @@ export function KmHow({ active, shown }: SlideProps) {
   )
 }
 
-/* ---------- 04 · access ---------- */
-export function KmAccess(_: SlideProps) {
-  const [viewer, setViewer] = useState(VIEWERS[0].id)
-  const who = VIEWERS.find((x) => x.id === viewer)!
-  return (
-    <div className="slide__frame kd kd--access">
-      <Kicker>Access</Kicker>
-      <Title lines={['Each reader sees', 'only their part']} />
-      <p className="kd-lead rv" style={d(260)}>
-        Rights are given to a person, a team or a role. What is outside them never enters the reader’s graph: it cannot be found, counted or quoted.
-      </p>
-      <div className="kp-access rv" style={d(380)}>
-        <div className="kp-viewers" role="radiogroup" aria-label="Viewing as">
-          <span className="kp-viewers__l">Viewing as</span>
-          {VIEWERS.map((x) => (
-            <button key={x.id} type="button" role="radio" aria-checked={viewer === x.id} className={viewer === x.id ? 'is-on' : ''} onClick={() => setViewer(x.id)}>
-              {x.name}
-            </button>
-          ))}
-        </div>
-        <div key={viewer} className="kp-answer">
-          <p className="kp-answer__q">“How much do we owe Lena Stone?”</p>
-          <p className="kp-answer__who">
-            {who.name} · {who.role}. Sees: {who.sees}
-          </p>
-          <p className={`kp-answer__a is-${who.answer.kind}`}>{who.answer.text}</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ---------- 08 · ask your company ---------- */
+/* ---------- 06 · ask your company ---------- */
 export function KmEnd(_: SlideProps) {
   return (
     <div className="slide__frame fin kd--end">

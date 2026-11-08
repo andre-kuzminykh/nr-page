@@ -13,25 +13,28 @@ interface Node {
 
 /** A slice of a company's knowledge graph (the product's demo workspace): records, joined by typed links. */
 const NODES: Node[] = [
-  { id: 'goal', name: 'Launch Neuronium 1.0', kind: 'goal', at: [450, 60], sm: [190, 50] },
-  { id: 'draft', name: 'Draft the article', kind: 'task', at: [230, 170], sm: [105, 150] },
-  { id: 'demo', name: 'Fund portfolio demo', kind: 'task', at: [680, 170], sm: [285, 150] },
-  { id: 'note', name: 'Weekly review', kind: 'note', at: [80, 280], sm: [80, 250] },
-  { id: 'am', name: 'Alex Mercer', kind: 'person', at: [300, 300], sm: [270, 250] },
-  { id: 'proc', name: 'Sales funnel', kind: 'process', at: [820, 290], sm: [300, 350] },
-  { id: 'ls', name: 'Lena Stone', kind: 'person', at: [540, 330], sm: [110, 350] },
-  { id: 'role', name: 'Designer', kind: 'role', at: [360, 440], sm: [80, 450] },
-  { id: 'book', name: 'Booking', kind: 'booking', at: [620, 440], sm: [230, 450] },
-  { id: 'acc', name: '300.00 EUR', kind: 'money', at: [830, 420], sm: [190, 540] },
+  { id: 'launch', name: 'Launch Neuronium 1.0', kind: 'goal', at: [230, 70], sm: [270, 290] },
+  { id: 'cyprus', name: 'Cyprus AI market review', kind: 'goal', at: [650, 70], sm: [190, 40] },
+  { id: 'demo', name: 'Fund portfolio demo', kind: 'task', at: [110, 190], sm: [270, 370] },
+  { id: 'am', name: 'Alex Mercer', kind: 'person', at: [330, 190], sm: [90, 290] },
+  { id: 'draft', name: 'Draft the article', kind: 'task', at: [560, 190], sm: [95, 120] },
+  { id: 'proof', name: 'Proofread & publish', kind: 'task', at: [790, 190], sm: [285, 120] },
+  { id: 'mk', name: 'Maria Kovacs', kind: 'person', at: [150, 310], sm: [85, 370] },
+  { id: 'book', name: 'Booking', kind: 'booking', at: [400, 310], sm: [110, 450] },
+  { id: 'sources', name: 'Collect market sources', kind: 'task', at: [680, 310], sm: [190, 200] },
+  { id: 'ls', name: 'Lena Stone', kind: 'person', at: [270, 430], sm: [290, 450] },
+  { id: 'acc', name: '300.00 EUR', kind: 'money', at: [560, 430], sm: [200, 530] },
 ]
 
 const EDGES: [string, string][] = [
-  ['draft', 'goal'],
-  ['demo', 'goal'],
-  ['demo', 'proc'],
+  ['draft', 'cyprus'],
+  ['proof', 'cyprus'],
+  ['sources', 'cyprus'],
+  ['demo', 'launch'],
   ['am', 'draft'],
-  ['note', 'draft'],
-  ['ls', 'role'],
+  ['am', 'launch'],
+  ['mk', 'demo'],
+  ['book', 'demo'],
   ['book', 'ls'],
   ['acc', 'ls'],
   ['acc', 'book'],
@@ -44,7 +47,7 @@ function Layout({ narrow, lit, on }: { narrow: boolean; lit: string[]; on: boole
   const pos = (n: Node) => (narrow ? n.sm : n.at)
   const litEdge = ([a, b]: [string, string]) => lit.includes(a) && lit.includes(b)
   return (
-    <svg className={`kg ${narrow ? 'kg--sm' : 'kg--lg'} ${on ? 'is-on' : ''} ${lit.length ? 'is-walking' : ''}`} viewBox={narrow ? '0 0 380 590' : '0 0 920 500'} aria-hidden="true">
+    <svg className={`kg ${narrow ? 'kg--sm' : 'kg--lg'} ${on ? 'is-on' : ''} ${lit.length ? 'is-walking' : ''}`} viewBox={narrow ? '0 0 380 580' : '0 0 920 500'} aria-hidden="true">
       {EDGES.map((e, i) => {
         const [x1, y1] = pos(byId[e[0]])
         const [x2, y2] = pos(byId[e[1]])

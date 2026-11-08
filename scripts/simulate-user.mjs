@@ -367,7 +367,7 @@ const waitFor = async (fn, ms = 4500) => {
           await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens, a deck like the landing: AI Knowledge Management', kmPage.h1 === 'AI Knowledge Management' && kmPage.blocks >= 8, JSON.stringify(kmPage))
           await page.keyboard.press('PageDown')
           const report = await page.waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 20000 }).then((e) => e.textContent()).catch(() => '')
-          await step(page, 'desktop', 'Turns to the next block there', 'The report generator is there with a finished report, then writes the next one by itself', !!report, report)
+          await step(page, 'desktop', 'Turns to the next block there', 'How it works: a question is typed, understood, searched in the graph and counted, then its report is composed', !!report, report)
           await out.back()
         }
       } else

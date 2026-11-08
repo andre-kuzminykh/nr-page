@@ -71,7 +71,6 @@
 }
 
 /* ---------- 02 · the report generator, 03 · how it works: a side column and a stage ---------- */
-.kd--report,
 .kd--how {
   display: grid;
   grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
@@ -100,102 +99,6 @@
 .kd-end__more {
   align-self: center;
   margin-top: clamp(14px, 2.4vh, 24px);
-}
-
-/* =========================================================
-   The report generator: the report above, the bar under it
-   ========================================================= */
-.kr {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2.2vh, 22px);
-}
-
-.kr-stage {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: clamp(360px, 58vh, 600px);
-}
-
-/* the four stages: one line that fills, the current step named over it */
-.kr-steps {
-  display: grid;
-  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
-  gap: 6px;
-  margin: 0 0 clamp(18px, 4vh, 40px);
-  padding: 34px 0 0;
-  list-style: none;
-  position: relative;
-}
-
-.kr-steps li {
-  position: relative;
-  height: 3px;
-  border-radius: 3px;
-  background: rgb(255 255 255 / 0.1);
-  overflow: visible;
-}
-
-.kr-steps li::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #a071ff, #e06ad8 55%, #ff8a33);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-}
-
-.kr-steps li.is-done::before {
-  transform: none;
-}
-
-.kr-steps li.is-now::before {
-  animation: kr-fill 650ms linear forwards;
-}
-
-@keyframes kr-fill {
-  to {
-    transform: none;
-  }
-}
-
-.kr-steps__dot {
-  display: none;
-}
-
-.kr-steps__l {
-  display: none;
-  position: absolute;
-  bottom: 14px;
-  left: 0;
-  white-space: nowrap;
-  font-size: clamp(15px, 1.3vw, 18px);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: #fff;
-  opacity: 0;
-}
-
-.kr-steps li.is-now .kr-steps__l {
-  display: block;
-  left: calc(-100% * var(--at) - 6px * var(--at));
-  opacity: 1;
-  animation: kr-step-in 360ms var(--ease-out);
-}
-
-.kr-steps__l em {
-  font-style: normal;
-  color: rgb(255 255 255 / 0.5);
-}
-
-@keyframes kr-step-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
 }
 
 /* the document */
@@ -619,7 +522,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: clamp(340px, 58vh, 600px);
+  min-height: clamp(380px, 62vh, 640px);
 }
 
 .kh-graph {
@@ -637,133 +540,187 @@
   opacity: 1;
 }
 
-/* the answer arrives: the graph steps back behind it */
-.kh.is-answer .kh-graph {
-  opacity: 0.3;
-  transform: scale(0.97);
+
+/* step 2 · understand: the question, large; each recognised word lights and says what it is */
+.kh-q {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 clamp(8px, 2vw, 32px);
 }
 
-.kh-answer {
+.kh-q__text {
+  max-width: 18em;
+  font-size: clamp(26px, 2.6vw, 40px);
+  font-weight: 500;
+  line-height: 1.7;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: rgb(255 255 255 / 0.55);
+  animation: kr-part 500ms var(--ease-out) both;
+  text-wrap: balance;
+}
+
+.kh-mark {
   position: relative;
+  display: inline-block;
+}
+
+.kh-mark__w {
+  color: #fff;
+  background: linear-gradient(90deg, rgb(160 113 255 / 0.4), rgb(224 106 216 / 0.34), rgb(255 138 51 / 0.36)) 0 88% / 0 0.36em no-repeat;
+  animation: kh-mark 520ms var(--ease-out) both;
+  animation-delay: calc(350ms + var(--k) * 380ms);
+}
+
+@keyframes kh-mark {
+  to {
+    background-size: 100% 0.36em;
+  }
+}
+
+.kh-mark__as {
+  position: absolute;
+  top: calc(100% - 0.28em);
+  left: 50%;
+  translate: -50% 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: #f1dcff;
+  animation: kh-chip 420ms var(--ease-out) both;
+  animation-delay: calc(560ms + var(--k) * 380ms);
+}
+
+@keyframes kh-chip {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.9);
+  }
+}
+
+/* step 3 · search the graph: the records counted as the walk goes */
+.kh-walked {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: rgb(255 255 255 / 0.6);
+  animation: kr-part 400ms var(--ease-out) both;
+}
+
+.kh-walked b {
+  font-size: clamp(28px, 2.6vw, 38px);
+  font-weight: 560;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+/* step 4 · count: what was found, a line, what it comes to */
+.kh-calc {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: clamp(20px, 2.8vh, 30px) clamp(20px, 2vw, 30px);
-  border: 1px solid transparent;
-  border-radius: 24px;
-  background:
-    linear-gradient(rgb(18 14 27 / 0.88), rgb(18 14 27 / 0.88)) padding-box,
-    linear-gradient(140deg, rgb(160 113 255 / 0.55), rgb(255 255 255 / 0.08) 40%, rgb(255 138 51 / 0.4)) border-box;
-  box-shadow: 0 40px 100px -40px rgb(160 113 255 / 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  animation: kr-rise 640ms var(--ease-out) both;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.4vh, 24px);
 }
 
-.kh-answer > * {
-  animation: kr-part 520ms var(--ease-out) both;
+.kh-calc__items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(20px, 4vw, 64px);
 }
 
-.kh-answer > :nth-child(2) {
-  animation-delay: 120ms;
+.kh-calc__item,
+.kh-calc__result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.kh-answer > :nth-child(3) {
-  animation-delay: 220ms;
+.kh-calc__item {
+  animation: kr-part 480ms var(--ease-out) both;
+  animation-delay: calc(var(--k) * 260ms);
 }
 
-.kh-answer > :nth-child(4) {
-  animation-delay: 300ms;
+.kh-calc__item b {
+  font-size: clamp(30px, 3vw, 46px);
+  font-weight: 540;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
-.kh-answer > :nth-child(5) {
-  animation-delay: 380ms;
+.kh-calc__item span,
+.kh-calc__result span {
+  font-size: 14px;
+  color: rgb(255 255 255 / 0.55);
 }
 
-.kh-answer__v {
-  font-size: clamp(44px, 4.6vw, 68px);
+.kh-calc__line {
+  width: min(360px, 70%);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #a071ff, #e06ad8, #ff8a33, transparent);
+  transform: scaleX(0);
+  animation: kh-line 600ms var(--ease-out) 700ms forwards;
+}
+
+@keyframes kh-line {
+  to {
+    transform: none;
+  }
+}
+
+.kh-calc__result {
+  animation: kh-result 620ms var(--ease-out) 1100ms both;
+}
+
+@keyframes kh-result {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+    filter: blur(6px);
+  }
+}
+
+.kh-calc__result b {
+  font-size: clamp(48px, 5vw, 80px);
   font-weight: 560;
   line-height: 1;
   letter-spacing: -0.05em;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(100deg, #fff 30%, #f2c9ff 70%, #ffd0ad);
+  background: linear-gradient(100deg, #fff 20%, #f2c9ff 60%, #ffc08f);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.kh-answer__v small {
-  margin-left: 8px;
-  font-size: 0.36em;
-  letter-spacing: 0;
+/* while counting, the walked graph stays faintly behind */
+.kh.is-count .kh-graph {
+  opacity: 0.05;
 }
 
-.kh-answer__l {
-  font-size: 14px;
-  color: rgb(255 255 255 / 0.55);
-}
-
-.kh-answer__t {
-  margin-top: 6px;
-  font-size: clamp(16px, 1.3vw, 19px);
-  line-height: 1.45;
-  letter-spacing: -0.01em;
-  text-wrap: pretty;
-}
-
-/* progress against plan, under a status */
-.kh-plan {
+/* step 5 · the report: composed part by part over the bar */
+.kh .kr-sheet {
   position: relative;
-  display: block;
-  height: 10px;
-  margin: 6px 0 2px;
-  border-radius: 10px;
-  background: rgb(255 255 255 / 0.07);
-}
-
-.kh-plan i {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--v);
-  border-radius: inherit;
-  background: linear-gradient(90deg, #a071ff, #e06ad8 60%, #ff8a33);
-  box-shadow: 0 0 18px rgb(224 106 216 / 0.45);
-  animation: kr-grow 1000ms var(--ease-out) 300ms both;
-}
-
-.kh-plan b {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: var(--e);
-  width: 2px;
-  border-radius: 2px;
-  background: #fff;
-}
-
-.kh-src {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 6px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.kh-src li {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 32px;
-  padding: 0 13px 0 11px;
-  border: 1px solid rgb(255 255 255 / 0.12);
-  border-radius: 999px;
-  font-size: 13.5px;
-  color: rgb(255 255 255 / 0.85);
-}
-
-.kh-src svg {
-  color: #d4b6ff;
+  z-index: 1;
 }
 
 /* the graph: names only, joined by lines; the walk lights up — always inside the stage */
@@ -865,112 +822,18 @@
   fill: #fff;
 }
 
-/* access */
-.kp-access {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: clamp(16px, 2vw, 30px);
-  align-items: stretch;
-}
-
-.kp-viewers {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.kp-viewers__l {
-  margin-bottom: 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.5);
-}
-
-.kp-viewers button {
-  padding: 16px 20px;
-  border: 1px solid rgb(255 255 255 / 0.1);
-  border-radius: 16px;
-  background: rgb(14 12 21 / 0.55);
-  text-align: left;
-  font-size: 16px;
-  color: rgb(255 255 255 / 0.7);
-  transition:
-    border-color 300ms,
-    background-color 300ms,
-    color 300ms;
-}
-
-.kp-viewers button.is-on {
-  border-color: transparent;
-  background:
-    linear-gradient(rgb(26 18 38), rgb(26 18 38)) padding-box,
-    var(--grad) border-box;
-  border: 1px solid transparent;
-  color: #fff;
-}
-
-.kp-answer {
-  padding: clamp(22px, 2.4vw, 32px);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  border-radius: 22px;
-  background: rgb(16 13 24 / 0.78);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  animation: kr-in 500ms var(--ease-out);
-}
-
-.kp-answer__q {
-  font-size: clamp(20px, 1.8vw, 26px);
-  font-weight: 520;
-  letter-spacing: -0.02em;
-}
-
-.kp-answer__who {
-  margin-top: 10px;
-  font-size: 13.5px;
-  color: rgb(255 255 255 / 0.5);
-}
-
-.kp-answer__a {
-  margin-top: 20px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  font-size: 15.5px;
-  line-height: 1.5;
-}
-
-.kp-answer__a.is-sum {
-  background: rgb(74 222 128 / 0.1);
-  color: #bbf7d0;
-}
-
-.kp-answer__a.is-gap {
-  background: rgb(251 191 36 / 0.1);
-  color: #fde68a;
-}
-
 /* =========================================================
    Smaller windows
    ========================================================= */
-/* where the gutter is narrower than the “Write to us” button, the bars stop above it */
+/* where the gutter is narrower than the “Write to us” button, the bar stops above it */
 @media (max-width: 1279px) {
-  .slide__frame.kd--report,
   .slide__frame.kd--how {
     padding-bottom: calc((76px + env(safe-area-inset-bottom, 0px)) / var(--fit));
   }
 }
 
-@media (max-width: 1100px) {
-  .kp-access {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* the side column goes on top; the stage under it */
 @media (max-width: 900px) {
-  .kd--report,
   .kd--how {
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
@@ -988,11 +851,8 @@
     gap: 7px;
     font-size: 15px;
   }
-  .kr-stage {
-    min-height: 0;
-  }
   .kh-stage {
-    height: clamp(300px, 46vh, 460px);
+    min-height: clamp(300px, 50vh, 480px);
   }
   .kg--lg {
     display: none;
@@ -1002,13 +862,10 @@
   }
 }
 
-/* shorter windows: the report keeps its figures, chart and findings */
+/* shorter windows: the report leaves out its source list */
 @media (max-height: 820px) {
-  .kd-report__demo .kr-sources {
+  .kh .kr-sources {
     display: none;
-  }
-  .kr-stage {
-    min-height: clamp(300px, 54vh, 520px);
   }
 }
 
@@ -1020,9 +877,7 @@
   .kd-title .mask {
     white-space: normal;
   }
-  .kd-title {
-    font-size: clamp(28px, 7.6vw, 44px);
-  }
+  .kd-title,
   .kd-side .kd-title {
     font-size: clamp(28px, 7.6vw, 44px);
   }
@@ -1032,8 +887,14 @@
   .kd-side .kd-kicker {
     display: none;
   }
-  .kr-sheet,
-  .kh-answer {
+  .kh-q__text {
+    font-size: 24px;
+    line-height: 2.25;
+  }
+  .kh-mark__as {
+    font-size: 11.5px;
+  }
+  .kr-sheet {
     padding: 18px;
     border-radius: 20px;
   }
@@ -1057,27 +918,14 @@
   .kr-cites {
     display: none;
   }
-  .kh-answer__v {
-    font-size: 44px;
-  }
-  .kp-viewers button {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-  .kp-answer {
-    padding: 18px;
-  }
 }
 
-/* short phones: the report keeps its figures, its chart and its limits */
+/* short phones: a shorter stage; the report keeps its figures, its chart and its findings */
 @media (max-width: 860px) and (max-height: 720px) {
-  .kd-report__demo .kr-part:not(.kr-limits) {
-    display: none;
-  }
   .kh-stage {
-    height: 280px;
+    min-height: 260px;
   }
-  .kh-src {
+  .kh .kr-limits {
     display: none;
   }
 }

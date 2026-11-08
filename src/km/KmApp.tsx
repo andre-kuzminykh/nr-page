@@ -8,7 +8,7 @@ import type { SlideMeta } from '../data/slides'
 import { CasesSlide } from '../slides/Cases/CasesSlide'
 import { FaqSlide } from '../slides/Faq/FaqSlide'
 import { PricingSlide } from '../slides/Pricing/PricingSlide'
-import { KmAccess, KmEnd, KmHow, KmOverview, KmReport } from './Blocks'
+import { KmEnd, KmHow, KmOverview } from './Blocks'
 import { KM_FAQ } from './content'
 import { KM_NAV, KM_SLIDES } from './slides'
 
@@ -18,9 +18,7 @@ const KmCases = (p: SlideProps) => <CasesSlide {...p} topic="Knowledge Managemen
 
 const BLOCKS: Record<string, ComponentType<SlideProps>> = {
   overview: KmOverview,
-  report: KmReport,
   how: KmHow,
-  access: KmAccess,
   cases: KmCases,
   pricing: PricingSlide,
   faq: KmFaq,
@@ -42,7 +40,7 @@ export function KmApp() {
       render={render}
       nav={<TopNav slides={KM_SLIDES} items={KM_NAV} home={HOME_URL} />}
       title={title}
-      skip={{ to: 'report', label: 'Skip to the report generator' }}
+      skip={{ to: 'how', label: 'Skip to how it works' }}
     >
       <ContactWidget />
     </Deck>

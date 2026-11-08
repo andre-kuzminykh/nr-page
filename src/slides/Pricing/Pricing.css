@@ -115,20 +115,25 @@
 }
 
 /* ---------- the model level: Own model · Low · Medium · High ---------- */
+/* the model level: a switch of mark and word, and under it how much AI Workforce each gives */
+.pr-level {
+  margin-top: clamp(16px, 2.6vh, 24px);
+}
+
+.pr-level.is-blank {
+  visibility: hidden;
+  height: calc(42px + 8px + 18px);
+}
+
 .pr-tiers {
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--n), minmax(0, 1fr));
-  height: 52px;
-  margin-top: clamp(16px, 2.6vh, 24px);
+  height: 42px;
   padding: 3px;
   border: 1px solid rgb(255 255 255 / 0.1);
-  border-radius: 16px;
+  border-radius: 999px;
   background: rgb(255 255 255 / 0.035);
-}
-
-.pr-tiers.is-blank {
-  visibility: hidden;
 }
 
 /* the chosen level: a light that glides under it */
@@ -138,7 +143,7 @@
   bottom: 3px;
   left: 3px;
   width: calc((100% - 6px) / var(--n));
-  border-radius: 13px;
+  border-radius: 999px;
   background: rgb(255 255 255 / 0.12);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
   transform: translateX(calc(var(--i) * 100%));
@@ -153,43 +158,23 @@
 .pr-tiers__opt {
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 6px;
   min-width: 0;
-  overflow: hidden;
-  border-radius: 13px;
+  border-radius: 999px;
   white-space: nowrap;
-  font-size: min(12.5px, 4.4cqi);
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: -0.005em;
-  color: rgb(255 255 255 / 0.6);
-  transition: color 300ms ease;
-}
-
-/* the level's mark and name */
-.pr-tiers__top {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
-}
-
-.pr-tiers__top svg {
-  flex-shrink: 0;
-  margin-top: -2px;
+  letter-spacing: -0.01em;
   color: rgb(255 255 255 / 0.62);
   transition: color 300ms ease;
 }
 
-/* how many times the lowest level's AI Workforce it gives */
-.pr-tiers__x {
-  font-family: var(--font-mono);
-  font-size: min(12px, 4cqi);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgb(255 255 255 / 0.5);
+.pr-tiers__opt svg {
+  flex-shrink: 0;
+  margin-top: -2px;
+  color: rgb(255 255 255 / 0.55);
   transition: color 300ms ease;
 }
 
@@ -198,26 +183,48 @@
   color: #fff;
 }
 
-.pr-tiers__opt.is-on .pr-tiers__top svg {
-  color: #d9b8ff;
-}
-
-.pr-tiers__opt.is-on .pr-tiers__x {
-  background: linear-gradient(90deg, #c9a8ff, #f3a6e6 50%, #ffc08f);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.pr-plan.is-featured .pr-tiers__opt.is-on .pr-tiers__top svg,
-.pr-plan.is-featured .pr-tiers__opt.is-on .pr-tiers__x {
-  background: none;
+.pr-tiers__opt.is-on svg {
   color: #fff;
 }
 
 .pr-tiers__opt:focus-visible {
   outline: 2px solid #fff;
   outline-offset: -2px;
+}
+
+/* a card too narrow for mark and word keeps the word */
+@container (max-width: 250px) {
+  .pr-tiers__opt svg {
+    display: none;
+  }
+}
+
+.pr-gains {
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  margin-top: 8px;
+  padding: 0 3px;
+  text-align: center;
+}
+
+.pr-gains span {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 0.4);
+  transition: color 300ms ease;
+}
+
+.pr-gains small {
+  display: none;
+}
+
+.pr-gains span.is-on {
+  background: linear-gradient(90deg, #c9a8ff, #f3a6e6 50%, #ffc08f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .pr-plan__list {
@@ -282,6 +289,9 @@
 
 /* narrower columns: the buttons' words get tighter */
 @media (max-width: 1100px) and (min-width: 861px) {
+  .pr-tiers__opt {
+    font-size: 12.5px;
+  }
   .pr-plan__cta {
     gap: 6px;
     padding: 0 8px;
@@ -367,29 +377,39 @@
   .pr-plan__num--word {
     font-size: 27px;
   }
-  .pr-tiers {
+  /* one line on phones: the switch, and beside it what the chosen level gives */
+  .pr-level {
     grid-area: tiers;
-    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-top: 9px;
-    border-radius: 999px;
   }
-  .pr-tiers__ink {
-    border-radius: 999px;
-  }
-  /* one line on phones: mark, name, gain */
-  .pr-tiers__opt {
-    flex-direction: row;
-    gap: 6px;
-    border-radius: 999px;
-  }
-  .pr-tiers.is-blank {
+  .pr-level.is-blank {
     display: none;
   }
-  .pr-tiers__opt {
-    font-size: min(12.5px, 3.6cqi);
+  .pr-tiers {
+    flex: 1;
+    height: 34px;
   }
-  .pr-tiers__x {
-    font-size: min(10.5px, 3.1cqi);
+  .pr-tiers__opt {
+    gap: 5px;
+    font-size: min(13px, 3.8cqi);
+  }
+  .pr-gains {
+    display: block;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+  }
+  .pr-gains span:not(.is-on) {
+    display: none;
+  }
+  .pr-gains small {
+    display: inline;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
   }
   /* what it includes: a row, wrapping between whole items */
   .pr-plan__list {
@@ -440,9 +460,11 @@
     gap: 0 8px;
     margin-top: 4px;
   }
+  .pr-level {
+    margin-top: 6px;
+  }
   .pr-tiers {
     height: 28px;
-    margin-top: 6px;
   }
   .pr-plan__cta {
     height: 29px;

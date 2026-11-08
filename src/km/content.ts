@@ -44,6 +44,12 @@ export interface Scenario {
   sources: string[]
   /** labels of the report's parts, in the language of the request */
   words: { findings: string; limits: string; sources: string; expected: string }
+  /** How it works plays it step by step: what it recognises in the words, the records it walks, what it counts */
+  how?: {
+    marks: { text: string; as: string }[]
+    walk: string[]
+    calc: { items: { v: string; l: string }[]; result: { v: string; l: string } }
+  }
 }
 
 const EN = { findings: 'Findings', limits: 'Limitations', sources: 'Sources', expected: 'expected' }
@@ -71,6 +77,15 @@ export const SCENARIOS: Scenario[] = [
     limits: ['No Decision records: the Ideas & Decisions module is not connected yet.'],
     sources: ['Goal · Cyprus AI market review · progress', 'Rule · goal verdict', 'Task · Draft the article', 'Task · Proofread & publish'],
     words: EN,
+    how: {
+      marks: [
+        { text: 'Why', as: 'Root cause' },
+        { text: 'Cyprus AI market review', as: 'Goal' },
+        { text: 'at risk', as: 'Verdict' },
+      ],
+      walk: ['cyprus', 'draft', 'proof', 'sources'],
+      calc: { items: [{ v: '33%', l: 'done' }, { v: '60%', l: 'expected by now' }], result: { v: '−27 pp', l: 'at risk' } },
+    },
   },
   {
     id: 'overview',
@@ -98,6 +113,14 @@ export const SCENARIOS: Scenario[] = [
     limits: ['Not connected yet: team pulse (HR), market share, profit, bugs, uptime. Their modules come later.'],
     sources: ['Goals · all', 'Tasks · by status', 'People · workspace'],
     words: EN,
+    how: {
+      marks: [
+        { text: 'Company', as: 'Whole workspace' },
+        { text: 'overview report', as: 'Company report' },
+      ],
+      walk: ['launch', 'cyprus', 'demo', 'draft', 'proof', 'sources', 'am', 'mk', 'ls'],
+      calc: { items: [{ v: '3', l: 'goals' }, { v: '19%', l: 'average progress' }], result: { v: '2', l: 'goals off plan' } },
+    },
   },
   {
     id: 'sum',
@@ -134,33 +157,36 @@ export const SCENARIOS: Scenario[] = [
     sources: [],
     words: EN,
   },
-]
-
-/** The four stages a report goes through before it arrives. */
-export const STAGES = ['Understanding the request', 'Walking the company graph', 'Calculating', 'Composing the report']
-
-/** Who is reading changes what the graph holds. */
-export const VIEWERS = [
   {
-    id: 'operator',
-    name: 'Operator',
-    role: 'workspace owner',
-    sees: 'Everything.',
-    answer: { kind: 'sum' as const, text: 'Sum of 1 accrual record linked to Lena Stone: 300.00 EUR. To pay 300.00 EUR, paid 0.' },
-  },
-  {
-    id: 'delivery',
-    name: 'Delivery team member',
-    role: 'workspace and the Delivery process',
-    sees: 'People, but not bookings, prices or money.',
-    answer: { kind: 'gap' as const, text: 'No amount: money records are outside what you may see, so they never entered your graph.' },
-  },
-  {
-    id: 'sales',
-    name: 'Sales · MK',
-    role: 'workspace and the Sales funnel',
-    sees: 'The workspace and the Sales funnel process.',
-    answer: { kind: 'gap' as const, text: 'No amount: accruals and payments are outside your access.' },
+    id: 'owe',
+    template: 'What we owe',
+    query: 'How much do we owe Lena Stone?',
+    intent: 'sum',
+    walked: 12,
+    title: 'Calculation report — Lena Stone',
+    prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
+    summary: 'Sum of 1 accrual record linked to Lena Stone: 300.00 EUR to pay, nothing paid yet.',
+    figures: [
+      { value: 300, unit: ' EUR', label: 'To pay', tone: 'warn' },
+      { value: 0, unit: ' EUR', label: 'Paid', tone: 'plain' },
+      { value: 1, label: 'Accrual', tone: 'plain' },
+    ],
+    findings: [
+      { status: 'Calculated', text: 'To pay: 300.00 EUR, summed per currency from 1 accrual record.', cites: ['c1'] },
+      { status: 'Confirmed', text: 'The accrual is based on her booking as a designer.', cites: ['c1', 'c2'] },
+    ],
+    limits: [],
+    sources: ['Accrual · 300.00 EUR', 'Booking · Lena Stone'],
+    words: EN,
+    how: {
+      marks: [
+        { text: 'How much', as: 'Sum' },
+        { text: 'owe', as: 'Accruals' },
+        { text: 'Lena Stone', as: 'Person' },
+      ],
+      walk: ['ls', 'book', 'acc'],
+      calc: { items: [{ v: '300.00 EUR', l: 'to pay' }, { v: '0.00 EUR', l: 'paid' }], result: { v: '300.00 EUR', l: 'owed' } },
+    },
   },
 ]
 

@@ -156,7 +156,7 @@ async function layoutPass(browser, { url = BASE, slides = SLIDES, tag = '' } = {
             })
             .map((sp) => `cut: ${sp.textContent.trim().slice(0, 28)}`)
           // Panel titles of visible interface pieces must be readable in full.
-          const truncated = [...(slide?.querySelectorAll('.pn__title, .pr-tiers__opt') ?? [])]
+          const truncated = [...(slide?.querySelectorAll('.pn__title, .pr-tiers__opt, .pr-tiers__l') ?? [])]
             .filter((t) => t.checkVisibility({ opacityProperty: true, visibilityProperty: true }) && t.scrollWidth > t.clientWidth + 1)
             .map((t) => `title: ${t.textContent.trim()}`)
           // the “Write to us” button in the corner never covers anything that can be clicked
@@ -723,7 +723,10 @@ async function functionalPass(browser) {
         last: [...x.querySelectorAll('.pr-plan__list li')].slice(-1).map((li) => li.textContent.replace(/\s+/g, ' ').trim()).join('|'),
         model: [...x.querySelectorAll('.pr-plan__list li')].some((li) => / model$/.test(li.textContent.trim())),
         href: x.querySelector('.pr-plan__cta')?.getAttribute('href'),
-        levels: [...x.querySelectorAll('[role="radio"]')].map((r) => `${r.querySelector('.pr-tiers__l')?.textContent.trim()} ${r.querySelector('.pr-tiers__x')?.textContent.trim()}${r.querySelector('svg') ? '' : ' (no icon)'}`).join('|'),
+        levels: [...x.querySelectorAll('[role="radio"]')].map((r) => `${r.querySelector('.pr-tiers__l')?.textContent.trim()}${r.querySelector('svg') ? '' : ' (no icon)'}`).join('|'),
+        gains: [...x.querySelectorAll('.pr-gains span')].map((g) => g.firstChild?.textContent.trim()).join('|'),
+        gainOn: x.querySelector('.pr-gains span.is-on')?.firstChild?.textContent.trim(),
+        gainInside: !!x.querySelector('.pr-tiers .pr-gains, .pr-tiers [class*="__x"]'),
         checked: x.querySelector('[role="radio"][aria-checked="true"] .pr-tiers__l')?.textContent.trim(),
       }))
     }
@@ -736,13 +739,13 @@ async function functionalPass(browser) {
     const seen = []
     for (const [plan, level, price, last, model] of levels) {
       const r = await pick(plan, level)
-      seen.push({ plan, level, ok: r.price === price && r.last === last && !r.model && r.checked === level && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
+      seen.push({ plan, level, ok: r.price === price && r.last === last && !r.model && r.checked === level && r.gainOn === { Low: '×1', Medium: '×1.7', High: '×3.3' }[level] && !r.gainInside && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
     }
-    const solo = seen[0].r.levels
-    const team = seen[2].r.levels
+    const solo = `${seen[0].r.levels} · ${seen[0].r.gains}`
+    const team = `${seen[2].r.levels} · ${seen[2].r.gains}`
     check(
-      'Pricing: inside Solo and Team a model level is chosen — each with its mark and how many times Low’s AI Workforce it gives (×1, ×1.7, ×3.3); Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model',
-      solo === 'Low ×1|Medium ×1.7|High ×3.3' && team === solo && seen.every((x) => x.ok),
+      'Pricing: inside Solo and Team a model level is chosen — a switch of mark and word, and under it, outside the switch, how many times Low’s AI Workforce each level gives (×1, ×1.7, ×3.3, the chosen one lit); Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model',
+      solo === 'Low|Medium|High · ×1|×1.7|×3.3' && team === solo && seen.every((x) => x.ok),
       `${solo} · ` + seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
@@ -1133,85 +1136,81 @@ async function kmPagePass(browser) {
     top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Platform' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
     JSON.stringify(top),
   )
-  // the report generator: the report above, the bar under it; it opens on a finished report, then the next request runs its stages
-  await go('report')
-  const first = await page
-    .waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 4000 })
+  // how it works: one block — a question is typed into the bar, then each step plays its own animation, and the report is composed
+  await go('how')
+  const lights = () => page.evaluate(() => document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim() ?? '')
+  const typing = await page
+    .waitForFunction(() => {
+      // the letters typed so far (the full question is in the screen-reader copy and the ghost)
+      const t = document.querySelector('.slide[data-state="active"] .kd-how__demo .prompt__q .type > span:nth-child(2)')?.textContent ?? ''
+      return t.length > 3 && t.length < 30
+    }, null, { timeout: 6000 })
+    .then(() => true)
+    .catch(() => false)
+  const askLit = await lights()
+  const understand = await page
+    .waitForSelector('.slide[data-state="active"] .kh-q .kh-mark', { timeout: 8000 })
+    .then(async () => {
+      await sleep(1500)
+      return page.evaluate(() => ({
+        marks: [...document.querySelectorAll('.slide[data-state="active"] .kh-mark')].map((m) => `${m.querySelector('.kh-mark__w').textContent}=${m.querySelector('.kh-mark__as').textContent}`).join('|'),
+        lit: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
+      }))
+    })
+    .catch(() => null)
+  const search = await page
+    .waitForFunction(() => document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-n.is-lit').length === 4, null, { timeout: 8000 })
+    .then(() =>
+      page.evaluate(() => ({
+        lit: [...document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-n.is-lit text')].map((t) => t.textContent.trim()).join('|'),
+        records: document.querySelector('.slide[data-state="active"] .kh-walked b')?.textContent.trim(),
+        labels: document.querySelectorAll('.slide[data-state="active"] .kg-e text, .slide[data-state="active"] .kg-n__t, .kp-graph__legend').length,
+        step: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
+      })),
+    )
+    .catch(() => null)
+  const count = await page
+    .waitForSelector('.slide[data-state="active"] .kh-calc', { timeout: 6000 })
+    .then(async () => {
+      await sleep(1900)
+      return page.evaluate(() => ({
+        items: [...document.querySelectorAll('.slide[data-state="active"] .kh-calc__item')].map((x) => x.textContent.replace(/\s+/g, ' ').trim()).join('|'),
+        result: document.querySelector('.slide[data-state="active"] .kh-calc__result')?.textContent.replace(/\s+/g, ' ').trim(),
+        step: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
+      }))
+    })
+    .catch(() => null)
+  const report = await page
+    .waitForSelector('.slide[data-state="active"] .kh .kr-sheet .kr-title', { timeout: 6000 })
     .then(async () => {
       await sleep(2400)
       return page.evaluate(() => {
-        const act = document.querySelector('.slide[data-state="active"]')
-        const s = act.querySelector('.kr-sheet')
-        const bar = act.querySelector('.kr-bar-row .prompt')
+        const a = document.querySelector('.slide[data-state="active"]')
+        const s = a.querySelector('.kr-sheet')
+        const bar = a.querySelector('.kd-how__demo .prompt')
         return {
           title: s.querySelector('.kr-title')?.textContent.trim(),
-          figs: [...s.querySelectorAll('.kr-fig__v')].map((f) => f.textContent.replace(/\s+/g, '')),
           ring: [s.querySelector('.kr-ring')?.getAttribute('data-v'), s.querySelector('.kr-ring__n')?.textContent.replace(/\s+/g, '')].join(' '),
+          figs: [...s.querySelectorAll('.kr-fig__v')].map((f) => f.textContent.replace(/\s+/g, '')).join(' '),
           parts: [...s.querySelectorAll('.kr-part h4')].map((h) => h.textContent.trim()).join('|'),
           badges: [...s.querySelectorAll('.kr-badge')].map((b) => b.textContent.trim()).join('|'),
-          query: act.querySelector('.kr-bar-row .prompt__q .sr-only')?.textContent.trim(),
-          barBelow: !!bar && bar.getBoundingClientRect().top >= s.getBoundingClientRect().bottom,
-          small: act.querySelectorAll('.kr-tpl, .kr-intent, .kr-kicker, .kr-prep, .kd-anatomy').length,
+          above: s.getBoundingClientRect().bottom <= bar.getBoundingClientRect().top + 1,
+          step: a.querySelector('.kh-steps li.is-now')?.textContent.trim(),
+          steps: [...a.querySelectorAll('.kh-steps li')].map((x) => x.textContent.trim()).join('|'),
         }
       })
     })
     .catch(() => null)
-  const stages = await page.waitForSelector('.slide[data-state="active"] .kr-steps', { timeout: 15000 }).then(() => page.$$eval('.slide[data-state="active"] .kr-steps li', (li) => li.map((x) => x.textContent.trim()))).catch(() => [])
-  const second = await page
-    .waitForSelector('.slide[data-state="active"] .kr-sheet .kr-bar__fill', { timeout: 8000 })
-    .then(async () => {
-      await sleep(1800)
-      return page.evaluate(() => {
-        const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
-        const b = s.querySelector('.kr-bar')
-        return { title: s.querySelector('.kr-title')?.textContent.trim(), bars: s.querySelectorAll('.kr-bar').length, grown: Math.round((b.querySelector('.kr-bar__fill').getBoundingClientRect().width / b.querySelector('.kr-bar__track').getBoundingClientRect().width) * 100), v: Number(b.dataset.v) }
-      })
-    })
-    .catch(() => null)
   check(
-    'Knowledge Management page: the report generator, the report above its bar — it opens on a finished report (a ring grown to 33% against 60% expected, figures counted up, findings with their statuses, limitations, sources; no templates or small print), then the next request is typed and runs the four stages and its report arrives with bars grown against plan',
-    first?.title === 'Root-cause report — Cyprus AI market review' && first.query === 'Why is the Cyprus AI market review at risk?' && first.ring === '33 33%' && first.figs.join(' ') === '−27pp 4 7' && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed' && first.barBelow && first.small === 0 &&
-      stages.length === 4 && /Walking the company graph/.test(stages[1]) && second?.title === 'Company report — Neuronium' && second.bars === 2 && Math.abs(second.grown - second.v) <= 2,
-    JSON.stringify({ stages: stages.length, ...first, second }),
+    'Knowledge Management page: “How it works” is the one block that shows a report being made — the question is typed into the bar (01 Ask); its words are recognised (02 Understand); the company graph appears and the question walks it, records counted, with no link labels or legend (03 Search the graph); what was found is counted (04 Count); and the report is composed over the bar — ring against plan, figures, findings with statuses, limitations, sources (05 Compose the report)',
+    typing && askLit === '01Ask' &&
+      understand?.marks === 'Why=Root cause|Cyprus AI market review=Goal|at risk=Verdict' && understand.lit === '02Understand' &&
+      search?.lit === 'Cyprus AI market review|Draft the article|Proofread & publish|Collect market sources' && Number(search.records) > 0 && search.labels === 0 && search.step === '03Search the graph' &&
+      count?.items === '33% done|60% expected by now' && count.result === '−27 pp at risk' && count.step === '04Count' &&
+      report?.title === 'Root-cause report — Cyprus AI market review' && report.ring === '33 33%' && report.figs === '−27pp 4 7' && report.parts === 'Findings|Limitations|Sources' && report.badges === 'Calculated|Confirmed' && report.above && report.step === '05Compose the report' &&
+      report.steps === '01Ask|02Understand|03Search the graph|04Count|05Compose the report' && !KM_SLIDES.some((x) => ['report', 'access', 'graph', 'rules'].includes(x.id)),
+    JSON.stringify({ typing, askLit, understand, search, count, report }),
   )
-  // how it works: one block — a question is typed, the graph appears and is walked, then the answer rises over the bar
-  await go('how')
-  const how = await page
-    .waitForFunction(() => document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-n.is-lit').length === 3, null, { timeout: 12000 })
-    .then(async () => {
-      const walk = await page.evaluate(() => {
-        const act = document.querySelector('.slide[data-state="active"]')
-        return {
-          lit: [...act.querySelectorAll('.kg--lg .kg-n.is-lit text')].map((t) => t.textContent.trim()).join('|'),
-          labels: act.querySelectorAll('.kg-e text, .kg-n__t, .kp-graph__legend').length,
-          steps: [...act.querySelectorAll('.kh-steps li')].map((x) => x.textContent.trim()).join('|'),
-        }
-      })
-      await page.waitForSelector('.slide[data-state="active"] .kh-answer', { timeout: 6000 })
-      await sleep(1400)
-      const ans = await page.evaluate(() => {
-        const act = document.querySelector('.slide[data-state="active"]')
-        const a = act.querySelector('.kh-answer')
-        const bar = act.querySelector('.kd-how__demo .prompt')
-        return { v: a.querySelector('.kh-answer__v')?.textContent.replace(/\s+/g, ''), src: a.querySelectorAll('.kh-src li').length, now: act.querySelector('.kh-steps li.is-now')?.textContent.trim(), above: a.getBoundingClientRect().bottom <= bar.getBoundingClientRect().top + 1 }
-      })
-      return { ...walk, ...ans }
-    })
-    .catch(() => null)
-  check(
-    'Knowledge Management page: “How it works” is one block — a question is typed into the bar, the company graph appears over it and the question walks it (no labels on links, no legend), then the answer rises over the bar with its figure and sources, while 01 Ask · 02 Search the graph · 03 Count · 04 Answer light in turn; the graph and principles blocks are gone',
-    how?.lit === 'Lena Stone|Booking|300.00 EUR' && how.labels === 0 && how.steps === '01Ask|02Search the graph|03Count|04Answer' && how.v === '300.00EUR' && how.src === 3 && how.now === '04Answer' && how.above && !KM_SLIDES.some((x) => x.id === 'graph' || x.id === 'rules'),
-    JSON.stringify(how),
-  )
-  await go('access')
-  const act = page.locator('.slide[data-state="active"]')
-  await act.getByRole('radio', { name: 'Delivery team member' }).click()
-  await sleep(400)
-  const delivery = await act.locator('.kp-answer__a').innerText()
-  await act.getByRole('radio', { name: 'Operator' }).click()
-  await sleep(400)
-  const operator = await act.locator('.kp-answer__a').innerText()
-  check('Knowledge Management page: “Viewing as” changes the answer', /300\.00 EUR/.test(operator) && /No amount/.test(delivery), JSON.stringify({ delivery: delivery.slice(0, 40), operator: operator.slice(0, 40) }))
   // its use cases: the landing's Cases, only Knowledge Management's; “All” opens every case filtered by it
   await go('cases')
   const uses = await page.evaluate(() => {

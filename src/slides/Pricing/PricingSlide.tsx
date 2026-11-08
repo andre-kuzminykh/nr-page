@@ -46,44 +46,50 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
       <p className="pr-plan__line">{p.line}</p>
 
       {tiers.length ? (
-        <div
-          className="pr-tiers"
-          role="radiogroup"
-          aria-label={`${p.name}: model`}
-          style={{ '--n': tiers.length, '--i': at } as CSSProperties}
-          onKeyDown={onKey}
-          data-own-keys
-        >
-          <span className="pr-tiers__ink" aria-hidden="true" />
-          {tiers.map((t) => {
-            const Icon = TIER_ICON[t]
-            const label = TIERS.find((x) => x.id === t)!.label
-            const gain = gainOf(p, t)
-            return (
-              <button
-                key={t}
-                type="button"
-                role="radio"
-                data-tier={t}
-                aria-checked={t === tier}
-                aria-label={`${label}, ${gain} AI Workforce`}
-                title={`${gain} the AI Workforce hours of ${TIERS.find((x) => x.id === tiers[0])!.label}`}
-                tabIndex={t === tier ? 0 : -1}
-                className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
-                onClick={() => setTier(t)}
-              >
-                <span className="pr-tiers__top">
-                  <Icon size={17} strokeWidth={2.4} aria-hidden="true" />
+        <div className="pr-level">
+          <div
+            className="pr-tiers"
+            role="radiogroup"
+            aria-label={`${p.name}: model`}
+            style={{ '--n': tiers.length, '--i': at } as CSSProperties}
+            onKeyDown={onKey}
+            data-own-keys
+          >
+            <span className="pr-tiers__ink" aria-hidden="true" />
+            {tiers.map((t) => {
+              const Icon = TIER_ICON[t]
+              const label = TIERS.find((x) => x.id === t)!.label
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  role="radio"
+                  data-tier={t}
+                  aria-checked={t === tier}
+                  aria-label={`${label}, ${gainOf(p, t)} AI Workforce`}
+                  tabIndex={t === tier ? 0 : -1}
+                  className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
+                  onClick={() => setTier(t)}
+                >
+                  <Icon size={16} strokeWidth={2.4} aria-hidden="true" />
                   <span className="pr-tiers__l">{label}</span>
-                </span>
-                <span className="pr-tiers__x">{gain}</span>
-              </button>
-            )
-          })}
+                </button>
+              )
+            })}
+          </div>
+          {/* how much more AI Workforce each level gives than the lowest, under each level */}
+          <div className="pr-gains" style={{ '--n': tiers.length } as CSSProperties} aria-hidden="true">
+            {tiers.map((t) => (
+              <span key={t} className={t === tier ? 'is-on' : ''} title={`${gainOf(p, t)} the AI Workforce hours of ${TIERS.find((x) => x.id === tiers[0])!.label}`}>
+                {gainOf(p, t)}
+                <small> AI Workforce</small>
+              </span>
+            ))}
+          </div>
         </div>
       ) : (
         // keeps the cards' lists level with each other
-        <div className="pr-tiers is-blank" aria-hidden="true" />
+        <div className="pr-level is-blank" aria-hidden="true" />
       )}
 
       <ul className="pr-plan__list">

@@ -1,13 +1,7 @@
-import { Check } from 'lucide-react'
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Prompt } from '../components/Prompt/Prompt'
-import { kmHref } from '../config/links'
-import { SCENARIOS, STAGES, type Figure, type Scenario } from './content'
+import { useEffect, useState, type CSSProperties } from 'react'
+import type { Figure, Scenario } from './content'
 
 const v = (vars: Record<string, string | number>) => vars as CSSProperties
-/** The stages take this long each; the finished report stays this long before the next request. */
-const STAGE_MS = 650
-const READ_MS = 6800
 
 /** A number that counts up to its value once `run` is on, after `delay` ms. */
 export function useCount(to: number, run: boolean, delay: number, ms = 1000) {
@@ -160,89 +154,5 @@ export function Report({ s, run }: { s: Scenario; run: boolean }) {
         </section>
       )}
     </article>
-  )
-}
-
-/**
- * The report generator, playing by itself, the way the landing's search does: the report above,
- * the bar under it. It opens on a finished report; then the next request types itself into the bar
- * and is sent, a thin line runs through the four stages, and its report rises in its place.
- * A request written by the visitor opens Knowledge Management with it.
- */
-export function ReportDemo({ live }: { live: boolean }) {
-  const [k, setK] = useState(0)
-  const [run, setRun] = useState(0)
-  const [phase, setPhase] = useState<'type' | 'stages' | 'report'>('report')
-  const [first, setFirst] = useState(true)
-  const [stage, setStage] = useState(0)
-  const [own, setOwn] = useState(false)
-  const s = SCENARIOS[k]
-  const timer = useRef(0)
-
-  // the stages, one after another, then the report; then the next request
-  useEffect(() => {
-    window.clearTimeout(timer.current)
-    if (!live || own) return
-    if (phase === 'stages') {
-      timer.current = window.setTimeout(() => {
-        if (stage < STAGES.length - 1) setStage(stage + 1)
-        else setPhase('report')
-      }, STAGE_MS)
-    } else if (phase === 'report') {
-      timer.current = window.setTimeout(() => {
-        setFirst(false)
-        setK((k + 1) % SCENARIOS.length)
-        setRun((r) => r + 1)
-        setStage(0)
-        setPhase('type')
-      }, READ_MS)
-    }
-    return () => window.clearTimeout(timer.current)
-  }, [phase, stage, live, own, k])
-
-  useEffect(() => {
-    if (!live) setPhase('report')
-  }, [live])
-
-  return (
-    <div className={`kr ${live ? 'is-live' : 'is-still'} is-${phase}`}>
-      <div className="kr-stage" aria-live="polite">
-        {phase === 'stages' && (
-          <ol className="kr-steps" style={v({ '--n': STAGES.length, '--at': stage })}>
-            {STAGES.map((label, i) => (
-              <li key={label} className={i < stage ? 'is-done' : i === stage ? 'is-now' : ''}>
-                <span className="kr-steps__dot">{i < stage ? <Check size={11} strokeWidth={2.8} aria-hidden="true" /> : null}</span>
-                <span className="kr-steps__l">
-                  {label}
-                  {i === 1 && <em> · {s.walked} records</em>}
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-        {phase === 'report' && <Report key={`${s.id}-${run}`} s={s} run={live} />}
-      </div>
-
-      <div className="kr-bar-row">
-        <Prompt
-          key={`${s.id}-${run}`}
-          label="Ask Knowledge Management"
-          placeholder="Ask anything about your company"
-          href={kmHref}
-          live={live && !own && !first}
-          text={s.query}
-          sent={phase !== 'type'}
-          onSent={() => {
-            if (phase === 'type') {
-              setStage(0)
-              setPhase('stages')
-            }
-          }}
-          delay={400}
-          onTake={() => setOwn(true)}
-          onLeave={() => setOwn(false)}
-        />
-      </div>
-    </div>
   )
 }
