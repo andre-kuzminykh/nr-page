@@ -39,9 +39,10 @@ The landing lives on **neuronium.ai**; the product lives on its own subdomains, 
 | “Open Platform” in the top menu (and in the phone menu) | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | “Open source”, next to it | `https://github.com/andre-kuzminykh` | `GITHUB_URL` in `links.ts` |
 | The bar on the hero and on the AI Superagent block, and the bar on the last block | `https://platform.neuronium.ai/?task=<the task>`; empty on the last block → the platform | `VITE_PLATFORM_URL` |
-| “Open Platform” on the AI Superagent block | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
+| “About Platform” under the AI Superagent title | `https://platform.neuronium.ai/` | `VITE_PLATFORM_URL` |
 | The bar in Knowledge Management | `https://management.neuronium.ai/km?q=<the question>` | `VITE_KM_URL` |
-| “Open Knowledge Management” beside the Km element | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
+| “About Knowledge Management” under its line | its own page, `/knowledge-management/` | `VITE_KM_ABOUT_URL` |
+| “Open Knowledge Management” on that page | `https://management.neuronium.ai/km` | `VITE_KM_URL` |
 | “Start Free Trial” on Own model, Solo and Team | `https://platform.neuronium.ai/?plan=own`, `?plan=<solo|team>&model=<low|medium|high>` | `VITE_PLATFORM_URL` |
 | “Contact sales” on Scale | the “Write to us” widget, about the Scale plan (or a sales page, if set) | `VITE_SALES_URL` |
 | Terms of Use · Privacy Policy (foot of the last block) | `https://andre.technology/terms/` · `https://andre.technology/privacy/` | `VITE_TERMS_URL` · `VITE_PRIVACY_URL` |
@@ -94,6 +95,25 @@ Pages project's Custom domains, and redirect `www` to the apex with a Redirect R
 **The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. In the same
 GoDaddy DNS add `CNAME platform` and `CNAME management`, each pointing to wherever that app is hosted (its host
 shows the value); nothing in this project serves them.
+
+## The AI Knowledge Management page
+
+`/knowledge-management/` is a page of its own (a second Vite entry: `knowledge-management/index.html` → `src/km/`),
+written from the feature's description (NR Management · M5). It scrolls as an ordinary page over the same light field,
+which moves with its sections:
+
+- **The report generator, live.** A request types itself into the bar and is sent; four stages run (*Understanding
+  the request → Walking the company graph — N records → Calculating → Composing the report*); then the report slides up:
+  title, who it was prepared for, the summary, key figures that count up, progress bars that grow against the expected
+  mark, findings with their status (*Calculated · Confirmed · Hypothesis*) and citations, limitations and sources.
+  The templates play their reports; a request in Russian gets a Russian report; a missing module is an honest gap.
+- **How it works** (GraphRAG in five steps), **three principles**, **questions → reports**, **the company knowledge
+  graph** (it draws itself, then questions walk it), **the ontology** (27 domains, 156 entity types, 25 modules — point
+  at a domain to see its types), **access** (“Viewing as” changes the answer), **honest gaps**, and **the modules still
+  to connect**. The bar at the end opens Knowledge Management with the question (`?q=`).
+
+The example reports use the product's demo workspace (its goals, tasks and people are samples). Static hosts serve the
+page at `/knowledge-management/` with no extra rule.
 
 ## Write to us
 
@@ -267,6 +287,7 @@ src/
     slides.ts                     block order, menu groups and light composition per block
     release.ts                    what is open on the site right now (staged release)
     ready.ts                      the open AI employees, for the FAQ
+  km/                             the AI Knowledge Management page: content, the live report generator, the knowledge graph
   config/links.ts                 where the buttons and bars lead, the social links, the contact endpoint
 api/contact.js                    the widget's messages → support@neuronium.ai (Vercel Function, Resend)
 scripts/                          validate-data, validate-api, validate-browser, simulate-user
