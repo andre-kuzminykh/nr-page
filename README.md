@@ -103,19 +103,18 @@ written from the feature's description (NR Management · M5). It is a deck like 
 blocks, gestures, transitions, light field, menu and progress line (`src/components/Deck`) — with its own blocks
 (`src/km/slides.ts`):
 
-1. **AI Knowledge Management** — the name, the line, and the bar (example requests type themselves, then “Try it
-   yourself”; a request opens Knowledge Management with it).
-2. **How it works** — the one block that shows a report being made, step by step, each step with its own
-   animation over the bar: **Ask** (the question is typed into the bar) → **Understand** (its words light and say
-   what they are recognised as: *Why* = root cause, *Cyprus AI market review* = goal, *at risk* = verdict) →
-   **Search the graph** (the company graph appears — names only, no link labels or legend — and the question walks
-   it while the records are counted) → **Count** (what was found, a line, what it comes to: 33% done, 60% expected
-   → −27 pp) → **Compose the report** (the report builds part by part: a ring against plan or bars for goals,
-   counted figures, findings with their status and citations, limitations, sources). Three questions — a goal at
-   risk, the company overview, what we owe an executor — then “Try it yourself”.
+1. **AI Knowledge Management** — the name, one line, and the bar (example requests type themselves, then “Try it
+   yourself”; a request opens Knowledge Management with it). No kicker, note or extra link.
+2. **How it works** — the one block that shows a report being made, step by step, each with its own animation over
+   the bar and no small print: **Ask** (the question is typed into the bar) → **Understand** (the question large;
+   the rest of it fades and the words that matter light up in turn) → **Search** (the company graph appears — names
+   only — and the question walks it; each link it takes lights up and a spark runs along it) → **Count** (one line
+   of large figures: 33% − 60% = −27 pp) → **Report** (composed part by part: a ring against plan, counted figures,
+   findings with their status and citations, limitations). The steps on the left are five words with a hairline
+   marking the one under way. Two questions — a goal at risk, what we owe an executor — then “Try it yourself”.
 3. **Use cases** — the landing's Cases block with Knowledge Management's seven cases, flowing in two rows; “All
    Knowledge Management cases” opens every case, filtered by it. 4. **Pricing** — the same block as on the
-   landing. 5. **FAQ** — its own. 6. **Ask your company** — its own end, with the bar and the foot.
+   landing. 5. **FAQ** — its own. 6. **Ask your company** — its own end, with the bar and the foot (no extra link).
 
 The menu reads How it works · Use cases · Pricing · FAQ · Contacts, with Open source and “Open AI OS”
 on the right, as on the landing; the logo leads back to the landing. The example reports use the product's demo
