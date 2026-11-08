@@ -105,22 +105,19 @@ blocks, gestures, transitions, light field, menu and progress line (`src/compone
 
 1. **AI Knowledge Management** — the name, the line, and the bar (example requests type themselves, then “Try it
    yourself”; a request opens Knowledge Management with it).
-2. **Ask a question. Get a report.** — the report sits over its bar, as the landing's search does. The block opens
-   on a finished report: a ring grown to the progress against the expected tick, figures that count up, findings with
-   their status and citations, limitations, sources. Then the next request types itself into the bar, one thin line
-   runs through the four stages (*Understanding the request → Walking the company graph · N records → Calculating →
-   Composing the report*), and its report rises — the company report with bars for its goals against plan, a count,
-   and a missing module as an honest gap, not a number.
-3. **How it works** — one block. A question types itself into the bar; the company graph appears over it (names only:
-   no link labels, no legend) and the question walks it record by record; then the graph steps back and the answer
-   rises with its figure and sources. *Ask · Search the graph · Count · Answer* light in turn on the left. Two
-   questions, then “Try it yourself”.
-4. **Access** — “Viewing as” changes the answer.
-5. **Use cases** — the landing's Cases block with only Knowledge Management's cases; “All Knowledge Management
-   cases” opens every case, filtered by it. 6. **Pricing** — the same block as on the landing. 7. **FAQ** — its own.
-   8. **Ask your company** — its own end, with the bar and the foot.
+2. **How it works** — the one block that shows a report being made, step by step, each step with its own
+   animation over the bar: **Ask** (the question is typed into the bar) → **Understand** (its words light and say
+   what they are recognised as: *Why* = root cause, *Cyprus AI market review* = goal, *at risk* = verdict) →
+   **Search the graph** (the company graph appears — names only, no link labels or legend — and the question walks
+   it while the records are counted) → **Count** (what was found, a line, what it comes to: 33% done, 60% expected
+   → −27 pp) → **Compose the report** (the report builds part by part: a ring against plan or bars for goals,
+   counted figures, findings with their status and citations, limitations, sources). Three questions — a goal at
+   risk, the company overview, what we owe an executor — then “Try it yourself”.
+3. **Use cases** — the landing's Cases block with Knowledge Management's seven cases, flowing in two rows; “All
+   Knowledge Management cases” opens every case, filtered by it. 4. **Pricing** — the same block as on the
+   landing. 5. **FAQ** — its own. 6. **Ask your company** — its own end, with the bar and the foot.
 
-The menu reads Report · How it works · Use cases · Pricing · FAQ · Contacts, with Open source and “Open Platform”
+The menu reads How it works · Use cases · Pricing · FAQ · Contacts, with Open source and “Open Platform”
 on the right, as on the landing; the logo leads back to the landing. The example reports use the product's demo
 workspace (its goals, tasks and people are samples). Static hosts serve the page at `/knowledge-management/` with no
 extra rule.
@@ -208,7 +205,7 @@ Latest results for the staged release (production build, headless Chromium with 
 - **Contact function**: `validate:api` passes — method, missing key, bad input, the bot trap, Reply-To and failures of the email provider.
 - **Browser**: **60 / 60 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
   - No block scrolls inside or is cut (a block too tall for a window is drawn smaller); no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, no JavaScript errors — on the landing and on the AI Knowledge Management page.
-  - The AI Knowledge Management page: its report generator (the report over its bar; it opens on a finished report — ring, figures counted, statuses — then the stages of the next request and its bars against plan), How it works (the graph appears and is walked, then the answer rises over the bar), viewers, its filtered use cases and All cases filtered by it, the shared pricing, its FAQ and its end.
+  - The AI Knowledge Management page: How it works step by step (typed into the bar; words recognised; the graph walked and the records counted, no labels or legend; the count; the report composed over the bar — ring, figures, statuses, limitations, sources), its seven use cases and All cases filtered by Knowledge Management, the shared pricing, its FAQ and its end.
   - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open Platform; links to closed blocks do nothing.
   - The input bar: the hero types its examples, then “Try it yourself”; clicking into the Superagent bar stops its demo and waits for the visitor's task.
   - Cases: two rows flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; All cases opens every case with a search.
@@ -234,8 +231,8 @@ Built and in the code; open now: 01, 02, 04 (1 · Km on its own), 15, 16, 17 (fo
 | 03 | 100 AI employees | One periodic table: Nr is element 0, the 10 departments are its rows, the 100 AI employees are elements 1–100. The table walks through its departments; hover or pick a department and its row lights up while the left side explains it in a few large lines; hover or pick an element (“44 · Sq”, then “Personalized Sequences”) to see what it does. Search by name, tool or symbol; arrow keys. |
 | 04–13 | Departments | Management · HR · Marketing · SMM · Sales · Support · Analytics · Design · Development · Engineering. Each block has its ten AI employees as elements (two rows of five) and **one interface at a time**: every five seconds the next AI employee takes over, its interface comes forward and the part it does lights up. Management is one interface that keeps turning, AI employee by AI employee in order — knowledge, meeting notes, goals, tasks, the board, the Gantt chart, the product, the calendar, the inbox and the team — with the same six tasks moving between the views, from To do to Done. |
 | 14 | Use cases | Your own AI employee as a node graph, the way a workflow editor shows it: grey nodes are the system, orange nodes are people, violet nodes are the LLM; data streams violet to orange along the connections, and a person can send work back for changes. It joins the table as element 101 and beyond. Three worked examples. |
-| 15 | Cases | Built for hundreds of cases. Two rows of cases flow by, one each way — a picture and a title each. Pointing at a row holds it; the case lifts, the others step back. A case with an `href` opens it; until then it says “Soon”. **All cases** opens every case on one page, with a search and its topics to filter by (All · Knowledge Management · AI Superagent). The cases are listed in `src/data/cases.ts`, each with its `topics`: with 12 or more, the two rows share them out; fewer than 3 stand still in one row; a real `image` replaces a drawn picture. |
-| 16 | Pricing | **Own model** first — $19 / month, bring your own Provider Key: AI Superagent, AI Management, your AI costs. **Solo**, for a solo builder, and **Team**, up to 10 people in a shared workspace — each at the model level chosen inside the card — Low, Medium and High each with a signal mark and how many times Low's AI Workforce hours it gives (×1, ×1.7, ×3.3): Solo Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000. The price rolls to the new one, the list ends with its hours (it does not name the model), and “Start Free Trial” tells the platform the plan and level. One AI Workforce hour is about one hour of work by one person: the FAQ says so, and so does the hours line when pointed at. **Scale**, Contact us, more than 10 people — shared workspace, custom AI Workforce; “Contact sales”. Every button is white. |
+| 15 | Cases | Built for hundreds of cases. Two rows of cases flow by, one each way — a picture and a title each. Pointing at a row holds it; the case lifts, the others step back. A case with an `href` opens it; until then it says “Soon”. **All cases** opens every case on one page, with a search and its topics to filter by (All · Knowledge Management · AI Superagent). The cases are listed in `src/data/cases.ts`, each with its `topics`: with 12 or more, the two rows share them out; fewer than 3 stand still in one row; `report`, `graph` and `ring` are drawn pictures too; a real `image` replaces a drawn picture. |
+| 16 | Pricing | **Own model** first — $19 / month, bring your own Provider Key: AI Superagent, AI Management, your AI costs. **Solo**, for a solo builder, and **Team**, up to 10 people in a shared workspace — each at the model level chosen inside the card — a switch of a signal mark and a word for Low, Medium and High, and under it, one under each level, how many times Low's AI Workforce hours it gives (×1, ×1.7, ×3.3; on phones the chosen one sits beside the switch): Solo Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000. The price rolls to the new one, the list ends with its hours (it does not name the model), and “Start Free Trial” tells the platform the plan and level. One AI Workforce hour is about one hour of work by one person: the FAQ says so, and so does the hours line when pointed at. **Scale**, Contact us, more than 10 people — shared workspace, custom AI Workforce; “Contact sales”. Every button is white. |
 | 17 | FAQ | Titled just “FAQ”. Questions that open in place — one at a time; none is open at first. Until all 100 are open: the answers for today, without questions about closed blocks. |
 | 18 | Run Your AI Business | “Run Your AI Business” on one line, “with Neuronium” smaller below, then just the input bar (“Describe your business task”): sending it opens the platform with the task. At the foot: the orange AIT logo, LinkedIn · X · Instagram · TikTok · YouTube · GitHub, Terms of Use, Privacy Policy. “Contacts”, last in the menu, leads here. |
 
@@ -301,7 +298,7 @@ src/
     release.ts                    what is open on the site right now (staged release)
     ready.ts                      the open AI employees, for the FAQ
   components/Deck/                the deck itself (blocks, gestures, light, menu) — used by both pages
-  km/                             the AI Knowledge Management page: its blocks, content, the live report generator, the graph
+  km/                             the AI Knowledge Management page: its blocks, content, How it works step by step, the report, the graph
   config/links.ts                 where the buttons and bars lead, the social links, the contact endpoint
 api/contact.js                    the widget's messages → support@neuronium.ai (Vercel Function, Resend)
 scripts/                          validate-data, validate-api, validate-browser, simulate-user
