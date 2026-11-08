@@ -45,6 +45,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
 const PLATFORM = process.env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
 const KM = process.env.VITE_KM_URL || 'https://management.neuronium.ai/km'
 const SUPPORT = 'support@neuronium.ai'
+const KM_ABOUT = '/knowledge-management/'
 const GITHUB = 'https://github.com/andre-kuzminykh'
 const OUT = path.resolve('validation')
 const SHOTS = path.join(OUT, 'screenshots')
@@ -875,9 +876,9 @@ async function functionalPass(browser) {
     })
   }
   check(
-    `Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → ${PLATFORM}${outs.km !== undefined ? `; “About Knowledge Management” under its line, above the Km element → ${KM}` : ''}`,
+    `Ways out, as quiet links without a background: “About Platform” under the AI Superagent title → ${PLATFORM}${outs.km !== undefined ? `; “About Knowledge Management” under its line, above the Km element → its page, ${KM_ABOUT}` : ''}`,
     outs.platform?.text === 'About Platform' && outs.platform.href === PLATFORM && outs.platform.seen && outs.platform.bg === 'rgba(0, 0, 0, 0)' &&
-      (outs.km === undefined || (outs.km?.text === 'About Knowledge Management' && outs.km.href === KM && outs.km.seen && outs.km.bg === 'rgba(0, 0, 0, 0)' && outs.km.order)),
+      (outs.km === undefined || (outs.km?.text === 'About Knowledge Management' && outs.km.href === KM_ABOUT && outs.km.seen && outs.km.bg === 'rgba(0, 0, 0, 0)' && outs.km.order)),
     JSON.stringify(outs),
   )
   // Cases: rows of pictures and titles flow by, one each way; pointing holds a row; All cases opens every case with a search
@@ -1093,9 +1094,130 @@ async function functionalPass(browser) {
   await r.close()
 }
 
+/** The AI Knowledge Management page: its report generator, its parts, and how it fits every window. */
+async function kmPagePass(browser) {
+  const url = new URL('knowledge-management/', BASE).href
+  // its demo writes a report by itself; templates play their reports; viewers change the answer
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+    const landed = []
+    await ctx.route(`${new URL(KM).origin}/**`, (r) => {
+      landed.push(r.request().url())
+      return r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>KM</title>' })
+    })
+    const page = await ctx.newPage()
+    trackErrors(page, 'knowledge-management')
+    await page.goto(url, { waitUntil: 'networkidle' })
+    const stages = await page.waitForSelector('.kr-steps', { timeout: 15000 }).then(() => page.$$eval('.kr-steps li', (li) => li.map((x) => x.textContent.trim()))).catch(() => [])
+    const first = await page
+      .waitForSelector('.kr-sheet .kr-title', { timeout: 20000 })
+      .then(async () => {
+        await sleep(2600)
+        return page.evaluate(() => {
+          const s = document.querySelector('.kr-sheet')
+          return {
+            title: s.querySelector('.kr-title')?.textContent.trim(),
+            figs: [...s.querySelectorAll('.kr-fig__v')].map((f) => f.textContent.replace(/\s+/g, '')),
+            bar: Math.round(parseFloat(getComputedStyle(s.querySelector('.kr-bar__fill')).width) / parseFloat(getComputedStyle(s.querySelector('.kr-bar__track')).width) * 100),
+            parts: [...s.querySelectorAll('.kr-part h4')].map((h) => h.textContent.trim()).join('|'),
+            badges: [...s.querySelectorAll('.kr-badge')].map((b) => b.textContent.trim()).join('|'),
+          }
+        })
+      })
+      .catch(() => null)
+    check(
+      'Knowledge Management page: its report generator types a request, runs the four stages (with the records walked), and a report arrives — title, figures counted up, the bar grown against plan, findings with their statuses, limitations, sources',
+      stages.length === 4 && /Walking the company graph/.test(stages[1]) && first?.title === 'Root-cause report — Cyprus AI market review' && first.figs.join(' ') === '33% −27pp 4 7' && Math.abs(first.bar - 33) <= 2 && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed',
+      JSON.stringify({ stages: stages.length, ...first }),
+    )
+    await page.locator('.kr-tpl', { hasText: 'Profit (not connected)' }).click()
+    const gap = await page
+      .waitForFunction(() => document.querySelector('.kr-sheet .kr-title')?.textContent.trim() === 'Расчёт', null, { timeout: 15000 })
+      .then(() => page.evaluate(() => ({ figs: document.querySelectorAll('.kr-sheet .kr-fig').length, limit: document.querySelector('.kr-sheet .kr-limits li')?.textContent.trim() })))
+      .catch(() => null)
+    await page.locator('#access').scrollIntoViewIfNeeded()
+    await page.getByRole('radio', { name: 'Delivery team member' }).click()
+    await sleep(400)
+    const delivery = await page.locator('.kp-answer__a').innerText()
+    await page.getByRole('radio', { name: 'Operator' }).click()
+    await sleep(400)
+    const operator = await page.locator('.kp-answer__a').innerText()
+    await page.locator('.kp-domain', { hasText: 'Finance' }).click()
+    const types = await page.locator('.kp-domain__types').innerText()
+    const dom = await page.evaluate(() => ({ domains: document.querySelectorAll('.kp-domain').length, nums: [...document.querySelectorAll('.kp-num small')].map((x) => x.textContent).join('|') }))
+    check(
+      'Knowledge Management page: a template plays its report (a request in Russian gets a Russian report, and a missing module is an honest gap, not a number); “Viewing as” changes the answer; the 27 ontology domains show their types',
+      gap?.figs === 0 && /модуля «Финансы»/.test(gap?.limit ?? '') && /300\.00 EUR/.test(operator) && /No amount/.test(delivery) && dom.domains === 27 && /Profit & margin/.test(types) && dom.nums === 'domains|entity types|Neuronium modules',
+      JSON.stringify({ gap, delivery: delivery.slice(0, 40), operator: operator.slice(0, 40), ...dom }),
+    )
+    // the way into the product, and back home
+    const ways = await page.evaluate(() => ({
+      cta: document.querySelector('.kp-cta')?.getAttribute('href'),
+      home: document.querySelector('.kp-logo')?.getAttribute('href'),
+      oss: document.querySelector('.kp-oss')?.getAttribute('href'),
+      foot: document.querySelectorAll('.kp-foot__social a').length,
+    }))
+    await page.locator('#end').scrollIntoViewIfNeeded()
+    await sleep(600)
+    const bar = page.locator('#end .prompt__input')
+    await bar.fill('Who owns pricing?')
+    await Promise.all([page.waitForURL((u) => u.href.startsWith(KM), { timeout: 6000 }).catch(() => {}), bar.press('Enter')])
+    check(
+      'Knowledge Management page: “Open Knowledge Management” leads to the product, the logo back to the landing; a question asked at the end opens Knowledge Management with it (?q=)',
+      ways.cta === KM && ways.home === '/' && ways.oss === GITHUB && ways.foot === 6 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
+      JSON.stringify({ ...ways, landed }),
+    )
+    await ctx.close()
+  }
+  // it fits every window: no sideways scroll, nothing cut at the sides, the parts arrive as they are reached
+  const fits = []
+  for (const [w, h] of [[1920, 1080], [1440, 900], [1024, 768], [768, 1024], [390, 844], [360, 640]]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, hasTouch: w < 800 })
+    const page = await ctx.newPage()
+    trackErrors(page, `knowledge-management ${w}x${h}`)
+    await page.goto(url, { waitUntil: 'networkidle' })
+    await sleep(800)
+    const H = await page.evaluate(() => document.documentElement.scrollHeight)
+    for (let y = 0; y <= H; y += Math.round(h * 0.7)) {
+      await page.evaluate((y) => window.scrollTo(0, y), y)
+      await sleep(220)
+    }
+    await sleep(900)
+    const m = await page.evaluate(() => {
+      const vw = innerWidth
+      const out = [...document.querySelectorAll('.kp *')].filter((el) => {
+        const r = el.getBoundingClientRect()
+        if (!r.width || el.closest('svg')) return false
+        return r.right > vw + 1 || r.left < -1
+      })
+      return {
+        x: document.documentElement.scrollWidth - vw,
+        out: out.slice(0, 3).map((e) => `${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}`),
+        unseen: [...document.querySelectorAll('[data-sec]')].filter((s) => !s.hasAttribute('data-in')).map((s) => s.id),
+        h1: (() => {
+          const h = document.querySelector('.kp-h1')
+          const r = document.createRange()
+          r.selectNodeContents(h)
+          return r.getBoundingClientRect().right <= h.getBoundingClientRect().right + 1
+        })(),
+      }
+    })
+    const dir = path.join(SHOTS, 'knowledge-management')
+    fs.mkdirSync(dir, { recursive: true })
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await sleep(300)
+    await page.screenshot({ path: path.join(dir, `${w}x${h}.jpg`), type: 'jpeg', quality: 78 })
+    fits.push({ size: `${w}x${h}`, ...m })
+    await ctx.close()
+  }
+  const bad = fits.filter((f) => f.x > 0 || f.out.length || f.unseen.length || !f.h1)
+  check('Knowledge Management page: at 1920×1080 … 360×640 no sideways scroll, nothing cut at the sides, the title fits, and every part arrives as it is reached', bad.length === 0, bad.length ? JSON.stringify(bad) : fits.map((f) => f.size).join(' · '))
+}
+
 const browser = await chromium.launch(LAUNCH)
 try {
   await functionalPass(browser)
+  await kmPagePass(browser)
   if (!process.env.SKIP_LAYOUT) await layoutPass(browser)
 } finally {
   await browser.close()

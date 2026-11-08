@@ -172,3 +172,10 @@
     transition: none;
   }
 }
+
+/* where the gutter is narrower than the “Write to us” button, the questions stop above it */
+@media (max-width: 1279px) {
+  .slide__frame.faq {
+    padding-bottom: calc((76px + env(safe-area-inset-bottom, 0px)) / var(--fit));
+  }
+}

@@ -361,8 +361,10 @@ const waitFor = async (fn, ms = 4500) => {
       if (alone) {
         await step(page, 'desktop', `Clicks element ${first.n} (${first.symbol})`, `${first.lead?.title ?? first.name} is the title; its element is picked and the line under it counts down to the next answer`, sel.title === (first.lead?.title ?? first.name) && sel.picked === first.name && sel.load === 1, JSON.stringify(sel))
         if (d.id === 'management' && first.n === 1) {
-          const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), KM, d.id)
-          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', `Knowledge Management opens (${KM})`, out.url === KM, out.url)
+          const out = await leave(page, () => page.locator('.slide[data-state="active"] .dept__more').click(), `${BASE}knowledge-management/`, d.id)
+          await page.waitForSelector('.kr-sheet', { timeout: 20000 }).catch(() => {})
+          const kmPage = await page.evaluate(() => ({ h1: document.querySelector('h1')?.textContent.replace(/\s+/g, ' ').trim(), report: document.querySelector('.kr-sheet .kr-title')?.textContent.trim() }))
+          await step(page, 'desktop', 'Clicks “About Knowledge Management” under its line', 'Its own page opens: AI Knowledge Management, with the report generator writing a report by itself', /AI Knowledge Management/.test(kmPage.h1 ?? '') && !!kmPage.report, JSON.stringify(kmPage))
           await out.back()
         }
       } else

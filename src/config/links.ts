@@ -10,6 +10,9 @@ const env = import.meta.env
 
 export const PLATFORM_URL: string = env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
 export const KM_URL: string = env.VITE_KM_URL || 'https://management.neuronium.ai/km'
+/** The landing itself, and its page about AI Knowledge Management (“About Knowledge Management”). */
+export const HOME_URL: string = env.VITE_HOME_URL || '/'
+export const KM_ABOUT_URL: string = env.VITE_KM_ABOUT_URL || '/knowledge-management/'
 
 export const SUPPORT_EMAIL = 'support@neuronium.ai'
 /** The contact widget posts here ({ email, subject, message }); api/contact.js sends it to support by email. */

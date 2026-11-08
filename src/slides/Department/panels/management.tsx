@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Avatar, Sym, Type } from '../../../components/Kit/Kit'
-import { KM_URL } from '../../../config/links'
+import { KM_ABOUT_URL } from '../../../config/links'
 import type { DepartmentStage, PanelRenderProps } from '../types'
 import { ANSWERS, ANSWER_MS, KnowledgeSearch } from './knowledge'
 import './management.css'
@@ -412,7 +412,7 @@ export const management: DepartmentStage = {
     1: {
       ms: ANSWER_MS,
       render: (p) => <KnowledgeSearch key={p.round} {...p} />,
-      cta: { label: 'About Knowledge Management', href: KM_URL },
+      cta: { label: 'About Knowledge Management', href: KM_ABOUT_URL },
     },
   },
 }
