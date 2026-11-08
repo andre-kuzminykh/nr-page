@@ -1135,6 +1135,8 @@ async function kmPagePass(browser) {
     JSON.stringify(top),
   )
   // how it works: one block — a question is typed into the bar, then each step plays its own animation, and the report is composed
+  // (the menu check above already turned to it; arrive afresh so the demo starts from its first question)
+  await go('start')
   await go('how')
   const lights = () => page.evaluate(() => document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim() ?? '')
   const typing = await page
