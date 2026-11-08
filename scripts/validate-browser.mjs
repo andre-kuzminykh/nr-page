@@ -1174,8 +1174,8 @@ async function kmPagePass(browser) {
     .then(async () => {
       await sleep(1900)
       return page.evaluate(() => ({
-        items: [...document.querySelectorAll('.slide[data-state="active"] .kh-calc__item')].map((x) => x.textContent.replace(/\s+/g, ' ').trim()).join('|'),
-        result: document.querySelector('.slide[data-state="active"] .kh-calc__result')?.textContent.replace(/\s+/g, ' ').trim(),
+        items: [...document.querySelectorAll('.slide[data-state="active"] .kh-calc__item')].map((x) => [...x.children].map((c) => c.textContent.trim()).join(' ')).join('|'),
+        result: [...(document.querySelector('.slide[data-state="active"] .kh-calc__result')?.children ?? [])].map((c) => c.textContent.trim()).join(' '),
         step: document.querySelector('.slide[data-state="active"] .kh-steps li.is-now')?.textContent.trim(),
       }))
     })
