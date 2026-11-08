@@ -57,43 +57,40 @@ The social links are the ones published on andre.technology; they are listed onc
 
 ## Hosting on neuronium.ai
 
-The site is plain static files. Navigation uses `#block` links (`neuronium.ai/#pricing`), so the host needs
-**no rewrite rules**: every address is served by `index.html`. File names under `assets/` carry a content hash,
-so they can be cached forever; only `index.html` must stay fresh (Vercel and Cloudflare do this by default).
+The site is published on **GitHub Pages**, the same way as andre-ait-page publishes andre.technology: every push
+to `main` runs [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml), which builds the site
+(`npm ci`, `npm run build`) and deploys `dist/`. Navigation uses `#block` links (`neuronium.ai/#pricing`), so no
+rewrite rules are needed; `/knowledge-management/` is a folder with its own `index.html`; any other address gets
+[`404.html`](public/404.html), which leads back home. `public/CNAME` holds `neuronium.ai`.
 
-The domain is registered at **GoDaddy**. The simplest path keeps its DNS there and hosts the site on **Vercel**:
-nothing moves away from GoDaddy, and existing records (such as mail for support@neuronium.ai) stay as they are.
+**1. GitHub: turn Pages on (once).**
+1. GitHub Pages needs the repository to be **public**, or a paid plan (GitHub Pro / Team) for a private one.
+   Public: the repository → Settings → General → Danger Zone → Change visibility → Public.
+2. The repository → **Settings → Pages** → Build and deployment → Source: **GitHub Actions**.
+3. Run the deploy once: **Actions → deploy-pages → Run workflow** (afterwards every push to `main` deploys by
+   itself). The site appears at the address Pages shows.
+4. Settings → Pages → **Custom domain**: `neuronium.ai` → Save. When the DNS check passes, tick **Enforce HTTPS**.
+5. Recommended: your GitHub profile → Settings → Pages → **Add a domain** → `neuronium.ai`; it shows one `TXT`
+   record to add at GoDaddy, which verifies the domain so no one else can use it on GitHub.
 
-**1. Vercel: deploy the site.**
-1. vercel.com → Add New → Project → import this GitHub repository. The Vite preset fills in the build command
-   (`npm run build`) and the output directory (`dist`); leave them. Deploy.
-2. The project → Settings → Domains → add `neuronium.ai`, then `www.neuronium.ai`, and choose to redirect `www` to
-   `neuronium.ai`. Vercel shows the DNS records each domain needs; keep that page open.
-
-**2. GoDaddy: point the domain at Vercel.** My Products → Domains → `neuronium.ai` → DNS.
+**2. GoDaddy: point the domain at GitHub Pages.** My Products → Domains → `neuronium.ai` → DNS.
 1. If the domain has **Forwarding** set, remove it first; GoDaddy keeps the `@` record locked while forwarding is on.
-2. Records for `@`: delete any existing `A` record (often “Parked”) and any `AAAA` record. Then add `A` · name `@` ·
-   value from the Vercel domain page (usually `76.76.21.21`).
-3. Record for `www`: edit the existing `CNAME www` (GoDaddy points it at `@`) to the value Vercel shows
-   (usually `cname.vercel-dns.com`).
+2. Delete the existing `A` record for `@` (often “Parked”) and any `AAAA` for `@`. Add four `A` records, name `@`:
+   `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
+   Optionally four `AAAA`, name `@`: `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`,
+   `2606:50c0:8003::153`.
+3. Edit the `CNAME` record `www` to point to `andre-kuzminykh.github.io` (GitHub then sends `www` to `neuronium.ai`).
 4. Leave the `MX`, `TXT` and `NS` records alone: mail and verification depend on them.
 
-The `api/` folder (the “Write to us” function) is deployed with the site; set its key as described in
-[Write to us](#write-to-us).
-
-Most changes are live within an hour (up to 48 hours). Vercel issues the HTTPS certificate on its own once the
-records match, and the domains turn green on its Domains page. From then on every push to `main` deploys, and
-every other branch and pull request gets a preview address.
-
-**Alternative: Cloudflare Pages.** Build command `npm run build`, output `dist`, `NODE_VERSION` = `22`. A root domain
-on Cloudflare Pages needs the domain's DNS on Cloudflare: add the site to Cloudflare, check that it copied every
-existing record (above all `MX` for mail), then replace the nameservers at GoDaddy (Domain → DNS → Nameservers →
-change → enter my own) with the two Cloudflare shows. Then add `neuronium.ai` and `www.neuronium.ai` under the
-Pages project's Custom domains, and redirect `www` to the apex with a Redirect Rule.
+DNS usually updates within an hour (up to 48). GitHub issues the HTTPS certificate on its own once the records match.
 
 **The product subdomains.** `platform.neuronium.ai` and `management.neuronium.ai` are separate apps. In the same
-GoDaddy DNS add `CNAME platform` and `CNAME management`, each pointing to wherever that app is hosted (its host
-shows the value); nothing in this project serves them.
+GoDaddy DNS add `CNAME platform` and `CNAME management`, each pointing to wherever that app is hosted; nothing in
+this project serves them.
+
+**Other hosts.** The site is plain static files, so any static host works. On **Vercel** (import the repository;
+the Vite preset fills in `npm run build` and `dist`), `api/contact.js` also runs as a function, and “Write to us”
+sends the message itself — see below.
 
 ## The AI Knowledge Management page
 
@@ -124,22 +121,23 @@ extra rule.
 
 The button in the bottom-right corner opens a small card: **your email**, **subject**, and an optional **message**
 (`src/components/Contact`). “Contact sales” on the Scale plan opens it too, with the subject “Scale plan”.
-It posts `{ email, subject, message }` to `/api/contact`, and the visitor sees “Sent. We’ll reply to …”.
-If sending fails, it says so and offers a plain email to support@neuronium.ai with the subject filled in.
 A hidden field catches bots; while the card is open, scrolling does not turn the block, and Escape closes it.
+Where the message goes is set by `VITE_CONTACT_ENDPOINT` at build time:
 
-`/api/contact` is [`api/contact.js`](api/contact.js), a Vercel Function that Vercel deploys on its own along with the site.
-It sends the message to support@neuronium.ai through [Resend](https://resend.com), with the visitor's address as
-Reply-To, so replying to the email answers them. To turn it on:
+- **`mailto`** — what GitHub Pages uses (it serves files only). “Send” opens the visitor's mail app with a message to
+  support@neuronium.ai, its subject, its text and “Reply to: their address”; the card says the message is ready to
+  send there.
+- **A form service** that takes JSON, such as [Formspree](https://formspree.io): set its address as the repository
+  variable `CONTACT_ENDPOINT` (Settings → Secrets and variables → Actions → Variables) and the next deploy posts
+  `{ email, subject, message }` to it; the visitor sees “Sent. We’ll reply to …”.
+- **`/api/contact`** (the default) — [`api/contact.js`](api/contact.js), a Vercel Function, for hosting on Vercel.
+  It sends the message to support@neuronium.ai through [Resend](https://resend.com) with the visitor's address as
+  Reply-To. To turn it on: add `neuronium.ai` in Resend and its DNS records in GoDaddy, create an API key, and set
+  `RESEND_API_KEY` (and, if needed, `CONTACT_TO`, `CONTACT_FROM`) in Vercel → Settings → Environment Variables.
+  Until the key is set, the function answers 503 and the widget offers the plain email.
 
-1. Create a Resend account, add the domain `neuronium.ai`, and add the DNS records Resend shows (SPF and DKIM
-   `TXT` records, an `MX` record for its bounce subdomain) in **GoDaddy → DNS**, next to the existing ones.
-2. Create an API key in Resend.
-3. In Vercel → the project → Settings → Environment Variables, add `RESEND_API_KEY` (and, if needed, `CONTACT_TO`,
-   `CONTACT_FROM`; the defaults are support@neuronium.ai and `Neuronium <hello@neuronium.ai>`). Redeploy.
-
-Until the key is set, the function answers 503 and the widget offers the plain email. Another backend can be used
-by pointing `VITE_CONTACT_ENDPOINT` at it. `npm run validate:api` checks the function with stand-ins (nothing is sent).
+If sending fails, the card says so and offers a plain email to support@neuronium.ai with the subject filled in.
+`npm run validate:api` checks the function with stand-ins (nothing is sent).
 
 ## Staged release
 

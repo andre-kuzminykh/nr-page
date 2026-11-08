@@ -1,0 +1,41 @@
+# Publishes neuronium.ai on GitHub Pages, the way andre-ait-page publishes andre.technology:
+# every push to main builds the site and deploys it (Settings → Pages → Source: “GitHub Actions”).
+name: deploy-pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+# Runs never cancel each other: they deploy one after another, so the newest commit lands last.
+concurrency:
+  group: pages-live
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Pages serves files only, so “Write to us” hands the message to the visitor's mail app — unless the
+      # repository variable CONTACT_ENDPOINT names a form service (Settings → Secrets and variables → Actions →
+      # Variables), e.g. a Formspree address.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_CONTACT_ENDPOINT: ${{ vars.CONTACT_ENDPOINT || 'mailto' }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
