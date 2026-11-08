@@ -202,8 +202,9 @@ Latest results for the staged release (production build, headless Chromium with 
 
 - **Data**: 10 departments × 10 = 100 AI employees (elements 1–100), with exact names, order and unique element symbols.
 - **Contact function**: `validate:api` passes — method, missing key, bad input, the bot trap, Reply-To and failures of the email provider.
-- **Browser**: **39 / 39 checks passed** at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844 and 375×667.
-  - Every open block fits without inner scroll, with no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, and no JavaScript errors.
+- **Browser**: **58 / 58 checks passed**, on both pages, at 1920×1080, 1440×900, 1440×760, 1366×657, 1280×800, 1024×768, 768×1024, 390×844, 375×667 and 360×640.
+  - No block scrolls inside or is cut (a block too tall for a window is drawn smaller); no horizontal overflow, cut headline lines or truncated panel titles, nothing under the “Write to us” button, no JavaScript errors — on the landing and on the AI Knowledge Management page.
+  - The AI Knowledge Management page: its report generator (stages, figures counted, bar grown, statuses), templates (a Russian request, an honest gap), viewers, ontology, use cases, the shared pricing, its FAQ and its end.
   - Only the open blocks are on the page; the menu shows Platform · Management · Cases · Pricing · FAQ · Contacts, then Open source and Open Platform; links to closed blocks do nothing.
   - The input bar: the hero types its examples, then “Try it yourself”; clicking into the Superagent bar stops its demo and waits for the visitor's task.
   - Cases: two rows flow by, one each way; pointing holds a row; each case is reached once by Tab and says “Soon” until it has a link; All cases opens every case with a search.
@@ -211,10 +212,10 @@ Latest results for the staged release (production build, headless Chromium with 
   - Knowledge Management answers one question after another, each with its sources and the documents it was found in.
   - Pricing shows Own model, Solo and Team with their model levels (the price, the model, its AI Workforce hours and the trial link follow the level picked) and Scale (Contact us), every button white; the FAQ names what is ready today.
   - Every way out leads where [the table above](#where-the-buttons-lead) says; the last block's task reaches the platform as `?task=`; the foot has the AIT logo, the six socials, support, Terms and Privacy. The platform and Knowledge Management are stand-in pages during the checks, so nothing leaves the machine. [Report](docs/validation/browser-report.md)
-- **Simulated users**: **45 / 45 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. The desktop visitor writes a task into the hero's bar, clicks through to the platform and Knowledge Management and comes back, opens Cases (holds a row, searches All cases), and writes to the team from “Contact sales”. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
+- **Simulated users**: **47 / 47 steps** behaved as expected for a desktop trackpad visitor, a phone visitor with swipes and a keyboard-only visitor. One trackpad flick always turns exactly one block, even while the page is busy. The desktop visitor writes a task into the hero's bar, clicks through to the platform and Knowledge Management and comes back, opens Cases (holds a row, searches All cases), and writes to the team from “Contact sales”. [Walkthrough with screenshots](docs/validation/user-walkthrough.md)
 - With everything opened in `release.ts`, the same scripts run the full tour of all blocks (last full run: 66 / 66 walkthrough steps).
 
-Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844),
+Screenshots: [desktop](docs/screenshots/desktop-1440x900), [phone](docs/screenshots/phone-390x844), [the AI Knowledge Management page](docs/screenshots/knowledge-management),
 contact sheets for all seven viewports in [docs/screenshots/sheets](docs/screenshots/sheets), and
 [reduced motion](docs/screenshots/reduced-motion-management.jpg).
 
