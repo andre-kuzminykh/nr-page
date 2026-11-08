@@ -7,8 +7,8 @@ import { useDemo } from '../components/Prompt/useDemo'
 import { useDeck, type SlideProps } from '../components/SlideController/DeckContext'
 import { COMPANY_URL, KM_URL, PRIVACY_URL, SOCIAL, TERMS_URL, kmHref } from '../config/links'
 import '../slides/Final/Final.css'
-import { PIPELINE, SCENARIOS, USE_CASES, VIEWERS } from './content'
-import { KnowledgeGraph } from './KnowledgeGraph'
+import { SCENARIOS, VIEWERS } from './content'
+import { HOW_STEPS, HowDemo } from './HowDemo'
 import { ReportDemo } from './ReportDemo'
 import './km.css'
 
@@ -82,14 +82,9 @@ export function KmReport({ active, shown }: SlideProps) {
   const { reducedMotion } = useDeck()
   return (
     <div className="slide__frame kd kd--report">
-      <div className="kd-report__text">
+      <div className="kd-side">
         <Kicker>The report generator</Kicker>
         <Title lines={['Ask a question.', 'Get a report.']} />
-        <ul className="kd-anatomy rv" style={d(300)}>
-          {['Summary', 'Key figures', 'Chart against plan', 'Findings: calculated, confirmed or hypothesis', 'Limitations', 'Numbered sources'].map((x) => (
-            <li key={x}>{x}</li>
-          ))}
-        </ul>
       </div>
       <div className="kd-report__demo rv" style={d(200)}>
         {shown && <ReportDemo live={active && !reducedMotion} />}
@@ -98,98 +93,32 @@ export function KmReport({ active, shown }: SlideProps) {
   )
 }
 
-/* ---------- 03 · how it works ---------- */
-export function KmHow(_: SlideProps) {
+/* ---------- 03 · how it works: ask, the graph is searched, the answer ---------- */
+export function KmHow({ active, shown }: SlideProps) {
+  const { reducedMotion } = useDeck()
+  const [step, setStep] = useState(-1)
   return (
     <div className="slide__frame kd kd--how">
-      <Kicker>How it works</Kicker>
-      <Title lines={['How a report gets built']} />
-      <p className="kd-lead rv" style={d(260)}>
-        Five steps from your question to a sourced report.
-      </p>
-      <ol className="kp-pipe">
-        <span className="kp-pipe__line rv rv--fade" style={d(400)} aria-hidden="true">
-          <i />
-        </span>
-        {PIPELINE.map((p, i) => (
-          <li key={p.n} className="rv" style={{ ...d(380 + i * 110), '--k': i } as CSSProperties}>
-            <span className="kp-pipe__n">{p.n}</span>
-            <h3>{p.title}</h3>
-            <p>{p.text}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
-
-/* ---------- 04 · three principles ---------- */
-export function KmRules(_: SlideProps) {
-  return (
-    <div className="slide__frame kd kd--rules">
-      <Kicker>Three principles</Kicker>
-      <Title lines={['A report you can check']} />
-      <div className="kp-rules">
-        <article className="kp-card rv" style={d(300)}>
-          <div className="kp-card__art kp-badges" aria-hidden="true">
-            <span className="kr-badge is-confirmed">Confirmed</span>
-            <span className="kr-badge is-calculated">Calculated</span>
-            <span className="kr-badge is-hypothesis">Hypothesis</span>
-            <span className="kr-cites">
-              <i>c1</i>
-              <i>c2</i>
-            </span>
-          </div>
-          <h3>Every claim is labelled</h3>
-          <p>Confirmed: a stored record, linked to its field. Calculated: by a named rule. Hypothesis: found in text. Every confirmed claim points to its source.</p>
-        </article>
-        <article className="kp-card rv" style={d(420)}>
-          <div className="kp-card__art kp-nodata" aria-hidden="true">
-            <span className="kp-nodata__v">—</span>
-            <span className="kp-nodata__l">Profit · Finance module not connected</span>
-          </div>
-          <h3>When data is missing, it says so</h3>
-          <p>A missing module, record, link or measurement becomes a limitation with its reason. Money is summed per currency and never replaced by a count of something else.</p>
-        </article>
-        <article className="kp-card rv" style={d(540)}>
-          <div className="kp-card__art kp-same" aria-hidden="true">
-            <span className="kp-same__doc" />
-            <span className="kp-same__eq">=</span>
-            <span className="kp-same__doc" />
-          </div>
-          <h3>Same question, same report</h3>
-          <p>The same data and the same request always give the same report, so a figure can be checked, compared and trusted.</p>
-        </article>
+      <div className="kd-side">
+        <Kicker>How it works</Kicker>
+        <Title lines={['From a question', 'to the answer']} />
+        <ol className="kh-steps rv" style={d(300)}>
+          {HOW_STEPS.map((x, i) => (
+            <li key={x} className={i === step ? 'is-now' : i < step ? 'is-done' : ''}>
+              <span>{String(i + 1).padStart(2, '0')}</span>
+              {x}
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="kd-how__demo rv" style={d(200)}>
+        {shown && <HowDemo live={active && !reducedMotion} onStep={setStep} />}
       </div>
     </div>
   )
 }
 
-/* ---------- 05 · the knowledge graph ---------- */
-export function KmGraph({ active }: SlideProps) {
-  const { reducedMotion } = useDeck()
-  return (
-    <div className="slide__frame kd kd--graph">
-      <div className="kd-graph__text">
-        <Kicker>The company knowledge graph</Kicker>
-        <Title lines={['Your company as', 'connected records']} />
-        <p className="kd-lead rv" style={d(260)}>
-          Goals, tasks, people, processes, bookings and money: each a record with its type, joined by typed links. One person is one record, so “AM” on the board and the account AM are both Alex Mercer.
-        </p>
-        <p className="kp-graph__legend rv" style={d(380)}>
-          <span className="is-link">stored link</span>
-          <span className="is-hyp">hypothesis: a name found in text</span>
-          <span className="is-walk">the walk a question takes</span>
-        </p>
-      </div>
-      <div className="kp-graph rv" style={d(200)}>
-        <KnowledgeGraph on={active && !reducedMotion} />
-      </div>
-    </div>
-  )
-}
-
-/* ---------- 06 · access ---------- */
+/* ---------- 04 · access ---------- */
 export function KmAccess(_: SlideProps) {
   const [viewer, setViewer] = useState(VIEWERS[0].id)
   const who = VIEWERS.find((x) => x.id === viewer)!
@@ -221,27 +150,7 @@ export function KmAccess(_: SlideProps) {
   )
 }
 
-/* ---------- 07 · use cases ---------- */
-export function KmCases(_: SlideProps) {
-  return (
-    <div className="slide__frame kd kd--cases">
-      <Kicker>Use cases</Kicker>
-      <Title lines={['Six questions it answers']} />
-      <div className="kp-uses">
-        {USE_CASES.map((u, i) => (
-          <article key={u.who} className="kp-use rv" style={d(260 + i * 90)}>
-            <p className="kp-use__who">{u.who}</p>
-            <p className="kp-use__ask">“{u.ask}”</p>
-            <p className="kp-use__r">{u.report}</p>
-            <p className="kp-use__res">{u.result}</p>
-          </article>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* ---------- 10 · ask your company ---------- */
+/* ---------- 08 · ask your company ---------- */
 export function KmEnd(_: SlideProps) {
   return (
     <div className="slide__frame fin kd--end">

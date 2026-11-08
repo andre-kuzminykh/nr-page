@@ -37,7 +37,7 @@ export interface Scenario {
   prepared: string
   summary: string
   figures: Figure[]
-  /** progress against plan: value and the level expected by now */
+  /** progress against plan: value and the level expected by now (one: a ring; more: bars) */
   chart?: { label: string; value: number; expected: number }[]
   findings: Finding[]
   limits: string[]
@@ -59,12 +59,11 @@ export const SCENARIOS: Scenario[] = [
     prepared: 'Prepared for Operator, workspace owner · Nov 7, 2026',
     summary: 'Cyprus AI market review is at risk: 33% done against 60% expected by elapsed time (−27 pp).',
     figures: [
-      { value: 33, unit: '%', label: 'Progress', tone: 'warn' },
       { value: -27, unit: ' pp', label: 'Against plan', tone: 'bad' },
       { value: 4, label: 'Days to deadline', tone: 'warn' },
       { value: 7, label: 'Sources', tone: 'plain' },
     ],
-    chart: [{ label: 'Cyprus AI market review', value: 33, expected: 60 }],
+    chart: [{ label: 'Done', value: 33, expected: 60 }],
     findings: [
       { status: 'Calculated', text: 'At risk: 33% done against 60% expected by elapsed time, by the goal rules.', cites: ['c1', 'c2'] },
       { status: 'Confirmed', text: 'Open work under the goal: Draft the article, Proofread & publish.', cites: ['c3', 'c4'] },
@@ -140,15 +139,6 @@ export const SCENARIOS: Scenario[] = [
 /** The four stages a report goes through before it arrives. */
 export const STAGES = ['Understanding the request', 'Walking the company graph', 'Calculating', 'Composing the report']
 
-/** How a report gets built, step by step. */
-export const PIPELINE = [
-  { n: '01', title: 'Understand', text: 'Works out what you are asking: a count, a cause, a status or an effect.' },
-  { n: '02', title: 'Link', text: 'Matches your words to real records: goals, tasks, people, money.' },
-  { n: '03', title: 'Walk the graph', text: 'Follows the links between records, only the ones you may see.' },
-  { n: '04', title: 'Calculate', text: 'Counts and sums by fixed, named rules.' },
-  { n: '05', title: 'Compose', text: 'Writes the report and cites every source.' },
-]
-
 /** Who is reading changes what the graph holds. */
 export const VIEWERS = [
   {
@@ -172,16 +162,6 @@ export const VIEWERS = [
     sees: 'The workspace and the Sales funnel process.',
     answer: { kind: 'gap' as const, text: 'No amount: accruals and payments are outside your access.' },
   },
-]
-
-/** Who uses it for what: each a request and the report it gets (from the product's examples). */
-export const USE_CASES = [
-  { who: 'Monday review', ask: 'Company overview report', report: 'Company report', result: '3 goals at 19% on average, 2 off plan; 11 open tasks; 4 people' },
-  { who: 'A goal slips', ask: 'Why is the Cyprus AI market review at risk?', report: 'Root-cause report', result: '−27 pp against plan, 4 days to the deadline, and the open work under it' },
-  { who: 'Paying executors', ask: 'How much do we owe Lena Stone?', report: 'Calculation report', result: '300.00 EUR to pay, 0 paid, summed per currency' },
-  { who: 'Daily stand-up', ask: 'How many tasks are in progress?', report: 'Calculation report', result: '3 tasks in progress, each with its source' },
-  { who: 'Who does what', ask: 'What tasks does MK own?', report: 'Records report', result: 'Maria Kovacs → owns → Cyprus bank AI audit, Fund portfolio demo' },
-  { who: 'Before a decision', ask: 'What effect did Collect market sources have?', report: 'Effect assessment', result: 'The work is recorded but no result was measured, so no effect is claimed' },
 ]
 
 /** The page's own questions. */

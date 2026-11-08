@@ -15,6 +15,7 @@ import { AI_EMPLOYEES, DEPARTMENTS } from '../src/data/departments.ts'
 import { ALL_SLIDES, SLIDES } from '../src/data/slides.ts'
 import { ALL_EMPLOYEES_OPEN, OPEN_EMPLOYEES } from '../src/data/release.ts'
 import { KM_NAV, KM_SLIDES } from '../src/km/slides.ts'
+import { CASES } from '../src/data/cases.ts'
 
 const require = createRequire(import.meta.url)
 
@@ -44,6 +45,9 @@ try {
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:4173/'
 // where the buttons lead (src/config/links.ts; the build is checked with its defaults)
 const PLATFORM = process.env.VITE_PLATFORM_URL || 'https://platform.neuronium.ai/'
+/** Knowledge Management's cases (its page shows only these) and how many cases there are in all. */
+const KM_CASES = CASES.filter((c) => c.topics.includes('Knowledge Management')).map((c) => c.title)
+const CASE_COUNT = CASES.length
 const KM = process.env.VITE_KM_URL || 'https://management.neuronium.ai/km'
 const SUPPORT = 'support@neuronium.ai'
 const KM_ABOUT = '/knowledge-management/'
@@ -152,7 +156,7 @@ async function layoutPass(browser, { url = BASE, slides = SLIDES, tag = '' } = {
             })
             .map((sp) => `cut: ${sp.textContent.trim().slice(0, 28)}`)
           // Panel titles of visible interface pieces must be readable in full.
-          const truncated = [...(slide?.querySelectorAll('.pn__title') ?? [])]
+          const truncated = [...(slide?.querySelectorAll('.pn__title, .pr-tiers__opt') ?? [])]
             .filter((t) => t.checkVisibility({ opacityProperty: true, visibilityProperty: true }) && t.scrollWidth > t.clientWidth + 1)
             .map((t) => `title: ${t.textContent.trim()}`)
           // the “Write to us” button in the corner never covers anything that can be clicked
@@ -693,8 +697,8 @@ async function functionalPass(browser) {
     })
     const want = [
       ['Own model', '$ 19 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Your AI Costs', 'own', ''],
-      ['Solo', '$ 99 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|Medium model|500 AI Workforce hours', 'solo', 'medium'],
-      ['Team', '$ 490 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|Shared workspace|Medium model|5 000 AI Workforce hours', 'team', 'medium'],
+      ['Solo', '$ 99 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|500 AI Workforce hours', 'solo', 'medium'],
+      ['Team', '$ 490 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|Shared workspace|5 000 AI Workforce hours', 'team', 'medium'],
       ['Scale', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Shared workspace|Custom AI Workforce', '', ''],
     ]
     const asWanted = pr.plans.length === 4 && want.every(([n, p, l, c, inc, id, model], k) => {
@@ -716,29 +720,30 @@ async function functionalPass(browser) {
       await sleep(250)
       return card.evaluate((x) => ({
         price: x.querySelector('.pr-plan__price')?.textContent.replace(/\s+/g, ''),
-        last: [...x.querySelectorAll('.pr-plan__list li')].slice(-2).map((li) => li.textContent.replace(/\s+/g, ' ').trim()).join('|'),
+        last: [...x.querySelectorAll('.pr-plan__list li')].slice(-1).map((li) => li.textContent.replace(/\s+/g, ' ').trim()).join('|'),
+        model: [...x.querySelectorAll('.pr-plan__list li')].some((li) => / model$/.test(li.textContent.trim())),
         href: x.querySelector('.pr-plan__cta')?.getAttribute('href'),
-        levels: [...x.querySelectorAll('[role="radio"]')].map((r) => r.textContent.trim()).join('|'),
-        checked: x.querySelector('[role="radio"][aria-checked="true"]')?.textContent.trim(),
+        levels: [...x.querySelectorAll('[role="radio"]')].map((r) => `${r.querySelector('.pr-tiers__l')?.textContent.trim()} ${r.querySelector('.pr-tiers__x')?.textContent.trim()}${r.querySelector('svg') ? '' : ' (no icon)'}`).join('|'),
+        checked: x.querySelector('[role="radio"][aria-checked="true"] .pr-tiers__l')?.textContent.trim(),
       }))
     }
     const levels = [
-      ['Solo', 'Low', '$59/month', 'Low model|300 AI Workforce hours', 'low'],
-      ['Solo', 'High', '$190/month', 'High model|1 000 AI Workforce hours', 'high'],
-      ['Team', 'Low', '$290/month', 'Low model|3 000 AI Workforce hours', 'low'],
-      ['Team', 'High', '$990/month', 'High model|10 000 AI Workforce hours', 'high'],
+      ['Solo', 'Low', '$59/month', '300 AI Workforce hours', 'low'],
+      ['Solo', 'High', '$190/month', '1 000 AI Workforce hours', 'high'],
+      ['Team', 'Low', '$290/month', '3 000 AI Workforce hours', 'low'],
+      ['Team', 'High', '$990/month', '10 000 AI Workforce hours', 'high'],
     ]
     const seen = []
     for (const [plan, level, price, last, model] of levels) {
       const r = await pick(plan, level)
-      seen.push({ plan, level, ok: r.price === price && r.last === last && r.checked === level && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
+      seen.push({ plan, level, ok: r.price === price && r.last === last && !r.model && r.checked === level && r.href === `${PLATFORM}?plan=${plan.toLowerCase()}&model=${model}`, r })
     }
     const solo = seen[0].r.levels
     const team = seen[2].r.levels
     check(
-      'Pricing: inside Solo and Team a model level is chosen — Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — and the price, the model, the hours and the trial link follow it',
-      solo === 'Low|Medium|High' && team === 'Low|Medium|High' && seen.every((x) => x.ok),
-      seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
+      'Pricing: inside Solo and Team a model level is chosen — each with its mark and how many times Low’s AI Workforce it gives (×1, ×1.7, ×3.3); Solo: Low $59 · Medium $99 · High $190 with 300 · 500 · 1 000 AI Workforce hours; Team: Low $290 · Medium $490 · High $990 with 3 000 · 5 000 · 10 000 — the price, the hours and the trial link follow it, and the list does not name the model',
+      solo === 'Low ×1|Medium ×1.7|High ×3.3' && team === solo && seen.every((x) => x.ok),
+      `${solo} · ` + seen.map((x) => `${x.plan} ${x.level} ${x.r.price}${x.ok ? '' : ' ✗ ' + JSON.stringify(x.r)}`).join(' · '),
     )
     await page.locator('.slide[data-state="active"] .pr-plan', { hasText: 'Scale' }).getByRole('button', { name: 'Contact sales' }).click()
     await sleep(500)
@@ -1128,39 +1133,76 @@ async function kmPagePass(browser) {
     top.h1 === 'AI Knowledge Management' && top.blocks === KM_SLIDES.length && top.items === KM_NAV.map((x) => x.label).join('|') && top.cta[0] === 'Open Platform' && top.cta[1] === PLATFORM && top.home === '/' && top.bar && turned === 1,
     JSON.stringify(top),
   )
-  // the report generator: it opens on a finished report, then the next request runs its stages
+  // the report generator: the report above, the bar under it; it opens on a finished report, then the next request runs its stages
   await go('report')
   const first = await page
     .waitForSelector('.slide[data-state="active"] .kr-sheet .kr-title', { timeout: 4000 })
     .then(async () => {
       await sleep(2400)
       return page.evaluate(() => {
-        const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
+        const act = document.querySelector('.slide[data-state="active"]')
+        const s = act.querySelector('.kr-sheet')
+        const bar = act.querySelector('.kr-bar-row .prompt')
         return {
           title: s.querySelector('.kr-title')?.textContent.trim(),
           figs: [...s.querySelectorAll('.kr-fig__v')].map((f) => f.textContent.replace(/\s+/g, '')),
-          bar: Math.round((parseFloat(getComputedStyle(s.querySelector('.kr-bar__fill')).width) / parseFloat(getComputedStyle(s.querySelector('.kr-bar__track')).width)) * 100),
+          ring: [s.querySelector('.kr-ring')?.getAttribute('data-v'), s.querySelector('.kr-ring__n')?.textContent.replace(/\s+/g, '')].join(' '),
           parts: [...s.querySelectorAll('.kr-part h4')].map((h) => h.textContent.trim()).join('|'),
           badges: [...s.querySelectorAll('.kr-badge')].map((b) => b.textContent.trim()).join('|'),
-          query: document.querySelector('.slide[data-state="active"] .kr-bar-row .prompt__q .sr-only')?.textContent.trim(),
+          query: act.querySelector('.kr-bar-row .prompt__q .sr-only')?.textContent.trim(),
+          barBelow: !!bar && bar.getBoundingClientRect().top >= s.getBoundingClientRect().bottom,
+          small: act.querySelectorAll('.kr-tpl, .kr-intent, .kr-kicker, .kr-prep, .kd-anatomy').length,
         }
       })
     })
     .catch(() => null)
   const stages = await page.waitForSelector('.slide[data-state="active"] .kr-steps', { timeout: 15000 }).then(() => page.$$eval('.slide[data-state="active"] .kr-steps li', (li) => li.map((x) => x.textContent.trim()))).catch(() => [])
-  check(
-    'Knowledge Management page: the report generator opens on a finished report — title, figures counted up, the bar grown against plan, findings with their statuses, limitations, sources — then the next request is typed and runs the four stages (with the records walked)',
-    first?.title === 'Root-cause report — Cyprus AI market review' && first.query === 'Why is the Cyprus AI market review at risk?' && first.figs.join(' ') === '33% −27pp 4 7' && Math.abs(first.bar - 33) <= 2 && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed' && stages.length === 4 && /Walking the company graph/.test(stages[1]),
-    JSON.stringify({ stages: stages.length, ...first }),
-  )
-  await page.locator('.slide[data-state="active"] .kr-tpl', { hasText: 'Profit' }).click()
-  const gap = await page
-    .waitForFunction(() => {
-      const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
-      return /profit last month/.test(s?.querySelector('.kr-prep')?.textContent ?? '') && s.querySelector('.kr-limits')
-    }, null, { timeout: 15000 })
-    .then(() => page.evaluate(() => ({ figs: document.querySelectorAll('.slide[data-state="active"] .kr-sheet .kr-fig').length, limit: document.querySelector('.slide[data-state="active"] .kr-sheet .kr-limits li')?.textContent.trim() })))
+  const second = await page
+    .waitForSelector('.slide[data-state="active"] .kr-sheet .kr-bar__fill', { timeout: 8000 })
+    .then(async () => {
+      await sleep(1800)
+      return page.evaluate(() => {
+        const s = document.querySelector('.slide[data-state="active"] .kr-sheet')
+        const b = s.querySelector('.kr-bar')
+        return { title: s.querySelector('.kr-title')?.textContent.trim(), bars: s.querySelectorAll('.kr-bar').length, grown: Math.round((b.querySelector('.kr-bar__fill').getBoundingClientRect().width / b.querySelector('.kr-bar__track').getBoundingClientRect().width) * 100), v: Number(b.dataset.v) }
+      })
+    })
     .catch(() => null)
+  check(
+    'Knowledge Management page: the report generator, the report above its bar — it opens on a finished report (a ring grown to 33% against 60% expected, figures counted up, findings with their statuses, limitations, sources; no templates or small print), then the next request is typed and runs the four stages and its report arrives with bars grown against plan',
+    first?.title === 'Root-cause report — Cyprus AI market review' && first.query === 'Why is the Cyprus AI market review at risk?' && first.ring === '33 33%' && first.figs.join(' ') === '−27pp 4 7' && first.parts === 'Findings|Limitations|Sources' && first.badges === 'Calculated|Confirmed' && first.barBelow && first.small === 0 &&
+      stages.length === 4 && /Walking the company graph/.test(stages[1]) && second?.title === 'Company report — Neuronium' && second.bars === 2 && Math.abs(second.grown - second.v) <= 2,
+    JSON.stringify({ stages: stages.length, ...first, second }),
+  )
+  // how it works: one block — a question is typed, the graph appears and is walked, then the answer rises over the bar
+  await go('how')
+  const how = await page
+    .waitForFunction(() => document.querySelectorAll('.slide[data-state="active"] .kg--lg .kg-n.is-lit').length === 3, null, { timeout: 12000 })
+    .then(async () => {
+      const walk = await page.evaluate(() => {
+        const act = document.querySelector('.slide[data-state="active"]')
+        return {
+          lit: [...act.querySelectorAll('.kg--lg .kg-n.is-lit text')].map((t) => t.textContent.trim()).join('|'),
+          labels: act.querySelectorAll('.kg-e text, .kg-n__t, .kp-graph__legend').length,
+          steps: [...act.querySelectorAll('.kh-steps li')].map((x) => x.textContent.trim()).join('|'),
+        }
+      })
+      await page.waitForSelector('.slide[data-state="active"] .kh-answer', { timeout: 6000 })
+      await sleep(1400)
+      const ans = await page.evaluate(() => {
+        const act = document.querySelector('.slide[data-state="active"]')
+        const a = act.querySelector('.kh-answer')
+        const bar = act.querySelector('.kd-how__demo .prompt')
+        return { v: a.querySelector('.kh-answer__v')?.textContent.replace(/\s+/g, ''), src: a.querySelectorAll('.kh-src li').length, now: act.querySelector('.kh-steps li.is-now')?.textContent.trim(), above: a.getBoundingClientRect().bottom <= bar.getBoundingClientRect().top + 1 }
+      })
+      return { ...walk, ...ans }
+    })
+    .catch(() => null)
+  check(
+    'Knowledge Management page: “How it works” is one block — a question is typed into the bar, the company graph appears over it and the question walks it (no labels on links, no legend), then the answer rises over the bar with its figure and sources, while 01 Ask · 02 Search the graph · 03 Count · 04 Answer light in turn; the graph and principles blocks are gone',
+    how?.lit === 'Lena Stone|Booking|300.00 EUR' && how.labels === 0 && how.steps === '01Ask|02Search the graph|03Count|04Answer' && how.v === '300.00EUR' && how.src === 3 && how.now === '04Answer' && how.above && !KM_SLIDES.some((x) => x.id === 'graph' || x.id === 'rules'),
+    JSON.stringify(how),
+  )
   await go('access')
   const act = page.locator('.slide[data-state="active"]')
   await act.getByRole('radio', { name: 'Delivery team member' }).click()
@@ -1169,14 +1211,34 @@ async function kmPagePass(browser) {
   await act.getByRole('radio', { name: 'Operator' }).click()
   await sleep(400)
   const operator = await act.locator('.kp-answer__a').innerText()
-  check(
-    'Knowledge Management page: a template plays its report (a missing module is an honest gap, not a number); “Viewing as” changes the answer',
-    gap?.figs === 0 && /Finance module, which is not connected yet/.test(gap?.limit ?? '') && /300\.00 EUR/.test(operator) && /No amount/.test(delivery),
-    JSON.stringify({ gap, delivery: delivery.slice(0, 40), operator: operator.slice(0, 40) }),
-  )
-  // its own use cases, the shared pricing, its own FAQ, its own end
+  check('Knowledge Management page: “Viewing as” changes the answer', /300\.00 EUR/.test(operator) && /No amount/.test(delivery), JSON.stringify({ delivery: delivery.slice(0, 40), operator: operator.slice(0, 40) }))
+  // its use cases: the landing's Cases, only Knowledge Management's; “All” opens every case filtered by it
   await go('cases')
-  const uses = await page.$$eval('.slide[data-state="active"] .kp-use', (u) => u.length)
+  const uses = await page.evaluate(() => {
+    const s = document.querySelector('.slide[data-state="active"]')
+    return {
+      title: s.querySelector('.cs__title')?.textContent.trim(),
+      cards: [...s.querySelectorAll('.cs-item:not([aria-hidden="true"]) .cs-title')].map((t) => t.textContent.trim()),
+      all: s.querySelector('.cs-all')?.textContent.replace(/\s+/g, ' ').trim(),
+    }
+  })
+  await page.locator('.slide[data-state="active"] .cs-all').click()
+  await sleep(600)
+  const ix = await page.evaluate(() => ({
+    title: document.querySelector('.cx__title')?.textContent.replace(/\s+/g, ' ').trim(),
+    on: document.querySelector('.cx__topic[aria-pressed="true"]')?.textContent.replace(/\d+/g, '').trim(),
+    cards: document.querySelectorAll('.cx .cs-item').length,
+  }))
+  await page.locator('.cx__topic', { hasText: 'All' }).click()
+  await sleep(300)
+  const everyCase = await page.$$eval('.cx .cs-item', (c) => c.length)
+  await page.keyboard.press('Escape')
+  await sleep(400)
+  check(
+    'Knowledge Management page: its use cases are the landing’s Cases block with only Knowledge Management’s cases; “All Knowledge Management cases” opens every case filtered by it, and the filter can be cleared',
+    uses.title === 'Use cases' && uses.cards.length === KM_CASES.length && uses.cards.every((t) => KM_CASES.includes(t)) && /All Knowledge Management cases/.test(uses.all) && ix.title === `Knowledge Management cases ${KM_CASES.length}` && ix.on === 'Knowledge Management' && ix.cards === KM_CASES.length && everyCase === CASE_COUNT,
+    JSON.stringify({ ...uses, ix, everyCase }),
+  )
   await go('pricing')
   const plans = await page.$$eval('.slide[data-state="active"] .pr-plan__name', (n) => n.map((x) => x.textContent.trim()).join('|'))
   await go('faq')
@@ -1193,9 +1255,9 @@ async function kmPagePass(browser) {
   await bar.fill('Who owns pricing?')
   await Promise.all([page.waitForURL((u) => u.href.startsWith(KM), { timeout: 6000 }).catch(() => {}), bar.press('Enter')])
   check(
-    'Knowledge Management page: its own use cases, the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)',
-    uses === 6 && plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 9 && faq.qs.includes('What is an AI Workforce hour?') && end.title === 'Ask your company' && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
-    JSON.stringify({ uses, plans, faq: faq.qs.length, ...end, landed: landed.length }),
+    'Knowledge Management page: the same pricing as the landing, its own FAQ (nothing open at first, and it says what an AI Workforce hour is), and its own end — “Ask your company”, whose bar opens Knowledge Management with the question (?q=)',
+    plans === 'Own model|Solo|Team|Scale' && faq.open === 0 && faq.qs[0] === 'What is AI Knowledge Management?' && faq.qs.length === 9 && faq.qs.includes('What is an AI Workforce hour?') && end.title === 'Ask your company' && end.foot === 6 && end.legal === 2 && landed.some((u) => new URL(u).searchParams.get('q') === 'Who owns pricing?'),
+    JSON.stringify({ plans, faq: faq.qs.length, ...end, landed: landed.length }),
   )
   await ctx.close()
 }

@@ -119,11 +119,11 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--n), minmax(0, 1fr));
-  height: 38px;
+  height: 52px;
   margin-top: clamp(16px, 2.6vh, 24px);
   padding: 3px;
   border: 1px solid rgb(255 255 255 / 0.1);
-  border-radius: 999px;
+  border-radius: 16px;
   background: rgb(255 255 255 / 0.035);
 }
 
@@ -138,7 +138,7 @@
   bottom: 3px;
   left: 3px;
   width: calc((100% - 6px) / var(--n));
-  border-radius: 999px;
+  border-radius: 13px;
   background: rgb(255 255 255 / 0.12);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
   transform: translateX(calc(var(--i) * 100%));
@@ -152,20 +152,66 @@
 
 .pr-tiers__opt {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   min-width: 0;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: 13px;
   white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: min(12.5px, 3.9cqi);
+  font-size: min(12.5px, 4.4cqi);
   font-weight: 500;
   letter-spacing: -0.005em;
   color: rgb(255 255 255 / 0.6);
   transition: color 300ms ease;
 }
 
+/* the level's mark and name */
+.pr-tiers__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.pr-tiers__top svg {
+  flex-shrink: 0;
+  margin-top: -2px;
+  color: rgb(255 255 255 / 0.62);
+  transition: color 300ms ease;
+}
+
+/* how many times the lowest level's AI Workforce it gives */
+.pr-tiers__x {
+  font-family: var(--font-mono);
+  font-size: min(12px, 4cqi);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgb(255 255 255 / 0.5);
+  transition: color 300ms ease;
+}
+
 .pr-tiers__opt:hover,
 .pr-tiers__opt.is-on {
+  color: #fff;
+}
+
+.pr-tiers__opt.is-on .pr-tiers__top svg {
+  color: #d9b8ff;
+}
+
+.pr-tiers__opt.is-on .pr-tiers__x {
+  background: linear-gradient(90deg, #c9a8ff, #f3a6e6 50%, #ffc08f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pr-plan.is-featured .pr-tiers__opt.is-on .pr-tiers__top svg,
+.pr-plan.is-featured .pr-tiers__opt.is-on .pr-tiers__x {
+  background: none;
   color: #fff;
 }
 
@@ -323,14 +369,27 @@
   }
   .pr-tiers {
     grid-area: tiers;
-    height: 32px;
+    height: 34px;
     margin-top: 9px;
+    border-radius: 999px;
+  }
+  .pr-tiers__ink {
+    border-radius: 999px;
+  }
+  /* one line on phones: mark, name, gain */
+  .pr-tiers__opt {
+    flex-direction: row;
+    gap: 6px;
+    border-radius: 999px;
   }
   .pr-tiers.is-blank {
     display: none;
   }
   .pr-tiers__opt {
     font-size: min(12.5px, 3.6cqi);
+  }
+  .pr-tiers__x {
+    font-size: min(10.5px, 3.1cqi);
   }
   /* what it includes: a row, wrapping between whole items */
   .pr-plan__list {

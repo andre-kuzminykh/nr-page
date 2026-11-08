@@ -1,12 +1,14 @@
-import { Check, MessageCircle, Sparkles } from 'lucide-react'
+import { Check, MessageCircle, SignalHigh, SignalLow, SignalMedium, Sparkles, type LucideIcon } from 'lucide-react'
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
-import { PLANS, TIERS, WORKFORCE_HOUR, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
+import { PLANS, TIERS, WORKFORCE_HOUR, gainOf, includesAt, tiersOf, type Plan, type Tier } from '../../data/pricing'
 import { openContact } from '../../lib/events'
 import './Pricing.css'
 
 const d = (ms: number) => ({ '--d': ms }) as CSSProperties
+/** Each model level's mark: the bars of a signal, one more per level. */
+const TIER_ICON: Record<Tier, LucideIcon> = { low: SignalLow, medium: SignalMedium, high: SignalHigh }
 
 /** A plan: its name, its price at the chosen model level, who it is for, the levels, what it includes, one button. */
 function PlanCard({ p, k }: { p: Plan; k: number }) {
@@ -53,20 +55,31 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
           data-own-keys
         >
           <span className="pr-tiers__ink" aria-hidden="true" />
-          {tiers.map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="radio"
-              data-tier={t}
-              aria-checked={t === tier}
-              tabIndex={t === tier ? 0 : -1}
-              className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
-              onClick={() => setTier(t)}
-            >
-              {TIERS.find((x) => x.id === t)!.label}
-            </button>
-          ))}
+          {tiers.map((t) => {
+            const Icon = TIER_ICON[t]
+            const label = TIERS.find((x) => x.id === t)!.label
+            const gain = gainOf(p, t)
+            return (
+              <button
+                key={t}
+                type="button"
+                role="radio"
+                data-tier={t}
+                aria-checked={t === tier}
+                aria-label={`${label}, ${gain} AI Workforce`}
+                title={`${gain} the AI Workforce hours of ${TIERS.find((x) => x.id === tiers[0])!.label}`}
+                tabIndex={t === tier ? 0 : -1}
+                className={`pr-tiers__opt ${t === tier ? 'is-on' : ''}`}
+                onClick={() => setTier(t)}
+              >
+                <span className="pr-tiers__top">
+                  <Icon size={17} strokeWidth={2.4} aria-hidden="true" />
+                  <span className="pr-tiers__l">{label}</span>
+                </span>
+                <span className="pr-tiers__x">{gain}</span>
+              </button>
+            )
+          })}
         </div>
       ) : (
         // keeps the cards' lists level with each other
