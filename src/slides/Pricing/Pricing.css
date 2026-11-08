@@ -232,6 +232,15 @@
   color: #c084fc;
 }
 
+/* what the plan does not have: crossed, and quieter */
+.pr-plan__list li.is-off {
+  color: rgb(255 255 255 / 0.38);
+}
+
+.pr-plan__list li.is-off svg {
+  color: rgb(255 255 255 / 0.32);
+}
+
 /* the button sits at the foot of every card, however much is above it */
 .pr-plan > :nth-last-child(2) {
   margin-bottom: clamp(22px, 4vh, 40px);

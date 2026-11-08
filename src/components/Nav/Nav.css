@@ -7,9 +7,13 @@
   /* same column as the blocks, so the logo lines up with the content on wide screens */
   max-width: calc(var(--frame-max) + 2 * var(--gutter));
   margin: 0 auto;
-  display: flex;
+  /* the logo, the menu in the very middle, the buttons: the sides share what is left equally, so
+     the menu sits at the centre of the page whenever there is room (and moves over when there is not) */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 20px;
+  --nav-btn: 40px;
   height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
   padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
   pointer-events: none;
@@ -20,6 +24,8 @@
 }
 
 .nav__brand {
+  grid-column: 1;
+  justify-self: start;
   position: relative;
   z-index: 2;
   display: inline-flex;
@@ -52,11 +58,20 @@
 
 /* ---------- desktop menu ---------- */
 .nav__menu {
+  grid-column: 2;
   position: relative;
   display: flex;
   align-items: center;
   gap: 2px;
-  margin: 0 auto;
+}
+
+/* Open source, the product button (and the burger on smaller screens), at the right */
+.nav__end {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav__item {
@@ -183,7 +198,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
+  box-sizing: border-box;
+  height: var(--nav-btn);
   padding: 0 16px 0 18px;
   border-radius: 999px;
   background: var(--fg);
@@ -213,10 +229,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
-  padding: 0 15px 0 13px;
+  box-sizing: border-box;
+  height: var(--nav-btn);
+  padding: 0 16px 0 14px;
   border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.16);
+  border: 1px solid rgb(255 255 255 / 0.24);
   background: rgb(11 10 15 / 0.35);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -235,10 +252,6 @@
   background: rgb(255 255 255 / 0.06);
 }
 
-.nav__oss + .nav__cta {
-  margin-left: -10px;
-}
-
 .nav__burger {
   position: relative;
   z-index: 2;
@@ -246,7 +259,6 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  margin-left: auto;
   border-radius: 50%;
   border: 1px solid rgb(255 255 255 / 0.16);
   background: rgb(11 10 15 / 0.35);
@@ -358,21 +370,20 @@
   .nav__burger {
     display: grid;
   }
-  /* Open source, the product button and the burger sit together on the right */
+  /* Open source, the product button and the burger sit together on the right, all one height */
+  .nav {
+    --nav-btn: 36px;
+  }
+  .nav__end {
+    gap: 8px;
+  }
   .nav__oss {
-    margin-left: auto;
-    margin-right: -10px;
-    height: 36px;
     padding: 0 13px 0 11px;
     font-size: 13px;
   }
   .nav__cta {
-    height: 36px;
     padding: 0 12px 0 14px;
     font-size: 13px;
-  }
-  .nav__oss ~ .nav__burger {
-    margin-left: -10px;
   }
 }
 

@@ -26,8 +26,8 @@ export interface Plan {
   hours?: Partial<Record<Tier, number>>
   /** The level the card opens on. */
   first?: Tier
-  /** What it includes; at a model level, its AI Workforce hours follow. */
-  includes: string[]
+  /** What it includes; at a model level, its AI Workforce hours follow. `{ not }` is shown crossed out. */
+  includes: (string | { not: string })[]
   cta: 'trial' | 'sales'
   featured?: boolean
 }
@@ -38,7 +38,7 @@ export const PLANS: Plan[] = [
     name: 'Own model',
     line: 'Bring your own Provider Key',
     price: 19,
-    includes: ['AI Superagent', 'AI Management', 'Your AI Costs'],
+    includes: ['AI Superagent', 'AI Management', { not: 'Shared workspace' }, 'Your AI Costs'],
     cta: 'trial',
   },
   {
@@ -48,7 +48,7 @@ export const PLANS: Plan[] = [
     prices: { low: 59, medium: 99, high: 190 },
     hours: { low: 300, medium: 500, high: 1000 },
     first: 'medium',
-    includes: ['AI Superagent', 'AI Management'],
+    includes: ['AI Superagent', 'AI Management', { not: 'Shared workspace' }],
     cta: 'trial',
   },
   {
@@ -81,8 +81,9 @@ const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u0
 export const WORKFORCE_HOUR = 'About one hour of work by one person.'
 
 /** What a plan includes at a level: its own items, then its hours of AI Workforce (the level itself is the switch). */
-export const includesAt = (p: Plan, tier?: Tier): string[] => {
-  if (!tier) return p.includes
-  const hours = p.hours?.[tier]
-  return [...p.includes, ...(hours ? [`${thousands(hours)} AI Workforce hours`] : [])]
+export const includesAt = (p: Plan, tier?: Tier): { label: string; off: boolean }[] => {
+  const hours = tier ? p.hours?.[tier] : undefined
+  return [...p.includes, ...(hours ? [`${thousands(hours)} AI Workforce hours`] : [])].map((x) =>
+    typeof x === 'string' ? { label: x, off: false } : { label: x.not, off: true },
+  )
 }

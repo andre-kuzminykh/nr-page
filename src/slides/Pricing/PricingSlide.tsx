@@ -1,4 +1,4 @@
-import { Check, MessageCircle, Sparkles } from 'lucide-react'
+import { Check, MessageCircle, Sparkles, X } from 'lucide-react'
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { SlideProps } from '../../components/SlideController/DeckContext'
 import { SALES_URL, trialHref } from '../../config/links'
@@ -93,12 +93,20 @@ function PlanCard({ p, k }: { p: Plan; k: number }) {
       )}
 
       <ul className="pr-plan__list">
-        {includesAt(p, tier).map((item) => (
-          <li key={item} title={/AI Workforce hours$/.test(item) ? `One AI Workforce hour: ${WORKFORCE_HOUR.toLowerCase()}` : undefined}>
-            <Check size={14} strokeWidth={2.2} aria-hidden="true" />
-            {item}
-          </li>
-        ))}
+        {includesAt(p, tier).map((item) =>
+          item.off ? (
+            <li key={item.label} className="is-off">
+              <X size={14} strokeWidth={2.2} aria-hidden="true" />
+              <span className="sr-only">Not included: </span>
+              {item.label}
+            </li>
+          ) : (
+            <li key={item.label} title={/AI Workforce hours$/.test(item.label) ? `One AI Workforce hour: ${WORKFORCE_HOUR.toLowerCase()}` : undefined}>
+              <Check size={14} strokeWidth={2.2} aria-hidden="true" />
+              {item.label}
+            </li>
+          ),
+        )}
       </ul>
 
       {p.cta === 'trial' ? (

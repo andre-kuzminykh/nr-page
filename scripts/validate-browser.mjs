@@ -696,8 +696,8 @@ async function functionalPass(browser) {
       }
     })
     const want = [
-      ['Own model', '$ 19 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Your AI Costs', 'own', ''],
-      ['Solo', '$ 99 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|500 AI Workforce hours', 'solo', 'medium'],
+      ['Own model', '$ 19 / month', 'Bring your own Provider Key', 'Start Free Trial', 'AI Superagent|AI Management|Not included: Shared workspace|Your AI Costs', 'own', ''],
+      ['Solo', '$ 99 / month', 'For a solo builder', 'Start Free Trial', 'AI Superagent|AI Management|Not included: Shared workspace|500 AI Workforce hours', 'solo', 'medium'],
       ['Team', '$ 490 / month', 'Up to 10 people', 'Start Free Trial', 'AI Superagent|AI Management|Shared workspace|5 000 AI Workforce hours', 'team', 'medium'],
       ['Scale', 'Contact us', 'More than 10 people', 'Contact sales', 'AI Superagent|AI Management|Shared workspace|Custom AI Workforce', '', ''],
     ]
@@ -709,7 +709,7 @@ async function functionalPass(browser) {
     // every button is white — the highlighted plan's too
     const white = pr.plans.every((x) => x.bg === pr.plans[0].bg && x.bgImage === 'none' && x.bg.match(/\d+/g).slice(0, 3).every((c) => Number(c) > 235))
     check(
-      'Pricing: Own model $19 first, then Solo and Team on the Medium model ($99 with 500 AI Workforce hours; $490 with 5 000 and a shared workspace), with Start Free Trial (to the platform, with the plan and level), and Scale “Contact us” with Contact sales — no other copy; every button white',
+      'Pricing: Own model $19 first, then Solo and Team on the Medium model ($99 with 500 AI Workforce hours; $490 with 5 000 and a shared workspace — crossed out on Own model and Solo), with Start Free Trial (to the platform, with the plan and level), and Scale “Contact us” with Contact sales — no other copy; every button white',
       asWanted && white && pr.title === 'Pricing' && pr.copy === 0,
       pr.plans.map((x) => `${x.name} ${x.price} · ${x.cta} → ${x.href.slice(0, 40) || x.tag} · ${x.bg}`).join(' | '),
     )

@@ -202,6 +202,7 @@ export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open Pl
         />
       </div>
 
+      <div className="nav__end">
       <a className="nav__oss" href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="Open source on GitHub">
         <BrandIcon brand="github" size={15} />
         <span>Open source</span>
@@ -221,6 +222,7 @@ export function TopNav({ slides = SLIDES, items = ITEMS, cta = { label: 'Open Pl
       >
         {sheetOpen ? <X size={20} strokeWidth={1.6} /> : <Menu size={20} strokeWidth={1.6} />}
       </button>
+      </div>
 
       {sheetOpen && (
         <div id="nav-sheet" className="nav__sheet" role="dialog" aria-modal="true" aria-label="Menu">
